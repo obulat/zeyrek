@@ -1,0 +1,260 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Zeyrek &mdash; Zeyrek 0.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> Zeyrek
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Zeyrek</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#user-guide">User Guide</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#disclaimer">Disclaimer</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Zeyrek</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>Zeyrek</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="zeyrek">
+<h1>Zeyrek<a class="headerlink" href="#zeyrek" title="Permalink to this headline">¶</a></h1>
+<p>Zeyrek is a python morphological analyzer and lemmatizer for Turkish.
+It is a partial port of the <a class="reference external" href="https://github.com/ahmetaa/zemberek-nlp">Zemberek-NLP Tools (Morphology)</a>
+Zeyrek can perform morphological analysis of Turkish text, returning all
+possible parses for each word, and lemmatize words, returning all possible
+base (non-inflected) forms of words.</p>
+</div>
+<div class="section" id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<p>To use Zeyrek, first create an instance of MorphAnalyzer class:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">zeyrek</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">analyzer</span> <span class="o">=</span> <span class="n">zeyrek</span><span class="o">.</span><span class="n">MorphAnalyzer</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Then, you can call its <cite>analyze</cite> method on words or texts to get all possible analyses:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">parse</span> <span class="ow">in</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="s1">&#39;benim&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">parse</span><span class="p">)</span>
+<span class="go">Parse(word=&#39;benim&#39;, lemma=&#39;ben&#39;, pos=&#39;Noun&#39;, morphemes=[&#39;Noun&#39;, &#39;A3sg&#39;, &#39;P1sg&#39;], formatted=&#39;[ben:Noun] ben:Noun+A3sg+im:P1sg&#39;)</span>
+<span class="go">Parse(word=&#39;benim&#39;, lemma=&#39;ben&#39;, pos=&#39;Pron&#39;, morphemes=[&#39;Pron&#39;, &#39;A1sg&#39;, &#39;Gen&#39;], formatted=&#39;[ben:Pron,Pers] ben:Pron+A1sg+im:Gen&#39;)</span>
+<span class="go">Parse(word=&#39;benim&#39;, lemma=&#39;ben&#39;, pos=&#39;Verb&#39;, morphemes=[&#39;Noun&#39;, &#39;A3sg&#39;, &#39;Zero&#39;, &#39;Verb&#39;, &#39;Pres&#39;, &#39;A1sg&#39;], formatted=&#39;[ben:Noun] ben:Noun+A3sg|Zero→Verb+Pres+im:A1sg&#39;)</span>
+<span class="go">Parse(word=&#39;benim&#39;, lemma=&#39;ben&#39;, pos=&#39;Verb&#39;, morphemes=[&#39;Pron&#39;, &#39;A1sg&#39;, &#39;Zero&#39;, &#39;Verb&#39;, &#39;Pres&#39;, &#39;A1sg&#39;], formatted=&#39;[ben:Pron,Pers] ben:Pron+A1sg|Zero→Verb+Pres+im:A1sg&#39;)</span>
+</pre></div>
+</div>
+<p>If you only need the base form of words, or lemmas, you can call <cite>lemmatize</cite>. It returns a list
+of tuples, with word itself and a list of possible lemmas:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">analyzer</span><span class="o">.</span><span class="n">lemmatize</span><span class="p">(</span><span class="s1">&#39;benim&#39;</span><span class="p">))</span>
+<span class="go">[(&#39;benim&#39;, [&#39;ben&#39;])]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>To install Zeyrek, run this command in your terminal:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> pip install zeyrek
+</pre></div>
+</div>
+</div>
+<div class="section" id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h1>
+<p>Zeyrek’s morphological analyzer returns instances of Parse object (based on pymorphy2’s Parse),
+which is a wrapper of namedtuple class.</p>
+<p>Parse object fields include:</p>
+<ul class="simple">
+<li><p><cite>word</cite>: the word itself</p></li>
+<li><p><cite>lemma</cite>: base form of the word, as found in a dictionary</p></li>
+<li><p><cite>pos</cite>: part of speech of the word. Note: Turkish is an agglutinative language, which makes it
+quite different from widespread European languages. A word can usually be much longer,
+made of Inflection Groups (IG), which can correspond to words in other languages. Each of these
+IGs can have its own part of speech, and the part of speech of the word as a whole is determined
+by the part of speech of the last IG.</p></li>
+<li><p><cite>morphemes</cite>: sequence of morphemes in the word, a list of strings - abbreviations of English names of morphemes.</p></li>
+<li><p><cite>formatted</cite>: a human-readable string representation of the analysis. There are several kinds of
+possible formats. Default formatter shows the dictionary item and its part of speech,
+and morphemes (with their surfaces, if available), divided into inflectional groups by <cite>|</cite> character.</p></li>
+</ul>
+</div>
+<div class="section" id="license">
+<h1>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h1>
+<p>Licensed under MIT License.
+Zemberek, from parts of which Zeyrek was ported, is under Apache License, Version 2.0.</p>
+</div>
+<div class="section" id="disclaimer">
+<h1>Disclaimer<a class="headerlink" href="#disclaimer" title="Permalink to this headline">¶</a></h1>
+<p>This project is in alpha stage, so the API can change.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Olga Bulat
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
