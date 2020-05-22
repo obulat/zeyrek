@@ -24,14 +24,14 @@ jobs:
         pip install setuptools wheel twine
     - name: Build and publish to test pypi
       env:
-        TWINE_USERNAME: obulat
+        TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.test_pypi_password }}
       run: |
         python setup.py sdist bdist_wheel
         twine upload -r testpypi dist/*
     - name: Build and publish to real pypi
       env:
-        TWINE_USERNAME: obulat
+        TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.pypi_password }}
       run: |
         python setup.py sdist bdist_wheel
