@@ -9,7 +9,9 @@ Zeyrek: Morphological Analyzer and Lemmatizer
 .. image:: https://readthedocs.org/projects/zeyrek/badge/?version=latest
         :target: https://zeyrek.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
-
+        
+.. image:: https://github.com/obulat/zeyrek/workflows/build/badge.svg?branch=master
+        :alt: build
 
 Zeyrek is a partial port of Zemberek library to Python for lemmatizing
 and analyzing Turkish language words. It is in alpha stage, and the API
