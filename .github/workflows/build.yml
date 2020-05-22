@@ -25,9 +25,11 @@ jobs:
         pip install flake8 pytest wheel
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         python -m nltk.downloader punkt
-    - name: Test with pytest
+        pip install coverage codecov pytest-cov
+    - name: Test with pytest and coverage
       run: |
         python -m pytest
+        py.test --cov-report=xml --cov=myproj tests/
     - name: Codecov
       uses: codecov/codecov-action@v1.0.7
 
