@@ -5,7 +5,7 @@
 
 from setuptools import setup
 
-with open('README.rst') as readme_file:
+with open('README.rst', encoding='utf-8') as readme_file:
     readme = readme_file.read()
 
 with open('HISTORY.rst') as history_file:
@@ -28,10 +28,11 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-    description="Python lemmatizer for Turkish",
+    description="Python morphological analyzer and lemmatizer for Turkish",
     install_requires=requirements,
     license="MIT license",
-    long_description=readme + '\n\n' + history,
+    long_description=readme,
+    long_description_content_type='text/x-rst',
     include_package_data=True,
     keywords='zeyrek',
     name='zeyrek',

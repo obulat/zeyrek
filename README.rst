@@ -12,7 +12,8 @@ Zeyrek: Morphological Analyzer and Lemmatizer
 
 
 Zeyrek is a partial port of Zemberek library to Python for lemmatizing
-and analyzing Turkish language words. It is not ready for use yet.
+and analyzing Turkish language words. It is in alpha stage, and the API
+will probably change.
 
 
 * Free software: MIT license
@@ -24,6 +25,7 @@ Basic Usage
 
 To use Zeyrek, first create an instance of MorphAnalyzer class::
 
+    >>> import zeyrek
     >>> analyzer = zeyrek.MorphAnalyzer()
 
 Then, you can call its `analyze` method on words or texts to get all possible analyses::
@@ -43,12 +45,13 @@ of tuples, with word itself and a list of possible lemmas::
 Credits
 -------
 
+This package is a Python port of part of the Zemberek_ package by `Ahmet A. Akın`_
+
+.. _Zemberek: https://github.com/ahmetaa/zemberek-nlp
+.. _Ahmet A. Akın: https://github.com/ahmetaa/
+
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
 
-This package is a Python port of part of the Zemberek_ package by `Ahmet A. Akın`_
-
-.. _Zemberek: https://github.com/ahmetaa/zemberek-nlp
-.. _Ahmet A. Akın: https://github.com/ahmetaa/

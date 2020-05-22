@@ -1,21 +1,13 @@
 from zeyrek import MorphAnalyzer
-lemmatizer = MorphAnalyzer()
-lemmas = lemmatizer.lemmatize('beyazlaştıracak')
-print(lemmas[0])
+analyzer = MorphAnalyzer()
 
-lemmatization = lemmatizer.lemmatize_text("Yarın doktora gideceğimizi öğrendi.")
-for sentence, lemmas in lemmatization:
-    print(sentence)
-    for word, lemma in lemmas:
-        print(f"{word}: {lemma}")
+with open('text.txt', encoding='utf-8') as text_file:
+    text = text_file.read()
 
-word_analysis = lemmatizer.analyze('beyazlaştıracak')
-for variant in word_analysis:
-    print(variant)
-
-analysis = lemmatizer.analyze("Yarın doktora gideceğimizi öğrendi.")
-for sentence, result in analysis:
-    for word_parse in result:
-        print(f"\n{word_parse[0].word}")
-        for parse in word_parse:
-            print(parse.formatted)
+# Analyze text from the file and print out formatted parses of each word.
+result = analyzer.analyze(text)
+for word_result in result:
+    print(word_result[0].word)
+    for parse in word_result:
+        print(parse.formatted)
+    print()
