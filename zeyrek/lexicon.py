@@ -195,8 +195,7 @@ class DictionaryItem:
         self.ref_item = None
 
     def __str__(self):
-        result = f"{self.lemma} [P:{self.primary_pos.value}]"
-        return result
+        return f"{self.lemma} [P:{self.primary_pos.value}]"
 
     def __repr__(self):
         return f"DictionaryItem({self.id_})"

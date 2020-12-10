@@ -83,10 +83,7 @@ def get_last_vowel(word):
 
 
 def contains_vowel(word):
-    for letter in word:
-        if letter in vowels_lower_set:
-            return True
-    return False
+    return any(letter in vowels_lower_set for letter in word)
 
 
 def vowel_count(word):
