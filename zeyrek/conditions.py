@@ -57,26 +57,17 @@ class CombinedCondition(Condition):
             return self.conditions[0].accept(path)
 
         if self.operator == 'AND':
-            for condition in self.conditions:
-                if not condition.accept(path):
-                    return False
-            return True
+            return all(condition.accept(path) for condition in self.conditions)
         else:
-            for condition in self.conditions:
-                if condition.accept(path):
-                    return True
-            return False
+            return any(condition.accept(path) for condition in self.conditions)
 
     def __len__(self):
         if len(self.conditions) == 0:
             return 0
-        result = 0
-        for condition in self.conditions:
-            if type(condition) == CombinedCondition:
-                result += len(condition)
-            else:
-                result += 1
-        return result
+        return sum(
+            len(condition) if type(condition) == CombinedCondition else 1
+            for condition in self.conditions
+        )
 
 
 def has(attribute):
@@ -187,10 +178,10 @@ class HasTailSequence(Condition):
         forms = path.transitions
         if len(forms) < len(self.morphemes):
             return False
-        for form, morph in zip(forms[-len(self.morphemes):], self.morphemes):
-            if form.morpheme != morph:
-                return False
-        return True
+        return all(
+            form.morpheme == morph
+            for form, morph in zip(forms[-len(self.morphemes) :], self.morphemes)
+        )
 
     def __repr__(self):
         return f"HasTailSequence({self.morphemes})"
@@ -270,11 +261,7 @@ class RootSurfaceIsAny(Condition):
         self.surfaces = surfaces
 
     def accept(self, path):
-        for s in self.surfaces:
-            if path.stem_transition.surface == s:
-                return True
-
-        return False
+        return any(path.stem_transition.surface == s for s in self.surfaces)
 
     def __repr__(self):
         return f"RootSurfaceIsAny({self.surfaces})"
@@ -300,10 +287,7 @@ class HasDerivation(Condition):
 
     def accept(self, path):
         suffixes = path.transitions
-        for suffix in suffixes:
-            if suffix.state.derivative:
-                return True
-        return False
+        return any(suffix.state.derivative for suffix in suffixes)
 
     def __repr__(self):
         return "HasDerivation"
@@ -414,7 +398,7 @@ class NoSurfaceAfterDerivation(Condition):
         for sf in reversed(suffixes):
             if sf.state.derivative or sf.is_derivational_or_root:  # TODO: check this
                 return True
-            if not len(sf.surface) == 0:
+            if len(sf.surface) != 0:
                 return False
         return True
 
@@ -428,10 +412,7 @@ class ContainsMorpheme(Condition):
 
     def accept(self, path):
         suffixes = path.transitions
-        for suffix in suffixes:
-            if suffix.state.morpheme in self.morphemes:
-                return True
-        return False
+        return any(suffix.state.morpheme in self.morphemes for suffix in suffixes)
 
     def __repr__(self):
         morphemes_str = ', '.join([m.id_ for m in self.morphemes])

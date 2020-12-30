@@ -110,10 +110,11 @@ class MorphemeState:
             self.add_outgoing(transition)
 
     def remove_transitions_to(self, morpheme: Morpheme):
-        transitions = []
-        for transition in self.outgoing:
-            if transition.to_.morpheme == morpheme:
-                transitions.append(transition)
+        transitions = [
+            transition
+            for transition in self.outgoing
+            if transition.to_.morpheme == morpheme
+        ]
 
         for transition in transitions:
             self.outgoing.remove(transition)
@@ -820,10 +821,9 @@ class StemTransitionsMapBased:
     def generate_transitions(self, dict_item: DictionaryItem):
 
         def has_modifier_attribute(item):
-            for attr in item.attributes:
-                if attr in StemTransitionsMapBased.modifiers:
-                    return True
-            return False
+            return any(
+                attr in StemTransitionsMapBased.modifiers for attr in item.attributes
+            )
 
         if dict_item.id_ in StemTransitionsMapBased.special_roots:
             return self.handle_special_roots(dict_item)
@@ -1058,13 +1058,12 @@ class StemTransitionsMapBased:
     def transitions_from_item(self, dict_item):
         if dict_item in self.different_stem_items:
             return self.different_stem_items.get(dict_item)
-        else:
-            transitions = self.transitions_from_stem(dict_item.root)
-            return [
-                transition
-                for transition in transitions
-                if transition.dict_item == dict_item
-            ]
+        transitions = self.transitions_from_stem(dict_item.root)
+        return [
+            transition
+            for transition in transitions
+            if transition.dict_item == dict_item
+        ]
 
     def add_dict_item(self, dict_item):
         transitions = self.generate_transitions(dict_item)

@@ -23,7 +23,7 @@ class PrimaryPos(Enum):
     Unknown = "Unk"
 
 
-primary_pos_set = set([pos.value for pos in list(PrimaryPos)])
+primary_pos_set = {pos.value for pos in list(PrimaryPos)}
 
 
 class SecondaryPos(Enum):
@@ -350,7 +350,7 @@ def infer_morphemic_attributes(word: str, pos_data, attrs: Set = None) -> Set:
             result.add(RootAttribute.Aorist_A)
         if last == 'l':
             result.add(RootAttribute.Passive_In)
-        if last_char_is_vowel or (last == 'l' or last == 'r') and vowel_count > 1:
+        if last_char_is_vowel or last in ['l', 'r'] and vowel_count > 1:
             result.add(RootAttribute.Causative_t)
     elif pos_data.primary_pos.value in ['Noun', 'Adjective', 'Duplicator']:
         # if a noun or adjective has more than one syllable and last letter is a stop consonant, add voicing.
