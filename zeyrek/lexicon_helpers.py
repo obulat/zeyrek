@@ -126,11 +126,10 @@ def turkish_numbers_to_string(word):
     result = []
     i = 0
     for c in word:
-        if c == '0':
-            result.append("sıfır")
-            i += 0
-        else:
+        if c != '0':
             break
+        result.append("sıfır")
+        i += 0
     rest = word[i:]
     if len(rest) > 0:
         result.append(convert_to_string(int(rest)))  # TODO: probably error, was blank
@@ -152,9 +151,8 @@ def guess_for_abbreviation(word):
     syllables = tr.vowel_count(word)
 
     first_two_cons = False
-    if len(word) > 2:
-        if tr.contains_vowel(word[:2]):
-            first_two_cons = True
+    if len(word) > 2 and tr.contains_vowel(word[:2]):
+        first_two_cons = True
     if syllables == 0 or len(word) < 3 or first_two_cons:
         return to_turkish_letter_pronunciation(word)
     else:
@@ -233,40 +231,37 @@ def get_pos_data(pos_str, word):
         return PosInfo(infer_primary_pos(word),
                        infer_secondary_pos(word)
                        )
-    else:
-        primary_pos = None
-        secondary_pos = None
-        tokens = [_.strip() for _ in pos_str.split(',')]
-        if len(tokens) > 2:
-            raise ValueError(f"Only two POS tokens are allowed in data chunk: {pos_str}")
-        for token in tokens:
-            if token not in primary_pos_set and token not in secondary_pos_set:
-                raise ValueError(f"Unrecognized pos data [{token}] in data chunk: {pos_str}")
+    primary_pos = None
+    secondary_pos = None
+    tokens = [_.strip() for _ in pos_str.split(',')]
+    if len(tokens) > 2:
+        raise ValueError(f"Only two POS tokens are allowed in data chunk: {pos_str}")
+    for token in tokens:
+        if token not in primary_pos_set and token not in secondary_pos_set:
+            raise ValueError(f"Unrecognized pos data [{token}] in data chunk: {pos_str}")
 
         #  Ques POS causes some trouble here. Because it is defined in both primary and secondary pos.
-        for token in tokens:
-            if token in primary_pos_set:
-                if primary_pos is None:
-                    primary_pos = PrimaryPos(token)
-                    continue
-                else:
-                    if pos_str == "Pron,Ques":
-                        primary_pos = PrimaryPos("Pron")
-                        secondary_pos = SecondaryPos("Ques")
-                    else:
-                        raise ValueError(f"Multiple primary pos in data chunk: {pos_str}")
-            elif token in secondary_pos_set:
-                if secondary_pos is None:
-                    secondary_pos = SecondaryPos(token)  # TODO: Test this works
-                    continue
-                else:
-                    raise ValueError(f"Multiple secondary pos in data chunk: {pos_str}")
+    for token in tokens:
+        if token in primary_pos_set:
+            if primary_pos is None:
+                primary_pos = PrimaryPos(token)
+                continue
+            else:
+                if pos_str != "Pron,Ques":
+                    raise ValueError(f"Multiple primary pos in data chunk: {pos_str}")
+                primary_pos = PrimaryPos("Pron")
+                secondary_pos = SecondaryPos("Ques")
+        elif token in secondary_pos_set:
+            if secondary_pos is not None:
+                raise ValueError(f"Multiple secondary pos in data chunk: {pos_str}")
 
-        # If there are no primary or secondary pos defined, try to infer them.
-        if primary_pos is None:
-            primary_pos = infer_primary_pos(word)
+            secondary_pos = SecondaryPos(token)  # TODO: Test this works
+            continue
+    # If there are no primary or secondary pos defined, try to infer them.
+    if primary_pos is None:
+        primary_pos = infer_primary_pos(word)
 
-        if secondary_pos is None:
-            secondary_pos = infer_secondary_pos(word)
+    if secondary_pos is None:
+        secondary_pos = infer_secondary_pos(word)
 
-        return PosInfo(primary_pos, secondary_pos)
+    return PosInfo(primary_pos, secondary_pos)

@@ -48,11 +48,15 @@ class RuleBasedAnalyzer:
             for path in current_paths:
                 # if there are no more letters to consume and path can be terminated, we accept this
                 # path as a correct result.
-                if len(path.tail) == 0:
-                    if path.is_terminal and PhoneticAttribute.CannotTerminate not in path.phonetic_attributes:
-                        logging.warning(f"APPENDING RESULT: {path}")
-                        result.append(path)
-                        continue
+                if (
+                    len(path.tail) == 0
+                    and path.is_terminal
+                    and PhoneticAttribute.CannotTerminate
+                    not in path.phonetic_attributes
+                ):
+                    logging.warning(f"APPENDING RESULT: {path}")
+                    result.append(path)
+                    continue
                 # Creates new paths with outgoing and matching transitions.
                 new_paths = self.advance(path)
                 logging.debug(f"\n--\nNew paths are: ")
@@ -174,7 +178,7 @@ def parse_analysis(search_path: SearchPath) -> _Single_Analysis:
             derivation_count += 1
         morpheme = transition.morpheme
         # we skip these two morphemes as they create visual noise and does not carry much information.
-        if morpheme == nom or morpheme == pnon:
+        if morpheme in [nom, pnon]:
             continue
         if len(transition.surface) == 0:
             morpheme_data = (morpheme, "")
@@ -186,21 +190,18 @@ def parse_analysis(search_path: SearchPath) -> _Single_Analysis:
         0 for _ in range(derivation_count + 1)
     ]  # we assume there is always an IG
     group_boundaries[0] = 0
-    morpheme_counter = 0
     derivation_counter = 1
-    for mdata in morphemes:
+    for morpheme_counter, mdata in enumerate(morphemes):
         if mdata[0].derivational:
             group_boundaries[derivation_counter] = morpheme_counter
             derivation_counter += 1
-        morpheme_counter += 1
-
     # if dictionary item is `Dummy`, use the referenced item.
     # `Dummy` items are usually generated for some compound words. For example for `zeytinyağı`
     # a DictionaryItem is generated with root "zeytinyağ". But here we switch to the original.
-    if search_path.dict_item.has_attribute(RootAttribute.Dummy):
+    if search_path.dict_item.has_attribute(
+        RootAttribute.Dummy
+    ) or not search_path.dict_item.has_attribute(RootAttribute.Dummy):
         # dict_item = search_path.dict_item.ref_item # this should work but doesn't
-        dict_item = search_path.dict_item
-    else:
         dict_item = search_path.dict_item
     ending = ''.join([_[1] for _ in morphemes[1:]]) if len(morphemes) > 1 else ''
     pos = 'Unknown'
