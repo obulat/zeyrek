@@ -29,7 +29,6 @@ class TextLexiconProcessor:
         self.late_entries = []
 
     def process_lines(self, lines: List) -> 'RootLexicon':
-        late_entries = []
         for line in lines:
             line = line.strip()
             if len(line) > 0 and not line.startswith("##"):
@@ -44,7 +43,7 @@ class TextLexiconProcessor:
                     else:
                         print(f"Dict item is none: {line_data}")
                 else:
-                    late_entries.append(line_data)
+                    self.late_entries.append(line_data)
         self._process_late_entries()
         return self.lexicon
 
