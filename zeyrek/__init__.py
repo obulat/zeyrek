@@ -4,7 +4,7 @@
 
 __author__ = """Olga Bulat"""
 __email__ = 'obulat@gmail.com'
-__version__ = '0.1.0'
+__version__ = '0.1.2'
 
 from .morphology import MorphAnalyzer
 
