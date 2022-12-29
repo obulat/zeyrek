@@ -22,7 +22,7 @@ copyright = '2020, Olga Bulat'
 author = 'Olga Bulat'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = '0.1.3'
 
 # -- General configuration ---------------------------------------------------
 
