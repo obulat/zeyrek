@@ -3578,13 +3578,13 @@ class SearchPath:
     def __repr__(self):
         return f"SearchPath({self.dict_item.id_}) (-{self.tail})({self.transitions})"
 
-    def copy(self, surface_node: SurfaceTransition, phonetic_attributes: Set = None):
+    def copy(self, surface_node: SurfaceTransition, pa: set[PhoneticAttribute] | None = None):
         phonetic_attributes = (
             calculate_phonetic_attributes(
-                surface_node.surface, self.phonetic_attributes
+                surface_node.surface, tuple(self.phonetic_attributes)
             )
-            if phonetic_attributes is None
-            else phonetic_attributes
+            if pa is None
+            else pa
         )
         is_terminal = surface_node.state.terminal
         hist = self.transitions[:]

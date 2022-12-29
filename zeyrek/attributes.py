@@ -77,12 +77,12 @@ class PosInfo(NamedTuple):
 
 
 class RootAttribute(Enum):
-    """These represents attributes of roots."""
+    """This represents attributes of roots."""
 
     # Generally Present tense (Aorist) suffix has the form [Ir]; such as gel-ir, bul-ur, kapat-ır.
     # But for most verbs with single syllable and compound verbs it forms as [Ar].
     # Such as yap-ar, yet-er, hapsed-er. There are exceptions for this case, such as "var-ır".
-    # Below two represents the attributes for clearing the ambiguity. These attributes does not
+    # Below two represents the attributes for clearing the ambiguity. These attributes do not
     # modify the root form.
     Aorist_I = auto()
     Aorist_A = auto()
@@ -282,10 +282,14 @@ no_vowel_attrs = [PhoneticAttribute.LastLetterConsonant, PhoneticAttribute.First
 
 
 @functools.lru_cache(maxsize=128, typed=False)
-def calculate_phonetic_attributes(word: str, predecessor_attrs=None) -> Set[PhoneticAttribute]:
+def calculate_phonetic_attributes(
+    word: str,
+    predecessor_attrs: tuple[PhoneticAttribute] | None = None
+) -> set[PhoneticAttribute]:
+    p_attrs = set() if predecessor_attrs is None else set(predecessor_attrs)
     # the word should be in lower case
     if len(word) == 0:
-        return predecessor_attrs
+        return p_attrs
     result = set()
     last_letter = word[-1]
     if last_letter in tr.vowels_lower_set:
@@ -313,7 +317,7 @@ def calculate_phonetic_attributes(word: str, predecessor_attrs=None) -> Set[Phon
     else:
         result.add(PhoneticAttribute.FirstLetterConsonant)
     if last_vowel is None:
-        result.update(predecessor_attrs)
+        result.update(p_attrs)
         result.update(no_vowel_attrs)
         result.discard(PhoneticAttribute.LastLetterVowel)
         result.discard(PhoneticAttribute.ExpectsConsonant)
@@ -321,8 +325,8 @@ def calculate_phonetic_attributes(word: str, predecessor_attrs=None) -> Set[Phon
     return result
 
 
-def parse_attr_data(data: str) -> Set:
-    attrs: Set = set()
+def parse_attr_data(data: str) -> set[RootAttribute]:
+    attrs = set()
     tokens = [_.strip() for _ in data.split(",")]
     for s in tokens:
         if s not in RootAttribute_set:
@@ -332,7 +336,7 @@ def parse_attr_data(data: str) -> Set:
     return attrs
 
 
-def infer_morphemic_attributes(word: str, pos_data, attrs: Set = None) -> Set:
+def infer_morphemic_attributes(word: str, pos_data, attrs: Set | None = None) -> set[RootAttribute]:
     result = attrs if attrs is not None else set()
     last = word[-1]
     last_char_is_vowel = tr.is_vowel(last)

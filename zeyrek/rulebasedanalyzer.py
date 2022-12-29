@@ -112,7 +112,7 @@ class RuleBasedAnalyzer:
             # if tail is equal to surface, no need to calculate phonetic attributes.
             tail_equals_surface = path.tail == surface
             attributes = path.phonetic_attributes if tail_equals_surface \
-                else calculate_phonetic_attributes(surface, frozenset(path.phonetic_attributes))
+                else calculate_phonetic_attributes(surface, tuple(path.phonetic_attributes))
 
             # This is required for suffixes like `cik` and `ciğ`
             # an extra attribute is added if "cik" or "ciğ" is generated and matches the tail.
