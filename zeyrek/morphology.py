@@ -5,16 +5,19 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 from zeyrek import tr
 from zeyrek.formatters import UDFormatter, DefaultFormatter
 from zeyrek.lexicon import RootLexicon
-from zeyrek.morphotactics import TurkishMorphotactics
-from zeyrek.rulebasedanalyzer import RuleBasedAnalyzer
-from typing import List, Tuple
+from zeyrek.morphotactics import TurkishMorphotactics, Morpheme
+from zeyrek.rulebasedanalyzer import RuleBasedAnalyzer, SingleAnalysis
+from typing import NamedTuple
 
 """Main module."""
 
-_Parse = collections.namedtuple('Parse', 'word, lemma, pos, morphemes, formatted')
 
-
-class Parse(_Parse):
+class Parse(NamedTuple):
+    word: str
+    lemma: str
+    pos: str
+    morphemes: list[Morpheme]
+    formatted: str
     """
     Parse result wrapper. Based on https://github.com/kmike/pymorphy2/blob/master/pymorphy2/analyzer.py
     """
@@ -34,14 +37,14 @@ class Parse(_Parse):
         return len(self.morphemes)
 
 
-def _normalize(word):
+def _normalize(word: str) -> str:
     word = tr.normalize_circumflex(tr.lower(word))
     # TODO: Decide what to do with apostrophes
     word = word.replace("'", "")
     return word
 
 
-def _tokenize_text(text):
+def _tokenize_text(text: str) -> list[str]:
     return word_tokenize(text.replace("'", "").replace("’", ""), language="turkish")
 
 
@@ -78,10 +81,9 @@ class MorphAnalyzer:
 
     formatters = {"UD": UDFormatter}
 
-    def __init__(self, lexicon=None, formatter=None):
-        self.lexicon = (
-            lexicon if lexicon is not None else RootLexicon.default_text_dictionaries()
-        )
+    def __init__(self, lexicon: "RootLexicon | None" = None, formatter: "Formatter | None" = None):
+        self.lexicon = lexicon or RootLexicon.default_text_dictionaries()
+
         self.morphotactics = TurkishMorphotactics(self.lexicon)
         self.analyzer = RuleBasedAnalyzer(self.morphotactics)
         self.formatter = (
@@ -90,7 +92,7 @@ class MorphAnalyzer:
             else MorphAnalyzer.formatters[formatter]()
         )
 
-    def _parse(self, word: str) -> List['SingleAnalysis']:
+    def _parse(self, word: str) -> list[SingleAnalysis]:
         """ Parses a word and returns SingleAnalysis result. """
         normalized_word = _normalize(word)
         return self.analyzer.analyze(normalized_word)
@@ -103,7 +105,7 @@ class MorphAnalyzer:
             result.append((sentence, sentence_analysis))
         return result
 
-    def analyze(self, text: str) -> List[List[Parse]]:
+    def analyze(self, text: str) -> list[list[Parse]]:
         """
         Public method that returns a list of analyses for each word in given text
         :param text: Text to analyze
@@ -113,7 +115,7 @@ class MorphAnalyzer:
         for word in _tokenize_text(text):
             analysis = self._parse(word)
             if len(analysis) == 0:
-                result.append([Parse(word, 'Unk', 'Unk', 'Unk', 'Unk')])
+                result.append([Parse(word, 'Unk', 'Unk', ['Unk'], 'Unk')])
             word_analysis = []
             for a in analysis:
                 if a is not None:
@@ -121,14 +123,14 @@ class MorphAnalyzer:
                     morpheme_list = [m[0].id_ for m in a.morphemes]
                     word_analysis.append(Parse(word, a.dict_item.lemma, a.pos.value, morpheme_list, formatted))
                 else:
-                    word_analysis.append(Parse(word, 'Unk', 'Unk', 'Unk', 'Unk'))
+                    word_analysis.append(Parse(word, 'Unk', 'Unk', ["Unk"], 'Unk'))
             result.append(word_analysis)
         return result
 
-    def lemmatize(self, text: str) -> List[Tuple[str, List]]:
+    def lemmatize(self, text: str) -> list[tuple[str, list]]:
         """
         This method will eventually use some form of disambiguation for lemmatizing.
-        Currently it simply returns all lemmas available for each word of the text.
+        Currently, it simply returns all lemmas available for each word of the text.
         :param text: The text which needs lemmatization.
         :return: A list of tuples: sentence and a list of list of
         lemmas for all words of the text
