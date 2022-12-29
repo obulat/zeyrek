@@ -284,7 +284,7 @@ no_vowel_attrs = [PhoneticAttribute.LastLetterConsonant, PhoneticAttribute.First
 @functools.lru_cache(maxsize=128, typed=False)
 def calculate_phonetic_attributes(
     word: str,
-    predecessor_attrs: tuple[PhoneticAttribute] | None = None
+    predecessor_attrs: "tuple[PhoneticAttribute] | None" = None
 ) -> set[PhoneticAttribute]:
     p_attrs = set() if predecessor_attrs is None else set(predecessor_attrs)
     # the word should be in lower case
@@ -336,7 +336,7 @@ def parse_attr_data(data: str) -> set[RootAttribute]:
     return attrs
 
 
-def infer_morphemic_attributes(word: str, pos_data, attrs: Set | None = None) -> set[RootAttribute]:
+def infer_morphemic_attributes(word: str, pos_data, attrs: "set[RootAttribute] | None" = None) -> set[RootAttribute]:
     result = attrs if attrs is not None else set()
     last = word[-1]
     last_char_is_vowel = tr.is_vowel(last)
