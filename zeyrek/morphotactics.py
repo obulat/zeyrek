@@ -1,5 +1,4 @@
-import sys, os
-from typing import List, Set, NamedTuple, Optional
+from typing import NamedTuple
 
 # sys.path.pop(0)
 # print(sys.path)
@@ -48,7 +47,7 @@ from zeyrek.lexicon import DictionaryItem, RootLexicon
 class Morpheme(NamedTuple):
     name: str
     id_: str
-    pos: Optional[PrimaryPos]
+    pos: "PrimaryPos | None"
     derivational: bool = False
     informal: bool = False
 
@@ -57,14 +56,14 @@ class Morpheme(NamedTuple):
 
 
 class MorphemeState:
-    def __init__(self, id_, morpheme, terminal=False, derivative=False, pos_root=False):
+    def __init__(self, id_: str, morpheme: Morpheme, terminal=False, derivative=False, pos_root=False):
         self.id_ = id_
         self.morpheme = morpheme
         self.terminal = terminal
         self.derivative = derivative
         self.pos_root = pos_root
-        self.outgoing = []
-        self.incoming = []
+        self.outgoing: list[MorphemeTransition] = []
+        self.incoming: list[SuffixTransition] = []
 
     def __str__(self):
         return f"[{self.id_}:{self.morpheme.id_}]"
@@ -72,7 +71,7 @@ class MorphemeState:
     def __repr__(self):
         return f"MorphemeState({self.id_}, {self.morpheme.id_})"
 
-    def add_outgoing(self, *suffix_transitions):
+    def add_outgoing(self, *suffix_transitions: "SuffixTransition | list[SuffixTransition]"):
         for transition in suffix_transitions:
             if transition in self.outgoing:
                 # Outgoing transition {transition} already exists in {self}")
@@ -81,7 +80,7 @@ class MorphemeState:
             self.outgoing.append(transition)
         return self
 
-    def add_incoming(self, suffix_transitions):
+    def add_incoming(self, suffix_transitions: list["SuffixTransition"]):
         for transition in suffix_transitions:
             if transition in self.incoming:
                 print(f"Incoming transition {transition} already exists in {self}")
@@ -89,12 +88,12 @@ class MorphemeState:
             self.incoming.append(transition)
         return self
 
-    def add(self, to_, template, condition=None):
+    def add(self, to_: "MorphemeState", template: str, condition: Condition | None = None):
         transition = SuffixTransition(self, to_, template, condition)
-        self.add_outgoing(transition)  # type: SuffixTransition
+        self.add_outgoing(transition)
         return self
 
-    def add_all(self, transitions):
+    def add_all(self, transitions: list[tuple["MorphemeState", str, Condition] | tuple["MorphemeState", str]]):
         for transition in transitions:
             self.add(*transition)
 
@@ -103,8 +102,10 @@ class MorphemeState:
         self.add_outgoing(transition)
         return self
 
-    def copy_outgoing_transitions_from(self, state):
+    def copy_outgoing_transitions_from(self, state: "MorphemeState"):
         for transition in state.outgoing:
+            if not isinstance(transition, SuffixTransition):
+                continue
             copy = transition.get_copy()
             copy.from_ = self
             self.add_outgoing(transition)
@@ -120,7 +121,7 @@ class MorphemeState:
             self.outgoing.remove(transition)
 
 
-morphemes = {}
+morphemes: dict[str, Morpheme] = {}
 
 
 def add_morpheme(*data):
@@ -766,9 +767,6 @@ class StemTransitionsMapBased:
     """
     Generates StemTransition objects from the dictionary item.
     Most of the time a single StemNode is generated.
-
-    @param item DictionaryItem
-    @return one or more StemTransition objects.
     """
 
     modifiers = {
@@ -803,24 +801,24 @@ class StemTransitionsMapBased:
         "birçoğu_Pron_Quant",
     }
 
-    def __init__(self, morphotactics):
+    def __init__(self, morphotactics: "TurkishMorphotactics"):
         self.lexicon: RootLexicon = morphotactics.lexicon
         self.morphotactics = morphotactics
-        self.multi_stems = {}
-        self.single_stems = {}
-        self.different_stem_items = {}
+        self.multi_stems: dict[str, list[StemTransition]] = {}
+        self.single_stems: dict[str, StemTransition] = {}
+        self.different_stem_items: dict[DictionaryItem, list[StemTransition]] = {}
         self.add_lexicon_items(self.lexicon.items)
 
-    def add_lexicon_items(self, items: List[DictionaryItem]):
+    def add_lexicon_items(self, items: list[DictionaryItem]):
         for dict_item in items:
             if dict_item is None:
                 print(dict_item)
             else:
                 self.add_dict_item(dict_item)
 
-    def generate_transitions(self, dict_item: DictionaryItem):
+    def generate_transitions(self, dict_item: DictionaryItem) -> list["StemTransition"]:
 
-        def has_modifier_attribute(item):
+        def has_modifier_attribute(item: DictionaryItem):
             return any(
                 attr in StemTransitionsMapBased.modifiers for attr in item.attributes
             )
@@ -835,11 +833,11 @@ class StemTransitionsMapBased:
             )
         return [transition]
 
-    def generate_modified_root_nodes(self, dict_item: DictionaryItem):
+    def generate_modified_root_nodes(self, dict_item: DictionaryItem) -> list["StemTransition"]:
         result = list(dict_item.pronunciation)
         original_attrs = calculate_phonetic_attributes(dict_item.pronunciation)
         modified_attrs = original_attrs.copy()
-        modified_root_state = None
+        modified_root_state_value: "MorphemeState | None" = None
         unmodified_root_state = None
         for attr in dict_item.attributes:
             if attr == RootAttribute.Voicing:
@@ -874,7 +872,7 @@ class StemTransitionsMapBased:
                         original_attrs.add(PhoneticAttribute.ExpectsConsonant)
                     else:
                         unmodified_root_state = verbLastVowelDropUnmodRoot_S
-                        modified_root_state = verbLastVowelDropModRoot_S
+                        modified_root_state_value = verbLastVowelDropModRoot_S
                 modified_attrs.add(PhoneticAttribute.ExpectsVowel)
                 modified_attrs.add(PhoneticAttribute.CannotTerminate)
             elif attr == RootAttribute.InverseHarmony:
@@ -897,8 +895,7 @@ class StemTransitionsMapBased:
                 dict_item, original_attrs
             )
         original = StemTransition(dict_item, unmodified_root_state, original_attrs)
-        if modified_root_state is None:
-            modified_root_state = self.morphotactics.get_root_state(
+        modified_root_state: MorphemeState = modified_root_state_value or self.morphotactics.get_root_state(
                 dict_item, modified_attrs
             )
         modified = StemTransition(
@@ -910,7 +907,7 @@ class StemTransitionsMapBased:
         else:
             return [original, modified]
 
-    def handle_special_roots(self, dict_item: DictionaryItem):
+    def handle_special_roots(self, dict_item: DictionaryItem) -> list["StemTransition"]:
         special_item_dict = {
             "birbiri_Pron_Quant": "birbir",
             "çoğu_Pron_Quant": "çok",
@@ -937,16 +934,13 @@ class StemTransitionsMapBased:
             "ora_Noun",
         ]:
             original = StemTransition(dict_item, unmodified_root_state, original_attrs)
-            root_for_modified = None
-            if dict_item.primary_pos == PrimaryPos.Noun:
-                root_for_modified = nounLastVowelDropRoot_S
-            elif dict_item.primary_pos == PrimaryPos.Adjective:
-                root_for_modified = adjLastVowelDropRoot_S
-
             # TODO: check postpositive case. Maybe it is not required.
-            elif dict_item.primary_pos == PrimaryPos.PostPositive:
-                root_for_modified = adjLastVowelDropRoot_S
-            else:
+            root_for_modified = {
+                PrimaryPos.Noun: nounLastVowelDropRoot_S,
+                PrimaryPos.Adjective: adjLastVowelDropRoot_S,
+                PrimaryPos.PostPositive: adjLastVowelDropRoot_S
+            }.get(dict_item.primary_pos)
+            if root_for_modified is None:
                 raise ValueError(f"No root morpheme state found for {dict_item}")
 
             m = dict_item.root[:-1]
@@ -1039,7 +1033,7 @@ class StemTransitionsMapBased:
         # if (!differentStemItems.containsEntry(stemTransition.item, stemTransition)) {
         #   differentStemItems.remove(stemTransition.item, stemTransition)
 
-    def transitions_from_stem(self, stem):
+    def transitions_from_stem(self, stem: str) -> list['StemTransition']:
         if stem in self.single_stems:
             return [self.single_stems.get(stem)]
         elif stem in self.multi_stems:
@@ -1047,7 +1041,7 @@ class StemTransitionsMapBased:
         else:
             return []
 
-    def prefix_matches(self, prefix):
+    def prefix_matches(self, prefix: str) -> list['StemTransition']:
         matches = []
         current_string = ""
         for letter in prefix:
@@ -1055,7 +1049,7 @@ class StemTransitionsMapBased:
             matches.extend(self.transitions_from_stem(current_string))
         return matches
 
-    def transitions_from_item(self, dict_item):
+    def transitions_from_item(self, dict_item: DictionaryItem) -> list['StemTransition']:
         if dict_item in self.different_stem_items:
             return self.different_stem_items.get(dict_item)
         transitions = self.transitions_from_stem(dict_item.root)
@@ -1065,7 +1059,7 @@ class StemTransitionsMapBased:
             if transition.dict_item == dict_item
         ]
 
-    def add_dict_item(self, dict_item):
+    def add_dict_item(self, dict_item: DictionaryItem):
         transitions = self.generate_transitions(dict_item)
         if transitions is None:
             print(f"Transitions are none for {dict_item}")
@@ -1586,7 +1580,8 @@ class TurkishMorphotactics:
         a3plActOf_S.add_empty(pnonActOf)
         pnonActOf.add_empty(nom_ST)
 
-    def connect_last_vowel_drop_words(self):
+    @staticmethod
+    def connect_last_vowel_drop_words():
         nounLastVowelDropRoot_S.add_empty(a3sgLastVowelDrop_S)
         nounLastVowelDropRoot_S.add(a3PlLastVowelDrop_S, "lAr")
         a3sgLastVowelDrop_S.add_empty(pNonLastVowelDrop_S)
@@ -1598,7 +1593,8 @@ class TurkishMorphotactics:
         postpLastVowelDropRoot_S.add_empty(zeroLastVowelDrop_S)
         zeroLastVowelDrop_S.add_empty(nounLastVowelDropRoot_S)
 
-    def connect_proper_nouns_and_abbreviations(self):
+    @staticmethod
+    def connect_proper_nouns_and_abbreviations():
         # ---- Proper noun handling -------
         # TODO: consider adding single quote after an overhaul.
         # nounProper_S.add(puncProperSeparator_S, "'")
@@ -3054,7 +3050,8 @@ class TurkishMorphotactics:
         vWhile_S.add_empty(advRoot_ST)
         vWhen_S.add_empty(advNounRoot_ST)
 
-    def connect_question(self):
+    @staticmethod
+    def connect_question():
         # mı
         questionRoot_S.add_empty(qPresent_S)
         # mıydı
@@ -3122,7 +3119,8 @@ class TurkishMorphotactics:
         qPresent_S.add(pvCopBeforeA3pl_S, "dIr")
         qCopBeforeA3pl_S.add(qA3pl_ST, "lAr")
 
-    def connect_imek(self):
+    @staticmethod
+    def connect_imek():
         # idi
         imekRoot_S.add(imekPast_S, "di")
         # imiş
@@ -3177,15 +3175,15 @@ class TurkishMorphotactics:
         verbLastVowelDropUnmodRoot_S.copy_outgoing_transitions_from(verbRoot_S)
         verbLastVowelDropUnmodRoot_S.remove_transitions_to(pass_)
 
-    def get_root_state(self, dict_item, attrs=None):
-        root = self.item_root_states.get(dict_item.id_)
+    def get_root_state(self, dict_item: DictionaryItem, attrs: set[PhoneticAttribute] | None = None):
+        root_ = self.item_root_states.get(dict_item.id_)
         attrs = (
             attrs.copy()
             if attrs is not None
             else calculate_phonetic_attributes(dict_item.pronunciation)
         )
-        if root is not None:
-            return root
+        if root_ is not None:
+            return root_
         # Verbs like "aramak" drops their last vowel when  connected to "Iyor" Progressive suffix.
         # those modified roots are connected to a separate root state called verbRoot_VowelDrop_S.
         if PhoneticAttribute.LastLetterDropped in attrs:
@@ -3264,7 +3262,7 @@ class MorphemeTransition:
     """
 
     def __init__(
-        self, from_: MorphemeState, to_: MorphemeState, condition: Condition = None
+        self, from_: MorphemeState, to_: MorphemeState, condition: Condition | None = None
     ):
         self.from_ = from_
         self.to_ = to_
@@ -3286,8 +3284,8 @@ class StemTransition(MorphemeTransition):
         self,
         dict_item: DictionaryItem,
         to_: MorphemeState,
-        attrs: Set = None,
-        surface: str = None,
+        attrs: set[PhoneticAttribute] | None = None,
+        surface: str | None = None,
     ):
         super().__init__(root_S, to_, None)
         if surface:
@@ -3326,11 +3324,17 @@ class SuffixTransition(MorphemeTransition):
     :param surface_template: this string represents the possible surface forms for this transition.
     """
 
-    def __init__(self, from_, to_, surface_template=None, condition=None):
+    def __init__(
+        self,
+        from_: MorphemeState,
+        to_: MorphemeState,
+        surface_template: str = "",
+        condition: Condition | None = None
+    ):
         if from_ is None or to_ is None:
             raise ValueError(f"Suffix transition cannot have empty from and to points")
         super().__init__(from_, to_, condition)
-        self.surface_template = "" if surface_template is None else surface_template
+        self.surface_template = surface_template
         self.condition = condition
         self.parse_conditions_from_template()
         self.token_list = list(SuffixTemplateTokenizer(self.surface_template))
@@ -3352,7 +3356,7 @@ class SuffixTransition(MorphemeTransition):
     def __hash__(self):
         return hash((self.from_.id_, self.to_.id_, self.surface_template))
 
-    def can_pass(self, path):
+    def can_pass(self, path: "SearchPath") -> bool:
         return self.condition is None or self.condition.accept(path)
 
     def connect(self):
@@ -3362,8 +3366,8 @@ class SuffixTransition(MorphemeTransition):
     # adds vowel-consonant expectation related automatically.
     # TODO: consider moving this to morphotactics somehow.
     def parse_conditions_from_template(self):
-        if self.surface_template is None or len(self.surface_template) == 0:
-            return
+        if not self.surface_template:
+            return None
         lower = tr.lower(self.surface_template)
         c = None
         first_char_is_vowel = tr.is_vowel(lower[0])
@@ -3397,7 +3401,7 @@ class SuffixTransition(MorphemeTransition):
 
 
 class SurfaceTransition:
-    def __init__(self, surface, lexical_transition):
+    def __init__(self, surface: str, lexical_transition):
         self.surface = surface
         self.lexical_transition = lexical_transition
 
@@ -3432,7 +3436,7 @@ class SurfaceTransition:
 
 
 def generate_surface(
-    transition: SurfaceTransition, phonetic_attributes: Set[PhoneticAttribute]
+    transition: SuffixTransition, phonetic_attributes: set[PhoneticAttribute]
 ) -> str:
     index = 0
     result = []
@@ -3480,7 +3484,7 @@ def generate_surface(
 
 
 class SuffixTemplateToken:
-    def __init__(self, type_, letter, append=False):
+    def __init__(self, type_: str, letter: str, append=False):
         self.type_ = type_
         self.letter = letter
         self.append = append
@@ -3493,7 +3497,7 @@ class SuffixTemplateToken:
 
 
 class SuffixTemplateTokenizer:
-    def __init__(self, word):
+    def __init__(self, word: str):
         self.word = word
         self.pointer = 0
 
@@ -3545,8 +3549,8 @@ class SearchPath:
         self,
         tail: str,
         current_state: MorphemeState,
-        transitions: List[SurfaceTransition],
-        phonetic_attributes: Set[PhoneticAttribute],
+        transitions: list[SurfaceTransition],
+        phonetic_attributes: set[PhoneticAttribute],
         terminal: bool,
     ):
         self.tail = tail
@@ -3558,14 +3562,14 @@ class SearchPath:
         self.contains_suffix_with_surface = False
 
     @classmethod
-    def initial(cls, stem_transition: StemTransition, tail: str):
-        morphemes = []
-        root = SurfaceTransition(stem_transition.surface, stem_transition)
-        morphemes.append(root)
+    def initial(cls, stem_transition: StemTransition, tail: str) -> "SearchPath":
+        morphemes_ = []
+        root_ = SurfaceTransition(stem_transition.surface, stem_transition)
+        morphemes_.append(root_)
         return cls(
             tail,
             stem_transition.to_,
-            morphemes,
+            morphemes_,
             stem_transition.attrs,
             stem_transition.to_.terminal,
         )
@@ -3578,7 +3582,7 @@ class SearchPath:
     def __repr__(self):
         return f"SearchPath({self.dict_item.id_}) (-{self.tail})({self.transitions})"
 
-    def copy(self, surface_node: SurfaceTransition, pa: "set[PhoneticAttribute] | None" = None):
+    def copy(self, surface_node: SurfaceTransition, pa: "set[PhoneticAttribute] | None" = None) -> "SearchPath":
         phonetic_attributes = (
             calculate_phonetic_attributes(
                 surface_node.surface, tuple(self.phonetic_attributes)
@@ -3602,26 +3606,26 @@ class SearchPath:
         return path
 
     @property
-    def stem_transition(self):
+    def stem_transition(self) -> StemTransition:
         return self.transitions[0].lexical_transition
 
     @property
-    def previous_state(self):
+    def previous_state(self) -> "MorphemeState | None":
         if len(self.transitions) < 2:
             return None
         return self.transitions[-2].state
 
     @property
-    def is_terminal(self):
+    def is_terminal(self) -> bool:
         return self.terminal
 
-    def has_dictionary_item(self, dict_item):
-        return self.stem_transition.item == dict_item
+    def has_dictionary_item(self, dict_item: DictionaryItem) -> bool:
+        return self.stem_transition.dict_item == dict_item
 
     @property
-    def last_transition(self):
+    def last_transition(self) -> SurfaceTransition:
         return self.transitions[-1]
 
     @property
-    def dict_item(self):
+    def dict_item(self) -> DictionaryItem:
         return self.stem_transition.dict_item
