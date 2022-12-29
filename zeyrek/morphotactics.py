@@ -88,12 +88,12 @@ class MorphemeState:
             self.incoming.append(transition)
         return self
 
-    def add(self, to_: "MorphemeState", template: str, condition: Condition | None = None):
+    def add(self, to_: "MorphemeState", template: str, condition: "Condition | None" = None):
         transition = SuffixTransition(self, to_, template, condition)
         self.add_outgoing(transition)
         return self
 
-    def add_all(self, transitions: list[tuple["MorphemeState", str, Condition] | tuple["MorphemeState", str]]):
+    def add_all(self, transitions: list["tuple[MorphemeState, str, Condition] | tuple[MorphemeState, str]"]):
         for transition in transitions:
             self.add(*transition)
 
@@ -3175,7 +3175,7 @@ class TurkishMorphotactics:
         verbLastVowelDropUnmodRoot_S.copy_outgoing_transitions_from(verbRoot_S)
         verbLastVowelDropUnmodRoot_S.remove_transitions_to(pass_)
 
-    def get_root_state(self, dict_item: DictionaryItem, attrs: set[PhoneticAttribute] | None = None):
+    def get_root_state(self, dict_item: DictionaryItem, attrs: "set[PhoneticAttribute] | None" = None):
         root_ = self.item_root_states.get(dict_item.id_)
         attrs = (
             attrs.copy()
@@ -3262,7 +3262,7 @@ class MorphemeTransition:
     """
 
     def __init__(
-        self, from_: MorphemeState, to_: MorphemeState, condition: Condition | None = None
+        self, from_: MorphemeState, to_: MorphemeState, condition: "Condition | None" = None
     ):
         self.from_ = from_
         self.to_ = to_
@@ -3284,8 +3284,8 @@ class StemTransition(MorphemeTransition):
         self,
         dict_item: DictionaryItem,
         to_: MorphemeState,
-        attrs: set[PhoneticAttribute] | None = None,
-        surface: str | None = None,
+        attrs: "set[PhoneticAttribute] | None" = None,
+        surface: "str | None" = None,
     ):
         super().__init__(root_S, to_, None)
         if surface:
@@ -3329,7 +3329,7 @@ class SuffixTransition(MorphemeTransition):
         from_: MorphemeState,
         to_: MorphemeState,
         surface_template: str = "",
-        condition: Condition | None = None
+        condition: "Condition | None" = None
     ):
         if from_ is None or to_ is None:
             raise ValueError(f"Suffix transition cannot have empty from and to points")
