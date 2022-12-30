@@ -99,6 +99,13 @@ def test_sentence():
     assert 'bu' in result[0][1]
 
 
+def test_compound_words():
+    lemmer = MorphAnalyzer()
+    compound_word = "Zeytinyağlı"
+    result = lemmer.lemmatize(compound_word)
+    assert 'zeytinyağı' in result
+
+
 def test_single_lemma():
     analyzer = MorphAnalyzer()
     res = analyzer.lemmatize("Şu dünyadaki sevilen kişi sevmeyi bilendir.")
