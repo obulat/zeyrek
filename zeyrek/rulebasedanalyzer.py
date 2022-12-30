@@ -2,13 +2,14 @@ from typing import NamedTuple
 
 from zeyrek.attributes import PhoneticAttribute, calculate_phonetic_attributes, RootAttribute, PrimaryPos
 from zeyrek.lexicon import DictionaryItem
-from zeyrek.morphotactics import SurfaceTransition, SearchPath, generate_surface, nom, pnon, Morpheme
+from zeyrek.morphotactics import SurfaceTransition, SearchPath, generate_surface, nom, pnon, Morpheme, SuffixTransition
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 class RuleBasedAnalyzer:
+    MAX_REPEATING_SUFFIX_TYPE_COUNT = 3
     """
     This is a Morphological Analyzer implementation.
     """
@@ -80,6 +81,8 @@ class RuleBasedAnalyzer:
         # for all outgoing transitions.
         # print(f"\n\n ADVANCE {path} for {len(path.current_state.outgoing)} transitions")
         for transition in path.current_state.outgoing:
+            if not isinstance(transition, SuffixTransition):
+                continue
             # if tail is empty and this transitions surface is not empty, no need to check.
             if len(path.tail) == 0 and transition.has_surface_form:
                 logger.debug(f"Rejecting path {path}: Path and transition surface mismatch: ")
@@ -144,11 +147,15 @@ class RuleBasedAnalyzer:
             remove = False
             type_counts = {}
             for node in token.transitions:
-                if type_counts.addOrIncrement(node.getState().id) > MAX_REPEATING_SUFFIX_TYPE_COUNT:
+                if node.state.id_ in type_counts:
+                    type_counts[node.state.id_] += 1
+                else:
+                    type_counts[node.state.id_] = 1
+                if type_counts[node.state.id_] > self.MAX_REPEATING_SUFFIX_TYPE_COUNT:
                     remove = True
                     break
-                if not remove:
-                    result.append(token)
+            if not remove:
+                result.append(token)
         return result
 
 

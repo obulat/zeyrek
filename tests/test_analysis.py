@@ -97,3 +97,9 @@ def test_sentence():
     result = lemmer.lemmatize(sentence)
     assert 'Bunu' in result[0][0]
     assert 'bu' in result[0][1]
+
+
+def test_last_lemma():
+    analyzer = MorphAnalyzer()
+    res = analyzer.lemmatize("Şu dünyadaki sevilen kişi sevmeyi bilendir.")
+    assert res == ['şu', 'Dünya', 'sevmek', 'kişi', 'sevmek', 'Bilen', '.']

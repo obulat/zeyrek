@@ -81,7 +81,12 @@ class MorphAnalyzer:
 
     formatters = {"UD": UDFormatter}
 
-    def __init__(self, lexicon: "RootLexicon | None" = None, formatter: "Formatter | None" = None):
+    def __init__(
+        self,
+        lexicon: "RootLexicon | None" = None,
+        formatter: "Formatter | None" = None,
+        options: dict = None,
+    ):
         self.lexicon = lexicon or RootLexicon.default_text_dictionaries()
 
         self.morphotactics = TurkishMorphotactics(self.lexicon)
@@ -91,6 +96,7 @@ class MorphAnalyzer:
             if formatter is None
             else MorphAnalyzer.formatters[formatter]()
         )
+        self.options = options or {}
 
     def _parse(self, word: str) -> list[SingleAnalysis]:
         """ Parses a word and returns SingleAnalysis result. """
@@ -127,7 +133,7 @@ class MorphAnalyzer:
             result.append(word_analysis)
         return result
 
-    def lemmatize(self, text: str) -> list[tuple[str, list]]:
+    def lemmatize(self, text: str) -> "list[tuple[str, list]] | list[str]":
         """
         This method will eventually use some form of disambiguation for lemmatizing.
         Currently, it simply returns all lemmas available for each word of the text.
@@ -135,17 +141,22 @@ class MorphAnalyzer:
         :return: A list of tuples: sentence and a list of list of
         lemmas for all words of the text
         """
+        return_all_lemmas = self.options.get("return_all_lemmas", False)
         result = []
         words = _tokenize_text(text)
         for word in words:
             analysis = self._parse(word)
-            if len(analysis) == 0:
-                word_lemmas = [word]
+            if return_all_lemmas:
+                if len(analysis) == 0:
+                    word_lemmas = [word]
+                else:
+                    analysis_lemmas = [a.dict_item.lemma for a in analysis]
+                    filtered_lemmas = list(set(analysis_lemmas))
+                    word_lemmas = filtered_lemmas
+                result.append((word, word_lemmas))
+
             else:
-                analysis_lemmas = [a.dict_item.lemma for a in analysis]
-                filtered_lemmas = list(set(analysis_lemmas))
-                word_lemmas = filtered_lemmas
-            result.append((word, word_lemmas))
+                result.append(analysis[0].dict_item.lemma if len(analysis) else word)
         return result
 
     def add_dictionary(self, path_to_dictionary: str):
