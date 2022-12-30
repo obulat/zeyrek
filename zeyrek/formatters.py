@@ -1,4 +1,8 @@
+from abc import ABC
+
 from zeyrek.attributes import SecondaryPos
+from zeyrek.morphotactics import Morpheme
+from zeyrek.rulebasedanalyzer import SingleAnalysis
 
 cases = ["Nom", "Dat", "Acc", "Abl", "Loc", "Ins", "Gen", "Equ"]
 
@@ -9,7 +13,17 @@ def format_dict_item(lemma, ppos, spos) -> str:
     return f'[{lemma}:{ppos}{spos_string}] '
 
 
-class UDFormatter:
+class Formatter:
+    """ Abstract formatter class. """
+
+    def format(self, analysis: SingleAnalysis) -> str:
+        raise NotImplementedError
+
+    def format_all(self, analyses: list[SingleAnalysis]) -> str:
+        raise NotImplementedError
+
+
+class UDFormatter(Formatter, ABC):
     possessives = {
         'P1sg': ('|Number[psor]=Sing', '|Person[psor]=1'),
         'P1pl': ('|Number[psor]=Plur', '|Person[psor]=1'),
@@ -31,7 +45,7 @@ class UDFormatter:
     def __init__(self, add_surface=True):
         self.add_surface = add_surface
 
-    def format_adj(self, analysis):
+    def format_adj(self, analysis: SingleAnalysis) -> str:
         ids = [m.id_ for m in analysis.morphemes]
         case = ''
         number = ''
@@ -57,7 +71,8 @@ class UDFormatter:
                                npsor=npsor, person=person,
                                psor=psor)
 
-    def format_noun(self, analysis):
+    @staticmethod
+    def format_noun(analysis: SingleAnalysis) -> str:
         noun_str = "{}Case={}|Number={}{}|Person={}{}"
         case = ''
         number = ''
@@ -84,10 +99,12 @@ class UDFormatter:
             abbr = ''
         return noun_str.format(abbr, case, number, number_psor, person, person_psor)
 
-    def format_num(self, analysis):
+    @staticmethod
+    def format_num(analysis: SingleAnalysis) -> str:
         return f"NumType={analysis.dict_item.secondary_pos.value}"
 
-    def format_pron(self, analysis):
+    @staticmethod
+    def format_pron(analysis: SingleAnalysis) -> str:
         prontypestr = analysis.dict_item.secondary_pos.value
 
         if prontypestr == 'Demons':
@@ -123,7 +140,8 @@ class UDFormatter:
         return pron_str.format(case=case, number=number, number_psor=number_psor, person_psor=person_psor,
                                person=person, prontype=prontype)
 
-    def format_verb(self, analysis):
+    @staticmethod
+    def format_verb(analysis: SingleAnalysis) -> str:
         aspect = ''
         mood = ''
         number = ''
@@ -149,9 +167,9 @@ class UDFormatter:
             agreement_value = UDFormatter.agreement_values.get(morph.id_)
             if agreement_value is not None and k == len(analysis.morphemes) - 1:
                 number, person = agreement_value
-            posessive_value = UDFormatter.possessives.get(morph.id_)
-            if posessive_value is not None:
-                number_psor, person_psor = posessive_value
+            possessive_value = UDFormatter.possessives.get(morph.id_)
+            if possessive_value is not None:
+                number_psor, person_psor = possessive_value
             if morph.id_ == 'Prog1':
                 register = "|Polite=Infm"
             elif morph.id_ == 'Prog2':
@@ -225,7 +243,7 @@ class UDFormatter:
             noun_deriv = morph_ids.index('Noun')
             for id_ in morph_ids[noun_deriv:]:
                 if id_ in cases:
-                    case = f"|Case={morph.id_}"
+                    case = f"|Case={id_}"
                 if case == '':
                     case = "|Case=Nom"
         if 'Fut' in morph_ids and 'Past' in morph_ids:
@@ -250,7 +268,7 @@ class UDFormatter:
             )
         )
 
-    def format(self, analysis) -> str:
+    def format(self, analysis: SingleAnalysis) -> str:
         pos = analysis.dict_item.primary_pos.value
         if pos == "Noun":
             return self.format_noun(analysis)
@@ -273,7 +291,7 @@ class UDFormatter:
         result += self.format_morphemes(stem=analysis.stem, surfaces=analysis.morphemes)
         return result
 
-    def format_morphemes(self, stem, surfaces):
+    def format_morphemes(self, stem: str, surfaces: list[tuple[Morpheme, str]]) -> str:
         result = []
         if self.add_surface:
             result.append(f"{stem}:")
@@ -291,16 +309,16 @@ class UDFormatter:
             result.append(m.id_)
             if m.derivational:
                 result.append("→")
-            elif i < len(surfaces) - 1 and not surfaces[i+1][0].derivational:
+            elif i < len(surfaces) - 1 and not surfaces[i + 1][0].derivational:
                 result.append("+")
         return "".join(result)
 
 
-class DefaultFormatter:
+class DefaultFormatter(Formatter, ABC):
     def __init__(self, add_surface=True):
         self.add_surface = add_surface
 
-    def format(self, analysis) -> str:
+    def format(self, analysis: SingleAnalysis) -> str:
         result = f"[{analysis.dict_item.lemma}:{analysis.dict_item.primary_pos.value}"
         if analysis.dict_item.secondary_pos != SecondaryPos.NONE:
             result = (
@@ -313,7 +331,7 @@ class DefaultFormatter:
         result += self.format_morphemes(stem=analysis.stem, surfaces=analysis.morphemes)
         return result
 
-    def format_morphemes(self, stem, surfaces):
+    def format_morphemes(self, stem: str, surfaces: list[tuple[Morpheme, str]]) -> str:
         result = []
         if self.add_surface:
             result.append(f"{stem}:")
@@ -331,6 +349,6 @@ class DefaultFormatter:
             result.append(m.id_)
             if m.derivational:
                 result.append("→")
-            elif i < len(surfaces) - 1 and not surfaces[i+1][0].derivational:
+            elif i < len(surfaces) - 1 and not surfaces[i + 1][0].derivational:
                 result.append("+")
         return "".join(result)

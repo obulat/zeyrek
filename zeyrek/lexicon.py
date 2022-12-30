@@ -1,6 +1,5 @@
 from enum import Enum
 from pathlib import Path
-from typing import List, Set
 
 from zeyrek.attributes import RootAttribute, PrimaryPos, SecondaryPos, parse_attr_data, infer_morphemic_attributes
 from zeyrek import tr
@@ -28,7 +27,7 @@ class TextLexiconProcessor:
         self.lexicon = RootLexicon()
         self.late_entries = []
 
-    def process_lines(self, lines: List) -> 'RootLexicon':
+    def process_lines(self, lines: list[str]) -> 'RootLexicon':
         for line in lines:
             line = line.strip()
             if len(line) > 0 and not line.startswith("##"):
@@ -47,7 +46,7 @@ class TextLexiconProcessor:
         self._process_late_entries()
         return self.lexicon
 
-    def _parse_dict_item(self, line_data):
+    def _parse_dict_item(self, line_data: dict) -> 'DictionaryItem':
         word = line_data['word']
         metadata = line_data['metadata']
         pos_info = get_pos_data(metadata.get(MetaDataId.POS), word)
@@ -89,12 +88,14 @@ class TextLexiconProcessor:
             else:
                 break
         try:
-            return DictionaryItem(lemma=word, root=clean_word,
-                                  primary_pos=pos_info.primary_pos,
-                                  secondary_pos=secondary_pos,
-                                  attrs=attributes,
-                                  pronunciation=pronunciation,
-                                  index=index)
+            return DictionaryItem(
+                lemma=word,
+                root=clean_word,
+                primary_pos=pos_info.primary_pos,
+                secondary_pos=secondary_pos,
+                attrs=attributes,
+                pronunciation=pronunciation,
+                index=index)
         except Exception as e:
             print(f"Could not create {word}/{index}/ {type(index)} dictionary item, error: {e} ")
 
@@ -126,7 +127,7 @@ class TextLexiconProcessor:
                     r = r[r.index('-') + 1:]
                 ref_items = self.lexicon.get_matching_items(r)  # check lexicon for [kuyruk]
                 if len(ref_items) > 0:
-                    ref_item = sorted(ref_items, key=lambda ref_item: ref_item.index)[0]
+                    ref_item = sorted(ref_items, key=lambda ref: ref.index)[0]
                     attr_set = ref_item.attributes.copy()
                 else:
                     attr_set = infer_morphemic_attributes(root, pos_info, set())
@@ -143,7 +144,7 @@ class TextLexiconProcessor:
                 fake_root.attributes.add(RootAttribute.Dummy)
                 if RootAttribute.Voicing in fake_root.attributes:
                     fake_root.attributes.remove(RootAttribute.Voicing)
-                fake_root.reference_item = item
+                fake_root.ref_item = item
                 self.lexicon.add(fake_root)
 
 
@@ -173,9 +174,10 @@ class DictionaryItem:
                  root: str,
                  primary_pos: PrimaryPos,
                  secondary_pos: SecondaryPos,
-                 attrs: Set,
+                 attrs: set[RootAttribute],
                  pronunciation: str,
-                 index: int):
+                 index: int
+                 ):
         """
         :id_(str)is the unique ID of the item. It is generated from Pos and lemma.
         If there are multiple items with same POS and Lemma user needs to add an index for
@@ -185,13 +187,13 @@ class DictionaryItem:
         self.lemma = lemma
         self.primary_pos = primary_pos
         self.secondary_pos = secondary_pos
-        # normalized_lemma: if this is a Verb, removes -mek -mak suffix.Otherwise returns the `lemma`
+        # normalized_lemma: if this is a Verb, removes -mek -mak suffix. Otherwise, returns the `lemma`
         self.normalized_lemma = self.lemma[:-3] if self.primary_pos == PrimaryPos.Verb else self.lemma
         self.attributes = attrs
         self.root = root
         self.index = index
         self.id_ = self.generate_id()
-        self.ref_item = None
+        self.ref_item: "DictionaryItem | None" = None
 
     def __str__(self):
         return f"{self.lemma} [P:{self.primary_pos.value}]"
@@ -199,14 +201,14 @@ class DictionaryItem:
     def __repr__(self):
         return f"DictionaryItem({self.id_})"
 
-    def has_any_attribute(self, root_attrs):
+    def has_any_attribute(self, root_attrs: list[RootAttribute]):
 
         return bool(set(root_attrs) & self.attributes)
 
-    def has_attribute(self, attr):
+    def has_attribute(self, attr: RootAttribute):
         return attr in self.attributes
 
-    def generate_id(self):
+    def generate_id(self) -> str:
         result = [self.lemma, self.primary_pos.value]  # shortForm is value
         if self.secondary_pos is not None and self.secondary_pos != SecondaryPos.NONE:
             result.append(self.secondary_pos.value)
@@ -233,11 +235,11 @@ class RootLexicon:
     ]
 
     def __init__(self):
-        self.item_set = set()
-        self.id_dict = {}
-        self.item_dict = {}
+        self.item_set: set[DictionaryItem] = set()
+        self.id_dict: dict[str, DictionaryItem] = {}
+        self.item_dict: dict[str, list[DictionaryItem]] = {}
 
-    def add_lexicon(self, additional_lexicon):
+    def add_lexicon(self, additional_lexicon: "RootLexicon"):
         for dict_item in additional_lexicon.items:
             self.add(dict_item)
 
@@ -250,7 +252,7 @@ class RootLexicon:
         return lexicon_from_path
 
     @classmethod
-    def default_text_dictionaries(cls):
+    def default_text_dictionaries(cls) -> 'RootLexicon':
         lines = []
         for resource in cls.DEFAULT_DICTIONARY_RESOURCES:
             dict_path = cls.RESOURCES_DIR / resource
@@ -260,11 +262,11 @@ class RootLexicon:
         return processor.process_lines(lines)
 
     @classmethod
-    def from_lines(cls, lines: List):
+    def from_lines(cls, lines: list[str]) -> 'RootLexicon':
         processor = TextLexiconProcessor()
         return processor.process_lines(lines)
 
-    def add(self, item):
+    def add(self, item: DictionaryItem):
         if item.id_ in self.id_dict:
             print(f"Duplicated item id_ of {item}: {item.id_} with {self.id_dict.get(item.id_)}")
             return
@@ -275,14 +277,13 @@ class RootLexicon:
         else:
             self.item_dict[item.lemma] = [item]
 
-    def get_matching_items(self, lemma):
-        items = self.item_dict.get(lemma)
-        return [] if items is None else items
+    def get_matching_items(self, lemma: str) -> list[DictionaryItem]:
+        return self.item_dict.get(lemma, [])
 
-    def get_item_by_id(self, id_):
-        return self.id_dict.get(id_, None)
+    def get_item_by_id(self, id_) -> "DictionaryItem | None":
+        return self.id_dict.get(id_)
 
-    def remove(self, item):
+    def remove(self, item: DictionaryItem):
         self.item_dict.get(item.lemma)  # TODO: test if works
         self.id_dict.pop(item.id_)
         self.item_set.remove(item)
@@ -291,5 +292,5 @@ class RootLexicon:
         return len(self.item_dict)
 
     @property
-    def items(self):
+    def items(self) -> list[DictionaryItem]:
         return list(self.item_set)

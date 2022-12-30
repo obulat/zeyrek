@@ -1,7 +1,8 @@
-import collections
+from typing import NamedTuple
 
-from zeyrek.attributes import PhoneticAttribute, calculate_phonetic_attributes, RootAttribute
-from zeyrek.morphotactics import SurfaceTransition, SearchPath, generate_surface, nom, pnon
+from zeyrek.attributes import PhoneticAttribute, calculate_phonetic_attributes, RootAttribute, PrimaryPos
+from zeyrek.lexicon import DictionaryItem
+from zeyrek.morphotactics import SurfaceTransition, SearchPath, generate_surface, nom, pnon, Morpheme
 import logging
 
 logger = logging.getLogger(__name__)
@@ -152,12 +153,16 @@ class RuleBasedAnalyzer:
 
 
 # Single Analysis contains more information about the word analysis that is not necessary for API:
-#
-_Single_Analysis = collections.namedtuple(
-    'SingleAnalysis', 'dict_item, stem, ending, morphemes, group_boundaries, pos')
+class SingleAnalysis(NamedTuple):
+    dict_item: DictionaryItem
+    stem: str
+    suffix: str
+    morphemes: list[tuple[Morpheme, str]]
+    group_boundaries: list[int]
+    pos: PrimaryPos
 
 
-def parse_analysis(search_path: SearchPath) -> _Single_Analysis:
+def parse_analysis(search_path: SearchPath) -> SingleAnalysis:
     """
     This class represents a single morphological analysis result.
     :param search_path: The Search path that was created by MorphAnalyzer
@@ -176,7 +181,7 @@ def parse_analysis(search_path: SearchPath) -> _Single_Analysis:
     for transition in search_path.transitions:
         if transition.is_derivative:
             derivation_count += 1
-        morpheme = transition.morpheme
+        morpheme: Morpheme = transition.morpheme
         # we skip these two morphemes as they create visual noise and does not carry much information.
         if morpheme in [nom, pnon]:
             continue
@@ -195,14 +200,12 @@ def parse_analysis(search_path: SearchPath) -> _Single_Analysis:
         if mdata[0].derivational:
             group_boundaries[derivation_counter] = morpheme_counter
             derivation_counter += 1
+    dict_item = search_path.dict_item
     # if dictionary item is `Dummy`, use the referenced item.
     # `Dummy` items are usually generated for some compound words. For example for `zeytinyağı`
     # a DictionaryItem is generated with root "zeytinyağ". But here we switch to the original.
-    if search_path.dict_item.has_attribute(
-        RootAttribute.Dummy
-    ) or not search_path.dict_item.has_attribute(RootAttribute.Dummy):
-        # dict_item = search_path.dict_item.ref_item # this should work but doesn't
-        dict_item = search_path.dict_item
+    if search_path.dict_item.has_attribute(RootAttribute.Dummy):
+        dict_item = search_path.dict_item.ref_item
     ending = ''.join([_[1] for _ in morphemes[1:]]) if len(morphemes) > 1 else ''
     pos = 'Unknown'
     for m in morphemes[group_boundaries[-1]:]:
@@ -210,4 +213,4 @@ def parse_analysis(search_path: SearchPath) -> _Single_Analysis:
             pos = m[0].pos
             break
 
-    return _Single_Analysis(dict_item, morphemes[0][1], ending, morphemes, group_boundaries, pos)
+    return SingleAnalysis(dict_item, morphemes[0][1], ending, morphemes, group_boundaries, pos)
