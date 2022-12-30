@@ -3,6 +3,7 @@ import collections
 
 from nltk.tokenize import word_tokenize, sent_tokenize
 from zeyrek import tr
+from zeyrek.attributes import SecondaryPos
 from zeyrek.formatters import UDFormatter, DefaultFormatter
 from zeyrek.lexicon import RootLexicon
 from zeyrek.morphotactics import TurkishMorphotactics, Morpheme
@@ -85,7 +86,7 @@ class MorphAnalyzer:
         self,
         lexicon: "RootLexicon | None" = None,
         formatter: "Formatter | None" = None,
-        options: dict = None,
+        return_all_lemmas: bool = False,
     ):
         self.lexicon = lexicon or RootLexicon.default_text_dictionaries()
 
@@ -96,7 +97,7 @@ class MorphAnalyzer:
             if formatter is None
             else MorphAnalyzer.formatters[formatter]()
         )
-        self.options = options or {}
+        self.return_all_lemmas = return_all_lemmas
 
     def _parse(self, word: str) -> list[SingleAnalysis]:
         """ Parses a word and returns SingleAnalysis result. """
@@ -141,7 +142,7 @@ class MorphAnalyzer:
         :return: A list of tuples: sentence and a list of list of
         lemmas for all words of the text
         """
-        return_all_lemmas = self.options.get("return_all_lemmas", False)
+        return_all_lemmas = self.return_all_lemmas
         result = []
         words = _tokenize_text(text)
         for word in words:
@@ -156,8 +157,20 @@ class MorphAnalyzer:
                 result.append((word, word_lemmas))
 
             else:
-                result.append(analysis[0].dict_item.lemma if len(analysis) else word)
+                analysis = self.filter_proper_nouns(word, analysis)
+                result.append(analysis[0].dict_item.lemma if analysis else word)
         return result
+
+    @staticmethod
+    def filter_proper_nouns(word: str, analysis: list[SingleAnalysis]):
+        if word[0].isupper():
+            only_proper_nouns = [a for a in analysis if a.dict_item.secondary_pos == SecondaryPos.ProperNoun]
+            analysis = only_proper_nouns if only_proper_nouns else analysis
+        else:
+            without_proper_nouns = [a for a in analysis if a.dict_item.secondary_pos != SecondaryPos.ProperNoun]
+            if without_proper_nouns:
+                analysis = without_proper_nouns
+        return analysis
 
     def add_dictionary(self, path_to_dictionary: str):
         """

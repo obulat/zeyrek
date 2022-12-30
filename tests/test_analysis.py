@@ -75,7 +75,7 @@ def lex_from_lines():
 
 
 def test_analysis(lex_from_lines):
-    lemmer = MorphAnalyzer(lexicon=lex_from_lines)
+    lemmer = MorphAnalyzer(lexicon=lex_from_lines, return_all_lemmas=True)
     analysis = lemmer.analyze('elma')
     assert analysis is not None
     analysis = lemmer.analyze('beyazlaştırıcı')
@@ -92,14 +92,14 @@ def test_default_lexicon():
 
 
 def test_sentence():
-    lemmer = MorphAnalyzer()
+    lemmer = MorphAnalyzer(return_all_lemmas=True)
     sentence = "Bunu okuyabiliyorum"
     result = lemmer.lemmatize(sentence)
     assert 'Bunu' in result[0][0]
     assert 'bu' in result[0][1]
 
 
-def test_last_lemma():
+def test_single_lemma():
     analyzer = MorphAnalyzer()
     res = analyzer.lemmatize("Şu dünyadaki sevilen kişi sevmeyi bilendir.")
-    assert res == ['şu', 'Dünya', 'sevmek', 'kişi', 'sevmek', 'Bilen', '.']
+    assert res == ['şu', 'dünya', 'sevmek', 'kişi', 'sevmek', 'bilmek', '.']
