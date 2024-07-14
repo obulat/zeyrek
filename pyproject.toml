@@ -1,0 +1,66 @@
+[project]
+name = "zeyrek"
+version = "0.1.4-alpha"
+description = "Python morphological analyzer and lemmatizer for Turkish"
+authors = [
+    {name = "Olga Bulat", email = "obulat@gmail.com"},
+]
+dependencies = [
+    "click==8.1.7",
+    "nltk==3.8.1",
+    "pytest==8.2.2",
+    "readme-renderer==35.0",
+    "regex==2024.5.15",
+    "requests==2.32.3",
+    "snowballstemmer==2.2.0",
+    "sphinx>=7.3.7",
+    "twine==4.0.0",
+    "furo>=2024.5.6",
+    "myst-parser>=3.0.1",
+    "sphinx-autobuild>=2024.4.16",
+    "bumpver>=2023.1129",
+]
+
+requires-python = ">=3.9"
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.urls]
+Homepage = "https://github.com/obulat/zeyrek"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.build]
+includes = ["zeyrek/", "zeyrek/resources/"]
+excludes = ["tests/"]
+
+[tool.pdm.scripts]
+docs-build = "make -C docs html"
+docs-dev = "sphinx-autobuild docs/ docs/_build/ --watch zeyrek/"
+test = "pytest"
+bump = "bumpver init"
+
+[tool.bumpver]
+current_version = "0.1.4-alpha"
+version_pattern = "MAJOR.MINOR.PATCH-[alpha|beta|rc|final]"
+commit_message = "bump version {old_version} -> {new_version}"
+tag_message = "{new_version}"
+tag_scope = "default"
+commit = true
+tag = true
+push = true
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    'version = "{version}"',
+    'current_version = "{version}"',
+]
+"docs/conf.py" = [
+    'version = "{version}"',
+    'release = "{version}"',
+]
