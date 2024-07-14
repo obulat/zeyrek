@@ -22,9 +22,6 @@ jobs:
     - name: Install dependencies
       run: pdm install
 
-    - name: Install nltk punkt
-      run: python3 -m nltk.downloader punkt
-
     - name: Test with pytest and coverage
       run: pdm run pytest
 
