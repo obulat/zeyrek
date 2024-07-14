@@ -102,3 +102,6 @@ ENV/
 .mypy_cache/
 /vvenv/
 /.idea/
+
+# pdm stuff
+.pdm-python

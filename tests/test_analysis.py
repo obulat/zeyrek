@@ -11,6 +11,9 @@ from zeyrek.morphology import MorphAnalyzer
 from zeyrek.morphotactics import StemTransition, SearchPath, root_S, noun_S, MorphemeState, p2sg_S, loc_ST, a3pl_S, \
     SuffixTransition, morphemes, equ_ST, TurkishMorphotactics, adjectiveRoot_ST
 
+import nltk
+nltk.download('punkt')
+
 
 @pytest.fixture
 def dict_item():
