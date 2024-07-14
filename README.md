@@ -1,6 +1,6 @@
 # Zeyrek: Morphological Analyzer and Lemmatizer
 
-![PyPI - Version](https://img.shields.io/pypi/v/:packageName)
+![PyPI - Version](https://img.shields.io/pypi/v/zeyrek)
 
 Zeyrek is a partial port of the [Zemberek library](https://github.com/ahmetaa/zemberek-nlp) to Python for lemmatizing
 and analyzing Turkish language words. It is in alpha stage, and the API
@@ -13,16 +13,16 @@ will probably change.
 
 ## Basic Usage
 
-To use Zeyrek, first create an instance of MorphAnalyzer class::
+To use Zeyrek, first create an instance of `MorphAnalyzer` class:
 
-```python
+```shell
 import zeyrek
 analyzer = zeyrek.MorphAnalyzer()
 ```
 
 Then, you can call its `analyze` method on words or texts to get all possible analyses::
 
-```python
+```shell
 print(analyzer.analyze('benim'))
 Parse(word='benim', lemma='ben', pos='Noun', morphemes=['Noun', 'A3sg', 'P1sg'], formatted='[ben:Noun] ben:Noun+A3sg+im:P1sg')
 Parse(word='benim', lemma='ben', pos='Pron', morphemes=['Pron', 'A1sg', 'Gen'], formatted='[ben:Pron,Pers] ben:Pron+A1sg+im:Gen')
@@ -32,7 +32,7 @@ Parse(word='benim', lemma='ben', pos='Verb', morphemes=['Pron', 'A1sg', 'Zero', 
 If you only need the base form of words, or lemmas, you can call `lemmatize`. It returns a list
 of tuples, with word itself and a list of possible lemmas::
 
-```python
+```shell
 print(analyzer.lemmatize('benim'))
 [('benim', ['ben'])]
 ```

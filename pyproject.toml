@@ -1,57 +1,66 @@
 [project]
 name = "zeyrek"
-version = "0.1.4"
+version = "0.1.4-alpha"
 description = "Python morphological analyzer and lemmatizer for Turkish"
 authors = [
     {name = "Olga Bulat", email = "obulat@gmail.com"},
 ]
 dependencies = [
-    "alabaster==0.7.16",
-    "Babel==2.15.0",
-    "bleach==6.1.0",
-    "certifi==2024.7.4",
-    "chardet==5.2.0",
     "click==8.1.7",
-    "colorama==0.4.6",
-    "coverage==7.6.0",
-    "docutils>=0.19",
-    "idna==3.7",
-    "imagesize==1.4.1",
-    "importlib-metadata==8.0.0",
-    "Jinja2==3.1.4",
-    "joblib==1.4.2",
-    "keyring==25.2.1",
-    "MarkupSafe==2.1.5",
     "nltk==3.8.1",
-    "packaging==24.1",
-    "pkginfo==1.11.1",
-    "Pygments==2.18.0",
-    "pyparsing==3.1.2",
     "pytest==8.2.2",
-    "pytz==2024.1",
-    "pywin32-ctypes==0.2.0",
     "readme-renderer==35.0",
     "regex==2024.5.15",
     "requests==2.32.3",
-    "requests-toolbelt==1.0.0",
-    "six==1.16.0",
     "snowballstemmer==2.2.0",
-    "Sphinx==5.3.0",
-    "sphinx-rtd-theme==2.0.0",
-    "tqdm==4.64.0",
+    "sphinx>=7.3.7",
     "twine==4.0.0",
-    "urllib3==1.26.18",
-    "webencodings==0.5.1",
-    "zipp==3.19.2",
+    "furo>=2024.5.6",
+    "myst-parser>=3.0.1",
+    "sphinx-autobuild>=2024.4.16",
+    "bumpver>=2023.1129",
 ]
+
 requires-python = ">=3.9"
 readme = "README.md"
 license = {text = "MIT"}
+
+[project.urls]
+Homepage = "https://github.com/obulat/zeyrek"
 
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
-
 [tool.pdm]
 distribution = true
+
+[tool.pdm.build]
+includes = ["zeyrek/", "zeyrek/resources/"]
+excludes = ["tests/"]
+
+[tool.pdm.scripts]
+docs-build = "make -C docs html"
+docs-dev = "sphinx-autobuild docs/ docs/_build/ --watch zeyrek/"
+test = "pytest"
+bump = "bumpver init"
+
+[tool.bumpver]
+current_version = "0.1.4-alpha"
+version_pattern = "MAJOR.MINOR.PATCH-[alpha|beta|rc|final]"
+commit_message = "bump version {old_version} -> {new_version}"
+tag_message = "{new_version}"
+tag_scope = "default"
+commit = true
+tag = true
+push = true
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    'version = "{version}"',
+    'current_version = "{version}"',
+]
+"docs/conf.py" = [
+    'version = "{version}"',
+    'release = "{version}"',
+]

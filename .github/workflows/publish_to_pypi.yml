@@ -14,18 +14,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.x'
+
     - name: Install dependencies
-      run: |
-          pdm install
-          pdm build
+      run: pdm install
 
     - name: Build and publish to real pypi
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.pypi_password }}
       run: |
+          pdm build
           pdm publish

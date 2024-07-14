@@ -105,3 +105,4 @@ ENV/
 
 # pdm stuff
 .pdm-python
+.pdm-build/
