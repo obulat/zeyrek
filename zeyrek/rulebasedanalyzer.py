@@ -56,14 +56,14 @@ class RuleBasedAnalyzer:
                     and PhoneticAttribute.CannotTerminate
                     not in path.phonetic_attributes
                 ):
-                    logger.warning(f"APPENDING RESULT: {path}")
+                    logger.debug("APPENDING RESULT: %s", path)
                     result.append(path)
                     continue
                 # Creates new paths with outgoing and matching transitions.
                 new_paths = self.advance(path)
-                logger.debug(f"\n--\nNew paths are: ")
+                logger.debug("\n--\nNew paths are: ")
                 for p in new_paths:
-                    logger.debug(f"-- {p}")
+                    logger.debug("-- %s", p)
                 logger.debug('')
                 all_new_paths.extend(new_paths)
             current_paths = all_new_paths
@@ -85,7 +85,7 @@ class RuleBasedAnalyzer:
                 continue
             # if tail is empty and this transitions surface is not empty, no need to check.
             if len(path.tail) == 0 and transition.has_surface_form:
-                logger.debug(f"Rejecting path {path}: Path and transition surface mismatch: ")
+                logger.debug("Rejecting path %s: Path and transition surface mismatch: ", path)
                 continue
 
             surface = generate_surface(
@@ -95,12 +95,12 @@ class RuleBasedAnalyzer:
             # no need to go further if generated surface form is not a prefix of the paths's tail.
             tail_starts_with = path.tail.startswith(surface)
             if not tail_starts_with:
-                logger.debug(f"Rejecting path {path}: tail doesnt start with {path.tail}-{surface}")
+                logger.debug("Rejecting path %s: tail doesnt start with %s-%s", path, path.tail, surface)
                 continue
 
             # check conditions.
             if not transition.can_pass(path):
-                logger.debug(f"Rejecting path {path}-{transition}: can't pass")
+                logger.debug("Rejecting path %s-%s: can't pass", path, transition)
                 continue
 
             # epsilon (empty) transition. Add and continue. Use existing attributes.
@@ -108,14 +108,14 @@ class RuleBasedAnalyzer:
                 blank_surface_transition = SurfaceTransition("", transition)
                 new_path = path.copy(blank_surface_transition, path.phonetic_attributes)
                 new_paths.append(new_path)
-                logger.debug(f"Appending path {new_path}")
+                logger.debug("Appending path %s", new_path)
                 continue
 
             surface_transition = SurfaceTransition(surface, transition)
 
             # if tail is equal to surface, no need to calculate phonetic attributes.
             tail_equals_surface = path.tail == surface
-            attributes = path.phonetic_attributes if tail_equals_surface \
+            attributes = set(path.phonetic_attributes) if tail_equals_surface \
                 else calculate_phonetic_attributes(surface, tuple(path.phonetic_attributes))
 
             # This is required for suffixes like `cik` and `ciğ`
@@ -131,11 +131,11 @@ class RuleBasedAnalyzer:
                 attributes.add(PhoneticAttribute.ExpectsVowel)
                 attributes.add(PhoneticAttribute.CannotTerminate)
             p = path.copy(surface_transition, attributes)
-            logger.debug(f"P path: {p}")
+            logger.debug("P path: %s", p)
             new_paths.append(p)
-        logger.debug(f"FINAL: ")
+        logger.debug("FINAL: ")
         for i, p in enumerate(new_paths):
-            logger.debug(f"\t {i}: {p}")
+            logger.debug("\t %s: %s", i, p)
         # print()
         return new_paths
 

@@ -235,7 +235,7 @@ class RootLexicon:
     ]
 
     def __init__(self):
-        self.item_set: set[DictionaryItem] = set()
+        self.item_set: dict[DictionaryItem, None] = {}
         self.id_dict: dict[str, DictionaryItem] = {}
         self.item_dict: dict[str, list[DictionaryItem]] = {}
 
@@ -270,7 +270,7 @@ class RootLexicon:
         if item.id_ in self.id_dict:
             print(f"Duplicated item id_ of {item}: {item.id_} with {self.id_dict.get(item.id_)}")
             return
-        self.item_set.add(item)
+        self.item_set[item] = None
         self.id_dict[item.id_] = item
         if item.lemma in self.item_dict:
             self.item_dict[item.lemma].append(item)
@@ -286,7 +286,7 @@ class RootLexicon:
     def remove(self, item: DictionaryItem):
         self.item_dict.get(item.lemma)  # TODO: test if works
         self.id_dict.pop(item.id_)
-        self.item_set.remove(item)
+        del self.item_set[item]
 
     def __len__(self):
         return len(self.item_dict)

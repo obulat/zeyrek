@@ -6,8 +6,16 @@ authors = [
     {name = "Olga Bulat", email = "obulat@gmail.com"},
 ]
 dependencies = [
+    "nltk>=3.8.1",
+]
+
+requires-python = ">=3.9"
+readme = "README.md"
+license = {text = "MIT"}
+
+[dependency-groups]
+dev = [
     "click==8.1.7",
-    "nltk==3.8.1",
     "pytest==8.2.2",
     "readme-renderer==35.0",
     "regex==2024.5.15",
@@ -20,10 +28,6 @@ dependencies = [
     "sphinx-autobuild>=2024.4.16",
     "bumpver>=2023.1129",
 ]
-
-requires-python = ">=3.9"
-readme = "README.md"
-license = {text = "MIT"}
 
 [project.urls]
 Homepage = "https://github.com/obulat/zeyrek"
