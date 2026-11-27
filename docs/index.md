@@ -10,15 +10,15 @@ base (non-inflected) forms of words.
 
 To use Zeyrek, first create an instance of MorphAnalyzer class:
 
-```shell
+```pycon
 >>> import zeyrek
 >>> analyzer = zeyrek.MorphAnalyzer()
 ```
 
 Then, you can call its `analyze` method on words or texts to get all possible analyses:
 
-```shell
->>> for parse in analyzer.analyze('benim')[0]:
+```pycon
+>>> for parse in analyzer.analyze("benim")[0]:
 ...     print(parse)
 Parse(word='benim', lemma='ben', pos='Noun', morphemes=['Noun', 'A3sg', 'P1sg'], formatted='[ben:Noun] ben:Noun+A3sg+im:P1sg')
 Parse(word='benim', lemma='ben', pos='Pron', morphemes=['Pron', 'A1sg', 'Gen'], formatted='[ben:Pron,Pers] ben:Pron+A1sg+im:Gen')
@@ -26,11 +26,19 @@ Parse(word='benim', lemma='ben', pos='Verb', morphemes=['Noun', 'A3sg', 'Zero', 
 Parse(word='benim', lemma='ben', pos='Verb', morphemes=['Pron', 'A1sg', 'Zero', 'Verb', 'Pres', 'A1sg'], formatted='[ben:Pron,Pers] ben:Pron+A1sg|Zero→Verb+Pres+im:A1sg')
 ```
 
-If you only need the base form of words, or lemmas, you can call `lemmatize`. It returns a list
-of tuples, with word itself and a list of possible lemmas:
+If you only need the base form of words, or lemmas, you can call `lemmatize`. It returns
+the most likely lemma for each word of the text:
 
-```shell
->>> print(analyzer.lemmatize('benim'))
+```pycon
+>>> analyzer.lemmatize("benim evim")
+['ben', 'ev']
+```
+
+To get every possible lemma, create the analyzer with `return_all_lemmas=True`. `lemmatize`
+then returns a list of tuples, with each word and a list of its possible lemmas:
+
+```pycon
+>>> zeyrek.MorphAnalyzer(return_all_lemmas=True).lemmatize("benim")
 [('benim', ['ben'])]
 ```
 
