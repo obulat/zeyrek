@@ -18,6 +18,9 @@ from zeyrek.rulebasedanalyzer import RuleBasedAnalyzer, SingleAnalysis
 NUMBER = re.compile(r"[+-]?\d+(?:[.,]\d+)*")
 THOUSANDS = re.compile(r"[+-]?\d{1,3}(?:\.\d{3})+")
 APOSTROPHE_ROOTS = (SecondaryPos.ProperNoun, SecondaryPos.Abbreviation)
+# Ottoman Turkish joins nouns with the Persian izafet, "bakiye-i ömür", and the
+# Arabic article, "Şeyh-ül İslam", written after a hyphen.
+OTTOMAN_LINK = re.compile(r"(\w+)-(?:ı|i|u|ü|ul|ül)")
 
 
 class Parse(NamedTuple):
@@ -147,7 +150,10 @@ class MorphAnalyzer:
         stem, apostrophe, ending = word.replace("’", "'").partition("'")
         if NUMBER.fullmatch(stem):
             return self._parse_number(stem, _normalize(ending))
-        analyses = self.analyzer.analyze(_normalize(word))
+        normalized_word = _normalize(word)
+        analyses = self.analyzer.analyze(normalized_word) or self._parse_ottoman_link(
+            normalized_word
+        )
         if not (apostrophe and stem):
             return analyses
         # An apostrophe separates a proper noun or an abbreviation from its suffixes,
@@ -158,7 +164,8 @@ class MorphAnalyzer:
             for a in analyses
             if a.stem == root and a.dict_item.secondary_pos in APOSTROPHE_ROOTS
         ]
-        return proper or self._parse_proper_noun(stem, _normalize(ending))
+        # In Ottoman words like "Mün'im", the apostrophe stands for a letter instead.
+        return proper or self._parse_proper_noun(stem, _normalize(ending)) or analyses
 
     def _analyze_unknown_stem(self, item: DictionaryItem, ending: str):
         transition = StemTransition(item, self.morphotactics.get_root_state(item))
@@ -185,6 +192,11 @@ class MorphAnalyzer:
             number, number, PrimaryPos.Numeral, kind, set(), pronunciation, 0
         )
         return self._analyze_unknown_stem(item, ending)
+
+    def _parse_ottoman_link(self, word: str) -> list[SingleAnalysis]:
+        """Analyses the noun of "bakiye-i", without the izafet after the hyphen."""
+        match = OTTOMAN_LINK.fullmatch(word)
+        return self.analyzer.analyze(match[1]) if match else []
 
     def _analyze_text(self, text, verbose=False):
         from nltk.tokenize import sent_tokenize
