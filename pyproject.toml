@@ -1,6 +1,6 @@
 [project]
 name = "zeyrek"
-version = "0.1.4a0"
+version = "0.2.0"
 description = "Python morphological analyzer and lemmatizer for Turkish"
 authors = [
     {name = "Olga Bulat", email = "obulat@gmail.com"},
