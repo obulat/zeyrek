@@ -4,21 +4,20 @@ from zeyrek.attributes import RootAttribute, PhoneticAttribute
 
 
 class Condition:
-
     def accept(self, path):
         raise NotImplementedError
 
     def and_(self, other):
-        if type(other) == CombinedCondition and other.operator == 'AND':
-            return CombinedCondition('AND', [self, *other.conditions])
+        if type(other) == CombinedCondition and other.operator == "AND":
+            return CombinedCondition("AND", [self, *other.conditions])
         else:
-            return CombinedCondition('AND', [self, other])
+            return CombinedCondition("AND", [self, other])
 
     def or_(self, other):
-        if type(other) == CombinedCondition and other.operator == 'OR':
-            return CombinedCondition('OR', [self, *other.conditions])
+        if type(other) == CombinedCondition and other.operator == "OR":
+            return CombinedCondition("OR", [self, *other.conditions])
         else:
-            return CombinedCondition('OR', [self, other])
+            return CombinedCondition("OR", [self, other])
 
     def and_not(self, other):
         return self.and_(other.not_())
@@ -45,7 +44,6 @@ class NotCondition(Condition):
 
 
 class CombinedCondition(Condition):
-
     def __init__(self, operator, conditions):
         self.operator = operator
         self.conditions = conditions
@@ -56,7 +54,7 @@ class CombinedCondition(Condition):
         elif len(self.conditions) == 1:
             return self.conditions[0].accept(path)
 
-        if self.operator == 'AND':
+        if self.operator == "AND":
             return all(condition.accept(path) for condition in self.conditions)
         else:
             return any(condition.accept(path) for condition in self.conditions)
@@ -152,7 +150,6 @@ class DictionaryItemIsAny(Condition):
 
 
 class HasAnySuffixSurface(Condition):
-
     def accept(self, path):
         return path.contains_suffix_with_surface
 
@@ -268,7 +265,6 @@ class RootSurfaceIsAny(Condition):
 
 
 class LastDerivationIs(Condition):
-
     def __init__(self, state):
         self.state = state
 
@@ -284,7 +280,6 @@ class LastDerivationIs(Condition):
 
 
 class HasDerivation(Condition):
-
     def accept(self, path):
         suffixes = path.transitions
         return any(suffix.state.derivative for suffix in suffixes)
@@ -331,7 +326,7 @@ class CurrentGroupContainsAny(Condition):
 
 
 class PreviousGroupContains(Condition):
-    """ Checks if any of the "MorphemeState" in "states" exist in previous Inflectional Group.
+    """Checks if any of the "MorphemeState" in "states" exist in previous Inflectional Group.
     # If previous group starts after a derivation, derivation MorphemeState is also checked.
     """
 
@@ -383,7 +378,7 @@ class PreviousGroupContainsMorpheme(Condition):
         return False
 
     def __repr__(self):
-        morpheme_str = ', '.join([m.id_ for m in self.morphemes])
+        morpheme_str = ", ".join([m.id_ for m in self.morphemes])
         return f"PreviousGroupContainsMorpheme({morpheme_str})"
 
 
@@ -415,12 +410,13 @@ class ContainsMorpheme(Condition):
         return any(suffix.state.morpheme in self.morphemes for suffix in suffixes)
 
     def __repr__(self):
-        morphemes_str = ', '.join([m.id_ for m in self.morphemes])
+        morphemes_str = ", ".join([m.id_ for m in self.morphemes])
         return f"ContainsMorpheme({morphemes_str})"
 
 
 class PreviousMorphemeIsAny(Condition):
     """Second before last morpheme"""
+
     def __init__(self, *morphemes):
         self.morphemes = morphemes
 
@@ -433,7 +429,6 @@ class PreviousMorphemeIsAny(Condition):
 
 
 class PreviousStateIsAny(Condition):
-
     def __init__(self, *states):
         self.states = states
 

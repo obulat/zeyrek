@@ -1,8 +1,21 @@
 from typing import NamedTuple
 
-from zeyrek.attributes import PhoneticAttribute, calculate_phonetic_attributes, RootAttribute, PrimaryPos
+from zeyrek.attributes import (
+    PhoneticAttribute,
+    calculate_phonetic_attributes,
+    RootAttribute,
+    PrimaryPos,
+)
 from zeyrek.lexicon import DictionaryItem
-from zeyrek.morphotactics import SurfaceTransition, SearchPath, generate_surface, nom, pnon, Morpheme, SuffixTransition
+from zeyrek.morphotactics import (
+    SurfaceTransition,
+    SearchPath,
+    generate_surface,
+    nom,
+    pnon,
+    Morpheme,
+    SuffixTransition,
+)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -64,7 +77,7 @@ class RuleBasedAnalyzer:
                 logger.debug("\n--\nNew paths are: ")
                 for p in new_paths:
                     logger.debug("-- %s", p)
-                logger.debug('')
+                logger.debug("")
                 all_new_paths.extend(new_paths)
             current_paths = all_new_paths
         return result
@@ -85,17 +98,22 @@ class RuleBasedAnalyzer:
                 continue
             # if tail is empty and this transitions surface is not empty, no need to check.
             if len(path.tail) == 0 and transition.has_surface_form:
-                logger.debug("Rejecting path %s: Path and transition surface mismatch: ", path)
+                logger.debug(
+                    "Rejecting path %s: Path and transition surface mismatch: ", path
+                )
                 continue
 
-            surface = generate_surface(
-                transition,
-                path.phonetic_attributes)
+            surface = generate_surface(transition, path.phonetic_attributes)
 
             # no need to go further if generated surface form is not a prefix of the paths's tail.
             tail_starts_with = path.tail.startswith(surface)
             if not tail_starts_with:
-                logger.debug("Rejecting path %s: tail doesnt start with %s-%s", path, path.tail, surface)
+                logger.debug(
+                    "Rejecting path %s: tail doesnt start with %s-%s",
+                    path,
+                    path.tail,
+                    surface,
+                )
                 continue
 
             # check conditions.
@@ -115,8 +133,13 @@ class RuleBasedAnalyzer:
 
             # if tail is equal to surface, no need to calculate phonetic attributes.
             tail_equals_surface = path.tail == surface
-            attributes = set(path.phonetic_attributes) if tail_equals_surface \
-                else calculate_phonetic_attributes(surface, tuple(path.phonetic_attributes))
+            attributes = (
+                set(path.phonetic_attributes)
+                if tail_equals_surface
+                else calculate_phonetic_attributes(
+                    surface, tuple(path.phonetic_attributes)
+                )
+            )
 
             # This is required for suffixes like `cik` and `ciğ`
             # an extra attribute is added if "cik" or "ciğ" is generated and matches the tail.
@@ -125,9 +148,9 @@ class RuleBasedAnalyzer:
             if PhoneticAttribute.CannotTerminate in attributes:
                 attributes.discard(PhoneticAttribute.CannotTerminate)
             last_token = transition.last_template_token
-            if last_token.type_ == 'LAST_VOICED':
+            if last_token.type_ == "LAST_VOICED":
                 attributes.add(PhoneticAttribute.ExpectsConsonant)
-            elif last_token.type_ == 'LAST_NOT_VOICED':
+            elif last_token.type_ == "LAST_NOT_VOICED":
                 attributes.add(PhoneticAttribute.ExpectsVowel)
                 attributes.add(PhoneticAttribute.CannotTerminate)
             p = path.copy(surface_transition, attributes)
@@ -213,11 +236,13 @@ def parse_analysis(search_path: SearchPath) -> SingleAnalysis:
     # a DictionaryItem is generated with root "zeytinyağ". But here we switch to the original.
     if search_path.dict_item.has_attribute(RootAttribute.Dummy):
         dict_item = search_path.dict_item.ref_item
-    ending = ''.join([_[1] for _ in morphemes[1:]]) if len(morphemes) > 1 else ''
-    pos = 'Unknown'
-    for m in morphemes[group_boundaries[-1]:]:
+    ending = "".join([_[1] for _ in morphemes[1:]]) if len(morphemes) > 1 else ""
+    pos = "Unknown"
+    for m in morphemes[group_boundaries[-1] :]:
         if m[0].pos is not None:
             pos = m[0].pos
             break
 
-    return SingleAnalysis(dict_item, morphemes[0][1], ending, morphemes, group_boundaries, pos)
+    return SingleAnalysis(
+        dict_item, morphemes[0][1], ending, morphemes, group_boundaries, pos
+    )

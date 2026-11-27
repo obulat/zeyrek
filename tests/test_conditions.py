@@ -2,44 +2,95 @@
 # -*- coding: utf-8 -*-
 
 """Tests for `zeyrek.conditions` module."""
+
 import pytest
-from zeyrek.attributes import RootAttribute, PhoneticAttribute, \
-    calculate_phonetic_attributes
-from zeyrek.conditions import CombinedCondition, has, HasRootAttribute, DictionaryItemIs, not_have, \
-    HasPhoneticAttribute, DictionaryItemIsAny, NoSurfaceAfterDerivation, HasAnySuffixSurface, HasTail, \
-    PreviousMorphemeIs, PreviousStateIs, LastDerivationIs, HasDerivation, PreviousStateIsNot, HasTailSequence, \
-    ContainsMorphemeSequence, LastDerivationIsAny, PreviousGroupContains, CurrentGroupContainsAny, \
-    PreviousGroupContainsMorpheme, ContainsMorpheme, PreviousMorphemeIsAny, PreviousStateIsAny
+from zeyrek.attributes import (
+    RootAttribute,
+    PhoneticAttribute,
+    calculate_phonetic_attributes,
+)
+from zeyrek.conditions import (
+    CombinedCondition,
+    has,
+    HasRootAttribute,
+    DictionaryItemIs,
+    not_have,
+    HasPhoneticAttribute,
+    DictionaryItemIsAny,
+    NoSurfaceAfterDerivation,
+    HasAnySuffixSurface,
+    HasTail,
+    PreviousMorphemeIs,
+    PreviousStateIs,
+    LastDerivationIs,
+    HasDerivation,
+    PreviousStateIsNot,
+    HasTailSequence,
+    ContainsMorphemeSequence,
+    LastDerivationIsAny,
+    PreviousGroupContains,
+    CurrentGroupContainsAny,
+    PreviousGroupContainsMorpheme,
+    ContainsMorpheme,
+    PreviousMorphemeIsAny,
+    PreviousStateIsAny,
+)
 from zeyrek.lexicon import RootLexicon
 from zeyrek.morphology import MorphAnalyzer
-from zeyrek.morphotactics import SearchPath, StemTransition, noun_S, SurfaceTransition, SuffixTransition, \
-    adjectiveRoot_ST, verbRoot_S, become_S, vPast_S, past, verb, vCausTir_S, \
-    nom_ST, vAgt_S, a3sg_S, pnon_S, morphemes, agt, a3sg, noun, pnon, nom, vPass_S, vAble_S
+from zeyrek.morphotactics import (
+    SearchPath,
+    StemTransition,
+    noun_S,
+    SurfaceTransition,
+    SuffixTransition,
+    adjectiveRoot_ST,
+    verbRoot_S,
+    become_S,
+    vPast_S,
+    past,
+    verb,
+    vCausTir_S,
+    nom_ST,
+    vAgt_S,
+    a3sg_S,
+    pnon_S,
+    morphemes,
+    agt,
+    a3sg,
+    noun,
+    pnon,
+    nom,
+    vPass_S,
+    vAble_S,
+)
 
 import nltk
-nltk.download('punkt_tab')
+
+nltk.download("punkt_tab")
 
 lex = RootLexicon.from_lines(["adak", "elma", "beyaz [P:Adj]", "meyve"])
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def lex_from_lines():
     return RootLexicon.from_lines(["adak", "elma", "beyaz [P:Adj]", "meyve"])
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def mt_lexicon():
     """Connects morphotactics graph and returns full lexicon"""
     lemmer = MorphAnalyzer()
     return lemmer.lexicon
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def searchpath_dict_item_with_tail_and_RA_voicing(mt_lexicon):
-    adak = mt_lexicon.get_item_by_id('adak_Noun')  # , elma, beyaz, meyve
-    stem_transition = StemTransition(adak, noun_S, calculate_phonetic_attributes(adak.pronunciation), surface='adağ')
+    adak = mt_lexicon.get_item_by_id("adak_Noun")  # , elma, beyaz, meyve
+    stem_transition = StemTransition(
+        adak, noun_S, calculate_phonetic_attributes(adak.pronunciation), surface="adağ"
+    )
     print(f"Stem transition: {stem_transition}")
-    path = SearchPath.initial(stem_transition, 'a')
+    path = SearchPath.initial(stem_transition, "a")
     print(f"Path {path}")
     return path
 
@@ -49,36 +100,94 @@ def simple_condition():
     return has(PhoneticAttribute.CannotTerminate)
 
 
-@pytest.mark.parametrize("text_input, expected", [
-    # (simple_condition, 1),
-    (has(PhoneticAttribute.CannotTerminate), 1),
-    (CombinedCondition('AND', [simple_condition, simple_condition]), 2),
-    (CombinedCondition('OR', [simple_condition, simple_condition]), 2),
-    (CombinedCondition('AND', [CombinedCondition('AND', [simple_condition, simple_condition]), simple_condition]), 3)
-])
+@pytest.mark.parametrize(
+    "text_input, expected",
+    [
+        # (simple_condition, 1),
+        (has(PhoneticAttribute.CannotTerminate), 1),
+        (CombinedCondition("AND", [simple_condition, simple_condition]), 2),
+        (CombinedCondition("OR", [simple_condition, simple_condition]), 2),
+        (
+            CombinedCondition(
+                "AND",
+                [
+                    CombinedCondition("AND", [simple_condition, simple_condition]),
+                    simple_condition,
+                ],
+            ),
+            3,
+        ),
+    ],
+)
 def test_condition_len(text_input, expected):
     condition = text_input
     assert len(condition) == expected
 
 
-@pytest.mark.parametrize("test_input, expected_op_len", [
-    ([has(PhoneticAttribute.CannotTerminate), has(RootAttribute.CompoundP3sgRoot)], ['AND', 2]),
-
-    ([has(PhoneticAttribute.CannotTerminate),
-      CombinedCondition('AND', [has(RootAttribute.CompoundP3sgRoot), has(PhoneticAttribute.CannotTerminate)])],
-     ['AND', 3]),
-
-    ([CombinedCondition('AND', [has(RootAttribute.CompoundP3sgRoot), has(PhoneticAttribute.CannotTerminate)]),
-      has(PhoneticAttribute.CannotTerminate)], ['AND', 3]),
-
-    ([has(PhoneticAttribute.CannotTerminate),
-      CombinedCondition('OR', [has(RootAttribute.CompoundP3sgRoot), has(PhoneticAttribute.CannotTerminate)])],
-     ['AND', 3]),
-
-    ([CombinedCondition('OR', [has(RootAttribute.CompoundP3sgRoot), has(PhoneticAttribute.CannotTerminate)]),
-      has(PhoneticAttribute.CannotTerminate)], ['AND', 3])
-
-])
+@pytest.mark.parametrize(
+    "test_input, expected_op_len",
+    [
+        (
+            [
+                has(PhoneticAttribute.CannotTerminate),
+                has(RootAttribute.CompoundP3sgRoot),
+            ],
+            ["AND", 2],
+        ),
+        (
+            [
+                has(PhoneticAttribute.CannotTerminate),
+                CombinedCondition(
+                    "AND",
+                    [
+                        has(RootAttribute.CompoundP3sgRoot),
+                        has(PhoneticAttribute.CannotTerminate),
+                    ],
+                ),
+            ],
+            ["AND", 3],
+        ),
+        (
+            [
+                CombinedCondition(
+                    "AND",
+                    [
+                        has(RootAttribute.CompoundP3sgRoot),
+                        has(PhoneticAttribute.CannotTerminate),
+                    ],
+                ),
+                has(PhoneticAttribute.CannotTerminate),
+            ],
+            ["AND", 3],
+        ),
+        (
+            [
+                has(PhoneticAttribute.CannotTerminate),
+                CombinedCondition(
+                    "OR",
+                    [
+                        has(RootAttribute.CompoundP3sgRoot),
+                        has(PhoneticAttribute.CannotTerminate),
+                    ],
+                ),
+            ],
+            ["AND", 3],
+        ),
+        (
+            [
+                CombinedCondition(
+                    "OR",
+                    [
+                        has(RootAttribute.CompoundP3sgRoot),
+                        has(PhoneticAttribute.CannotTerminate),
+                    ],
+                ),
+                has(PhoneticAttribute.CannotTerminate),
+            ],
+            ["AND", 3],
+        ),
+    ],
+)
 def test_and_condition(test_input, expected_op_len):
     cond1, cond2 = test_input
     operator, length = expected_op_len
@@ -87,24 +196,70 @@ def test_and_condition(test_input, expected_op_len):
     assert and_cond.operator == operator
 
 
-@pytest.mark.parametrize("test_input, expected_op_len", [
-    ([has(PhoneticAttribute.CannotTerminate), has(RootAttribute.CompoundP3sgRoot)], ['OR', 2]),
-
-    ([has(PhoneticAttribute.CannotTerminate),
-      CombinedCondition('AND', [has(RootAttribute.CompoundP3sgRoot), has(PhoneticAttribute.CannotTerminate)])],
-     ['OR', 3]),
-
-    ([CombinedCondition('AND', [has(RootAttribute.CompoundP3sgRoot), has(PhoneticAttribute.CannotTerminate)]),
-      has(PhoneticAttribute.CannotTerminate)], ['OR', 3]),
-
-    ([has(PhoneticAttribute.CannotTerminate),
-      CombinedCondition('OR', [has(RootAttribute.CompoundP3sgRoot), has(PhoneticAttribute.CannotTerminate)])],
-     ['OR', 3]),
-
-    ([CombinedCondition('OR', [has(RootAttribute.CompoundP3sgRoot), has(PhoneticAttribute.CannotTerminate)]),
-      has(PhoneticAttribute.CannotTerminate)], ['OR', 3])
-
-])
+@pytest.mark.parametrize(
+    "test_input, expected_op_len",
+    [
+        (
+            [
+                has(PhoneticAttribute.CannotTerminate),
+                has(RootAttribute.CompoundP3sgRoot),
+            ],
+            ["OR", 2],
+        ),
+        (
+            [
+                has(PhoneticAttribute.CannotTerminate),
+                CombinedCondition(
+                    "AND",
+                    [
+                        has(RootAttribute.CompoundP3sgRoot),
+                        has(PhoneticAttribute.CannotTerminate),
+                    ],
+                ),
+            ],
+            ["OR", 3],
+        ),
+        (
+            [
+                CombinedCondition(
+                    "AND",
+                    [
+                        has(RootAttribute.CompoundP3sgRoot),
+                        has(PhoneticAttribute.CannotTerminate),
+                    ],
+                ),
+                has(PhoneticAttribute.CannotTerminate),
+            ],
+            ["OR", 3],
+        ),
+        (
+            [
+                has(PhoneticAttribute.CannotTerminate),
+                CombinedCondition(
+                    "OR",
+                    [
+                        has(RootAttribute.CompoundP3sgRoot),
+                        has(PhoneticAttribute.CannotTerminate),
+                    ],
+                ),
+            ],
+            ["OR", 3],
+        ),
+        (
+            [
+                CombinedCondition(
+                    "OR",
+                    [
+                        has(RootAttribute.CompoundP3sgRoot),
+                        has(PhoneticAttribute.CannotTerminate),
+                    ],
+                ),
+                has(PhoneticAttribute.CannotTerminate),
+            ],
+            ["OR", 3],
+        ),
+    ],
+)
 def test_or_condition(test_input, expected_op_len):
     cond1, cond2 = test_input
     operator, length = expected_op_len
@@ -136,38 +291,47 @@ def test_has_phonetic_attributes(searchpath_dict_item_with_tail_and_RA_voicing):
     assert not not_have(PhoneticAttribute.LastVowelBack).accept(path)
 
 
-def test_DictionaryItemIs(searchpath_dict_item_with_tail_and_RA_voicing,
-                          lex_from_lines):
+def test_DictionaryItemIs(
+    searchpath_dict_item_with_tail_and_RA_voicing, lex_from_lines
+):
     """Tests DictionaryItemIs"""
     path = searchpath_dict_item_with_tail_and_RA_voicing
-    adak = lex_from_lines.get_item_by_id('adak_Noun')
+    adak = lex_from_lines.get_item_by_id("adak_Noun")
     assert DictionaryItemIs(adak).accept(path)
 
-    elma = lex_from_lines.get_item_by_id('elma_Noun')
+    elma = lex_from_lines.get_item_by_id("elma_Noun")
     assert not DictionaryItemIs(elma).accept(path)
 
 
-def test_DictionaryItemIsAny(mt_lexicon,
-                             searchpath_dict_item_with_tail_and_RA_voicing):
+def test_DictionaryItemIsAny(mt_lexicon, searchpath_dict_item_with_tail_and_RA_voicing):
     path = searchpath_dict_item_with_tail_and_RA_voicing
-    adak = mt_lexicon.get_item_by_id('adak_Noun')
-    elma = mt_lexicon.get_item_by_id('elma_Noun')
+    adak = mt_lexicon.get_item_by_id("adak_Noun")
+    elma = mt_lexicon.get_item_by_id("elma_Noun")
     assert not DictionaryItemIsAny(elma).accept(path)
     assert DictionaryItemIsAny(elma, adak).accept(path)
     assert DictionaryItemIsAny(adak).accept(path)
     assert DictionaryItemIsAny([elma, adak])
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def beyazlastirici_paths(mt_lexicon):
-    beyaz = mt_lexicon.get_item_by_id('beyaz_Adj')
+    beyaz = mt_lexicon.get_item_by_id("beyaz_Adj")
     assert beyaz is not None
 
-    states = [(become_S, 'laş'), (verbRoot_S, ''), (vCausTir_S, 'tır'), (verbRoot_S, ''),
-              (vAgt_S, 'ıcı'), (noun_S, ''), (a3sg_S, ''), (pnon_S, ''), (nom_ST, '')]
+    states = [
+        (become_S, "laş"),
+        (verbRoot_S, ""),
+        (vCausTir_S, "tır"),
+        (verbRoot_S, ""),
+        (vAgt_S, "ıcı"),
+        (noun_S, ""),
+        (a3sg_S, ""),
+        (pnon_S, ""),
+        (nom_ST, ""),
+    ]
     stem_transition = StemTransition(beyaz, adjectiveRoot_ST)
     surface_transitions = [SurfaceTransition(stem_transition.surface, stem_transition)]
-    path = SearchPath.initial(stem_transition, 'laştırıcı')
+    path = SearchPath.initial(stem_transition, "laştırıcı")
     paths = [path]
     previous_state = adjectiveRoot_ST
     attrs = path.phonetic_attributes
@@ -282,20 +446,18 @@ def test_HasTailSequence(beyazlastirici_paths):
 def test_ContainsMorphemeSequence(beyazlastirici_paths):
     path = beyazlastirici_paths[3]
 
-    assert ContainsMorphemeSequence(morphemes['Adj'],
-                                    morphemes['Become'],
-                                    morphemes['Verb']
-                                    ).accept(path)
-    assert ContainsMorphemeSequence(morphemes['Adj'],
-                                    morphemes['Become']
-                                    ).accept(path)
-    assert ContainsMorphemeSequence(morphemes['Become'],
-                                    morphemes['Verb'],
-                                    morphemes['Caus']
-                                    ).accept(path)
+    assert ContainsMorphemeSequence(
+        morphemes["Adj"], morphemes["Become"], morphemes["Verb"]
+    ).accept(path)
+    assert ContainsMorphemeSequence(morphemes["Adj"], morphemes["Become"]).accept(path)
+    assert ContainsMorphemeSequence(
+        morphemes["Become"], morphemes["Verb"], morphemes["Caus"]
+    ).accept(path)
 
-    assert ContainsMorphemeSequence(morphemes['Become']).accept(path)
-    assert not ContainsMorphemeSequence(morphemes['Become'], morphemes['Caus']).accept(path)
+    assert ContainsMorphemeSequence(morphemes["Become"]).accept(path)
+    assert not ContainsMorphemeSequence(morphemes["Become"], morphemes["Caus"]).accept(
+        path
+    )
 
 
 def test_LastDerivationIsAny(beyazlastirici_paths):
@@ -336,32 +498,31 @@ def test_PreviousGroupContainsMorpheme(beyazlastirici_paths):
     path = beyazlastirici_paths[4]
     # WHERE the previous infl group is: become_S + verbRoot_S
     # the current inflection group is ici:vCausTir_S+verbRoot_S
-    assert not PreviousGroupContainsMorpheme(morphemes['Caus']).accept(path)
-    assert PreviousGroupContainsMorpheme(morphemes['Become']).accept(path)
-    assert PreviousGroupContainsMorpheme(morphemes['Verb']).accept(path)
+    assert not PreviousGroupContainsMorpheme(morphemes["Caus"]).accept(path)
+    assert PreviousGroupContainsMorpheme(morphemes["Become"]).accept(path)
+    assert PreviousGroupContainsMorpheme(morphemes["Verb"]).accept(path)
 
 
 def test_ContainsMorpheme(beyazlastirici_paths):
     path = beyazlastirici_paths[4]
-    assert ContainsMorpheme(morphemes['Verb']).accept(path)
-    assert ContainsMorpheme(morphemes['Agt']).not_().accept(path)
-    assert not ContainsMorpheme(morphemes['JustLike']).accept(path)
+    assert ContainsMorpheme(morphemes["Verb"]).accept(path)
+    assert ContainsMorpheme(morphemes["Agt"]).not_().accept(path)
+    assert not ContainsMorpheme(morphemes["JustLike"]).accept(path)
 
 
 def test_PreviousMorphemeIsAny(beyazlastirici_paths):
     path = beyazlastirici_paths[4]
     # WHERE path end is: become_S + verbRoot_S+ici:vCausTir_S+verbRoot_S
-    assert not PreviousMorphemeIsAny(morphemes['Verb'],
-                                     morphemes['Noun']).accept(path)
-    assert PreviousMorphemeIsAny(morphemes['Caus']).accept(path)
+    assert not PreviousMorphemeIsAny(morphemes["Verb"], morphemes["Noun"]).accept(path)
+    assert PreviousMorphemeIsAny(morphemes["Caus"]).accept(path)
 
 
 def test_PreviousStateIsAny(beyazlastirici_paths):
     path = beyazlastirici_paths[4]
     # WHERE path end is: become_S + verbRoot_S+ici:vCausTir_S+verbRoot_S
-    assert not PreviousStateIsAny(morphemes['Verb'],
-                                  morphemes['Noun']).accept(path)
-    assert PreviousMorphemeIsAny(morphemes['Caus']).accept(path)
+    assert not PreviousStateIsAny(morphemes["Verb"], morphemes["Noun"]).accept(path)
+    assert PreviousMorphemeIsAny(morphemes["Caus"]).accept(path)
+
 
 # TODO: SecondaryPosIs
 # TODO: RootSurfaceIs

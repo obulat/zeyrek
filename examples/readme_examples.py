@@ -1,12 +1,13 @@
 from zeyrek import MorphAnalyzer
 import nltk
-nltk.download('punkt')
+
+nltk.download("punkt")
 
 
 def run_examples():
     analyzer = MorphAnalyzer()
 
-    with open('text.txt', encoding='utf-8') as text_file:
+    with open("text.txt", encoding="utf-8") as text_file:
         text = text_file.read()
 
     # Analyze text from the file and print out formatted parses of each word.
@@ -18,5 +19,5 @@ def run_examples():
         print()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_examples()
