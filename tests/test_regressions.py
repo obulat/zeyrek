@@ -238,3 +238,22 @@ def test_derived_lemmas(analyzer, word, lemmas):
 
 def test_derived_lemmas_of_an_unknown_word(analyzer):
     assert analyzer.derived_lemmas("xqzt") == []
+
+
+@pytest.mark.parametrize(
+    "word, lemma",
+    [
+        # https://github.com/obulat/zeyrek/issues/34
+        ("Rezzâk-ı", "Rezzak"),
+        ("bakiye-i", "bakiye"),
+        ("Mün'im-i", "Münim"),
+        ("Şeyh-ül", "şeyh"),
+        ("Zülcelâle", "Zülcelâl"),
+    ],
+)
+def test_ottoman_compounds(analyzer, word, lemma):
+    assert lemma in {parse.lemma for parse in analyzer.analyze_word(word)}
+
+
+def test_hyphen_without_an_izafet_is_still_unknown(analyzer):
+    assert [parse.lemma for parse in analyzer.analyze_word("ev-ler")] == ["Unk"]
