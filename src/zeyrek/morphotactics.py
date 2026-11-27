@@ -852,11 +852,13 @@ class StemTransitionsMapBased:
         self, dict_item: DictionaryItem
     ) -> list["StemTransition"]:
         result = list(dict_item.pronunciation)
-        original_attrs = calculate_phonetic_attributes(dict_item.pronunciation)
-        modified_attrs = original_attrs.copy()
+        original_attrs = set(calculate_phonetic_attributes(dict_item.pronunciation))
+        modified_attrs = set(original_attrs)
         modified_root_state_value: MorphemeState | None = None
         unmodified_root_state = None
-        for attr in dict_item.attributes:
+        # Apply the attributes in declaration order, as Zemberek's EnumSet does,
+        # so roots with several of them (ret: Voicing, Doubling) don't depend on set order.
+        for attr in sorted(dict_item.attributes, key=lambda a: a.value):
             if attr == RootAttribute.Voicing:
                 last = dict_item.pronunciation[-1]
                 voiced = tr.voice(last)
@@ -903,7 +905,9 @@ class StemTransitionsMapBased:
                 if len(result) > 1:
                     result.pop()
                     if tr.contains_vowel("".join(result)):
-                        modified_attrs = calculate_phonetic_attributes("".join(result))
+                        modified_attrs = set(
+                            calculate_phonetic_attributes("".join(result))
+                        )
                     modified_attrs.add(PhoneticAttribute.LastLetterDropped)
             else:
                 continue
@@ -3326,10 +3330,10 @@ class StemTransition(MorphemeTransition):
                 )
         self.surface = surface if surface is not None else dict_item.root
         self.dict_item = dict_item
-        self.attrs = (
+        self.attrs = set(
             calculate_phonetic_attributes(dict_item.pronunciation)
             if attrs is None
-            else attrs.copy()
+            else attrs
         )
 
     def __str__(self):
@@ -3618,7 +3622,7 @@ class SearchPath:
     ) -> "SearchPath":
         phonetic_attributes = (
             calculate_phonetic_attributes(
-                surface_node.surface, tuple(self.phonetic_attributes)
+                surface_node.surface, frozenset(self.phonetic_attributes)
             )
             if pa is None
             else pa
@@ -3628,7 +3632,7 @@ class SearchPath:
         hist.append(surface_node)
         new_tail = self.tail[len(surface_node.surface) :]
         path = SearchPath(
-            new_tail, surface_node.state, hist, phonetic_attributes.copy(), is_terminal
+            new_tail, surface_node.state, hist, set(phonetic_attributes), is_terminal
         )
         path.contains_suffix_with_surface = (
             self.contains_suffix_with_surface or len(surface_node.surface) > 0

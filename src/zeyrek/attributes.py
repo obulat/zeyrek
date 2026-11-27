@@ -314,12 +314,17 @@ no_vowel_attrs = [
 
 @functools.lru_cache(maxsize=128, typed=False)
 def calculate_phonetic_attributes(
-    word: str, predecessor_attrs: "tuple[PhoneticAttribute] | None" = None
-) -> set[PhoneticAttribute]:
+    word: str, predecessor_attrs: "frozenset[PhoneticAttribute] | None" = None
+) -> frozenset[PhoneticAttribute]:
+    """Return the phonetic attributes of ``word``.
+
+    The result is cached, so it is a frozenset: callers that add or remove
+    attributes must copy it into a ``set`` first.
+    """
     p_attrs = set() if predecessor_attrs is None else set(predecessor_attrs)
     # the word should be in lower case
     if len(word) == 0:
-        return p_attrs
+        return frozenset(p_attrs)
     result = set()
     last_letter = word[-1]
     if last_letter in tr.vowels_lower_set:
@@ -352,7 +357,7 @@ def calculate_phonetic_attributes(
         result.discard(PhoneticAttribute.LastLetterVowel)
         result.discard(PhoneticAttribute.ExpectsConsonant)
 
-    return result
+    return frozenset(result)
 
 
 def parse_attr_data(data: str) -> set[RootAttribute]:

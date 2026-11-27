@@ -1,5 +1,9 @@
 """Tests for `zeyrek` package."""
 
+import os
+import subprocess
+import sys
+
 import nltk
 import pytest
 
@@ -126,3 +130,55 @@ def test_single_lemma():
     analyzer = MorphAnalyzer()
     res = analyzer.lemmatize("Şu dünyadaki sevilen kişi sevmeyi bilendir.")
     assert res == ["şu", "dünya", "sevmek", "kişi", "sevmek", "bilmek", "."]
+
+
+def test_phonetic_attributes_cache_cannot_be_changed():
+    attrs = calculate_phonetic_attributes("en")
+    assert isinstance(attrs, frozenset)
+    calculate_phonetic_attributes.cache_clear()
+    assert calculate_phonetic_attributes("en") == attrs
+
+
+def test_repeated_analysis_gives_the_same_lemmas():
+    # Analyzing a word used to change the cached phonetic attributes, so the
+    # second call for "olacak" found no analysis and returned the word itself.
+    analyzer = MorphAnalyzer()
+    text = "olacak oluyor gelecek yapılacak"
+    expected = ["olmak", "olmak", "gelecek", "yapmak"]
+    assert analyzer.lemmatize(text) == expected
+    assert analyzer.lemmatize(text) == expected
+
+
+def test_analysis_does_not_depend_on_hash_seed():
+    code = (
+        "from zeyrek.morphology import MorphAnalyzer;"
+        "a = MorphAnalyzer();"
+        "print(sorted(str(x) for w in ('reddi', 'reddine', 'bilendir') for x in a._parse(w)))"
+    )
+    outputs = {
+        subprocess.run(
+            [sys.executable, "-c", code],
+            env={**os.environ, "PYTHONHASHSEED": seed},
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        for seed in ("1", "2")
+    }
+    assert len(outputs) == 1
+
+
+@pytest.mark.parametrize(
+    ("base", "word", "lemma"),
+    [
+        ("okumak", "okunmak", "okumak"),
+        ("yazmak", "yazılmak", "yazmak"),
+        ("okumak", "okuyabilmek", "okumak"),
+        ("gelmek", "gelememek", "gelmek"),
+    ],
+)
+def test_analysing_a_verb_does_not_break_its_derived_forms(base, word, lemma):
+    # https://github.com/obulat/zeyrek/issues/42
+    analyzer = MorphAnalyzer()
+    analyzer.analyze(base)
+    assert analyzer.lemmatize(word) == [lemma]

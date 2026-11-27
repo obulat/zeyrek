@@ -69,7 +69,7 @@ class RuleBasedAnalyzer:
                     and PhoneticAttribute.CannotTerminate
                     not in path.phonetic_attributes
                 ):
-                    logger.warning(f"APPENDING RESULT: {path}")
+                    logger.debug(f"APPENDING RESULT: {path}")
                     result.append(path)
                     continue
                 # Creates new paths with outgoing and matching transitions.
@@ -130,11 +130,13 @@ class RuleBasedAnalyzer:
 
             # if tail is equal to surface, no need to calculate phonetic attributes.
             tail_equals_surface = path.tail == surface
-            attributes = (
+            # Copy the attributes: the parent path's set is shared with the other
+            # paths built from it, and the cached result can't be changed.
+            attributes = set(
                 path.phonetic_attributes
                 if tail_equals_surface
                 else calculate_phonetic_attributes(
-                    surface, tuple(path.phonetic_attributes)
+                    surface, frozenset(path.phonetic_attributes)
                 )
             )
 
