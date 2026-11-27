@@ -1,13 +1,22 @@
 """Main module."""
 
+import re
 from typing import ClassVar, NamedTuple
 
 from zeyrek import tr
-from zeyrek.attributes import SecondaryPos
+from zeyrek.attributes import PrimaryPos, SecondaryPos
 from zeyrek.formatters import DefaultFormatter, Formatter, UDFormatter
-from zeyrek.lexicon import RootLexicon
-from zeyrek.morphotactics import Morpheme, TurkishMorphotactics
+from zeyrek.lexicon import DictionaryItem, RootLexicon
+from zeyrek.lexicon_helpers import (
+    to_turkish_letter_pronunciation,
+    turkish_numbers_to_string,
+)
+from zeyrek.morphotactics import Morpheme, StemTransition, TurkishMorphotactics
 from zeyrek.rulebasedanalyzer import RuleBasedAnalyzer, SingleAnalysis
+
+NUMBER = re.compile(r"[+-]?\d+(?:[.,]\d+)*")
+THOUSANDS = re.compile(r"[+-]?\d{1,3}(?:\.\d{3})+")
+APOSTROPHE_ROOTS = (SecondaryPos.ProperNoun, SecondaryPos.Abbreviation)
 
 
 class Parse(NamedTuple):
@@ -37,7 +46,6 @@ class Parse(NamedTuple):
 
 def _normalize(word: str) -> str:
     word = tr.normalize_circumflex(tr.lower(word))
-    # TODO: Decide what to do with apostrophes
     word = word.replace("'", "").replace("’", "")
     return word
 
@@ -45,7 +53,21 @@ def _normalize(word: str) -> str:
 def _tokenize_text(text: str) -> list[str]:
     from nltk.tokenize import word_tokenize
 
-    return word_tokenize(text.replace("'", "").replace("’", ""), language="turkish")
+    # NLTK keeps "Ankara'da" in one token, but splits "Ankara’da" in three.
+    return word_tokenize(text.replace("’", "'"), language="turkish")
+
+
+def _read_number(number: str) -> tuple[str, SecondaryPos]:
+    """
+    How a number is read, which decides the vowels of its suffixes, and whether it is
+    a whole number. "1.000" is "bin", and "3,5" ends in "beş".
+    """
+    number = number.lstrip("+-")
+    if THOUSANDS.fullmatch(number):
+        return turkish_numbers_to_string(number.replace(".", "")), SecondaryPos.Cardinal
+    *whole, last = re.split(r"[.,]", number)
+    kind = SecondaryPos.Real if whole else SecondaryPos.Cardinal
+    return turkish_numbers_to_string(last), kind
 
 
 class MorphAnalyzer:
@@ -60,8 +82,8 @@ class MorphAnalyzer:
         >>> lemmer = zeyrek.MorphAnalyzer()
 
     Analyzer uses default text dictionaries from Zemberek-NLP. All dictionaries are
-    in resources/tr folder (TODO: add unknown word analyzer).
-    You can also add your own dictionary files in .txt format, with
+    in resources/tr folder. Numbers, and unknown proper nouns written with an
+    apostrophe, such as "Melik'in", are analysed too. You can also add your own dictionary files in .txt format, with
     each word on its own line.
 
         >>> lemmer.add_dictionary('/path/to/file')
@@ -71,7 +93,6 @@ class MorphAnalyzer:
         >>> lemmer.lemmatize('beyazlaştırmak')
         ['beyaz']
 
-    #TODO: Add analysis for words with apostrophes
     Methods should be:
     analyze: public method, takes in a string with one/more words, returns list of lists of Parses.
     lemmatize: public method, takes in a string with one/more words, returns list of lists of strings: lemmas
@@ -100,8 +121,47 @@ class MorphAnalyzer:
 
     def _parse(self, word: str) -> list[SingleAnalysis]:
         """Parses a word and returns SingleAnalysis result."""
-        normalized_word = _normalize(word)
-        return self.analyzer.analyze(normalized_word)
+        stem, apostrophe, ending = word.replace("’", "'").partition("'")
+        if NUMBER.fullmatch(stem):
+            return self._parse_number(stem, _normalize(ending))
+        analyses = self.analyzer.analyze(_normalize(word))
+        if not (apostrophe and stem):
+            return analyses
+        # An apostrophe separates a proper noun or an abbreviation from its suffixes,
+        # so the root is the part before it.
+        root = _normalize(stem)
+        proper = [
+            a
+            for a in analyses
+            if a.stem == root and a.dict_item.secondary_pos in APOSTROPHE_ROOTS
+        ]
+        return proper or self._parse_proper_noun(stem, _normalize(ending))
+
+    def _analyze_unknown_stem(self, item: DictionaryItem, ending: str):
+        transition = StemTransition(item, self.morphotactics.get_root_state(item))
+        return self.analyzer.analyze_with_stem(transition, ending)
+
+    def _parse_proper_noun(self, stem: str, ending: str) -> list[SingleAnalysis]:
+        root = _normalize(stem)
+        if not root.isalpha():
+            return []
+        if stem.isupper() and len(stem) > 1 or not tr.contains_vowel(root):
+            kind = SecondaryPos.Abbreviation
+            pronunciation = to_turkish_letter_pronunciation(root)
+        else:
+            kind, pronunciation = SecondaryPos.ProperNoun, root
+        item = DictionaryItem(
+            stem, root, PrimaryPos.Noun, kind, set(), pronunciation, 0
+        )
+        return self._analyze_unknown_stem(item, ending)
+
+    def _parse_number(self, number: str, ending: str) -> list[SingleAnalysis]:
+        reading, kind = _read_number(number)
+        pronunciation = reading.replace(" ", "")
+        item = DictionaryItem(
+            number, number, PrimaryPos.Numeral, kind, set(), pronunciation, 0
+        )
+        return self._analyze_unknown_stem(item, ending)
 
     def _analyze_text(self, text, verbose=False):
         from nltk.tokenize import sent_tokenize
