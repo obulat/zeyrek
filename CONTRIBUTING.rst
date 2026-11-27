@@ -86,7 +86,9 @@ Ready to contribute? Here's how to set up `trLemmer` for local development.
     $ uv run make -C docs html
     $ uv run sphinx-autobuild docs/ docs/_build/ --watch zeyrek/
 
-   Bump the version with ``uv run bumpver update --patch``.
+   Bump the version with ``uv version --bump patch`` (or ``minor``, ``major``,
+   ``alpha``, ``beta``, ``rc``, ``stable``). The version lives only in
+   ``pyproject.toml``; the package and the docs read it from there.
 
 6. Commit your changes and push your branch to GitHub::
 
