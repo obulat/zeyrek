@@ -64,11 +64,11 @@ Ready to contribute? Here's how to set up `trLemmer` for local development.
 
     $ git clone git@github.com:your_name_here/trLemmer.git
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+3. Install `uv <https://docs.astral.sh/uv/>`_, then create the virtualenv with the
+   package and its dev and docs dependencies::
 
-    $ mkvirtualenv trLemmer
-    $ cd trLemmer/
-    $ python setup.py develop
+    $ cd zeyrek/
+    $ uv sync
 
 4. Create a branch for local development::
 
@@ -76,14 +76,17 @@ Ready to contribute? Here's how to set up `trLemmer` for local development.
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8 and the
-   tests, including testing other Python versions with tox::
+5. When you're done making changes, run the tests, including on other Python versions::
 
-    $ flake8 trLemmer tests
-    $ python setup.py test or py.test
-    $ tox
+    $ uv run pytest
+    $ uv run --python 3.9 pytest
 
-   To get flake8 and tox, just pip install them into your virtualenv.
+   Build the docs once, or serve them with live reload::
+
+    $ uv run make -C docs html
+    $ uv run sphinx-autobuild docs/ docs/_build/ --watch zeyrek/
+
+   Bump the version with ``uv run bumpver update --patch``.
 
 6. Commit your changes and push your branch to GitHub::
 

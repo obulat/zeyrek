@@ -103,6 +103,3 @@ ENV/
 /vvenv/
 /.idea/
 
-# pdm stuff
-.pdm-python
-.pdm-build/
