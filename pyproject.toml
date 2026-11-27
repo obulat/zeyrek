@@ -5,20 +5,44 @@ description = "Python morphological analyzer and lemmatizer for Turkish"
 authors = [
     {name = "Olga Bulat", email = "obulat@gmail.com"},
 ]
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+keywords = ["turkish", "nlp", "morphology", "lemmatizer", "morphological-analysis", "zemberek"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: Turkish",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing :: Linguistic",
+]
 dependencies = [
     "nltk>=3.9",
 ]
 
-requires-python = ">=3.10"
-readme = "README.md"
-license = {text = "MIT"}
-
 [project.urls]
 Homepage = "https://github.com/obulat/zeyrek"
+Documentation = "https://zeyrek.readthedocs.io"
+Source = "https://github.com/obulat/zeyrek"
+Issues = "https://github.com/obulat/zeyrek/issues"
+Changelog = "https://github.com/obulat/zeyrek/releases"
 
 [dependency-groups]
 dev = [
     "pytest>=8.2.2",
+    "pytest-cov>=7",
+    "ruff>=0.17.6",
 ]
 docs = [
     "sphinx>=7.3.7",
@@ -36,3 +60,9 @@ default-groups = ["dev", "docs"]
 
 [tool.uv.build-backend]
 module-root = ""
+
+[tool.ruff.lint]
+extend-select = ["I", "UP", "B"]
+
+[tool.pytest.ini_options]
+addopts = "--cov=zeyrek --cov-report=term-missing --cov-report=xml"
