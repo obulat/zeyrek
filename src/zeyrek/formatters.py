@@ -47,30 +47,22 @@ class UDFormatter(Formatter, ABC):
         self.add_surface = add_surface
 
     def format_adj(self, analysis: SingleAnalysis) -> str:
-        ids = [m.id_ for m in analysis.morphemes]
-        case = ""
-        number = ""
-        person = ""
-        npsor = ""
-        psor = ""
-        if "Noun" not in ids:
-            return self.format(analysis)
+        """UD features of an adjective.
 
-        for m_id in ids:
-            if m_id in cases:
-                case = m_id
-            else:
-                possessive = UDFormatter.possessives.get(m_id)
-                if possessive is None:
-                    agreement = UDFormatter.agreement_values.get(m_id)
-                    if agreement is not None:
-                        number, person = agreement
-                else:
-                    npsor, psor = possessive
-        nadj_str = "Case={case}|Number={number}|{npsor}|Person={person}{psor}"
-        return nadj_str.format(
-            case=case, number=number, npsor=npsor, person=person, psor=psor
-        )
+        A plain adjective has no features in UD. An adjective derived into a noun
+        (``kırmızıya``: Adj+Zero+Noun+A3sg+Dat) or a verb (``güzeldi``:
+        Adj+Zero+Verb+Past+A3sg) gets the features of the last one.
+        """
+        derived = [
+            morpheme.id_
+            for morpheme, _ in analysis.morphemes
+            if morpheme.id_ in ("Noun", "Verb")
+        ]
+        if not derived:
+            return "_"
+        if derived[-1] == "Verb":
+            return self.format_verb(analysis)
+        return self.format_noun(analysis)
 
     @staticmethod
     def format_noun(analysis: SingleAnalysis) -> str:
@@ -271,6 +263,8 @@ class UDFormatter(Formatter, ABC):
             return self.format_pron(analysis)
         elif pos == "Num":
             return self.format_num(analysis)
+        elif pos == "Adj":
+            return self.format_adj(analysis)
 
         # result = f"[{analysis.dict_item.lemma}:{analysis.dict_item.primary_pos.value}"
         # if analysis.dict_item.secondary_pos != SecondaryPos.NONE:
