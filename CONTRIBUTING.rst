@@ -79,7 +79,7 @@ Ready to contribute? Here's how to set up `trLemmer` for local development.
 5. When you're done making changes, run the tests, including on other Python versions::
 
     $ uv run pytest
-    $ uv run --python 3.9 pytest
+    $ uv run --python 3.11 pytest
 
    Build the docs once, or serve them with live reload::
 

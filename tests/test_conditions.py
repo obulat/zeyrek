@@ -17,7 +17,7 @@ from zeyrek.morphotactics import SearchPath, StemTransition, noun_S, SurfaceTran
     nom_ST, vAgt_S, a3sg_S, pnon_S, morphemes, agt, a3sg, noun, pnon, nom, vPass_S, vAble_S
 
 import nltk
-nltk.download('punkt')
+nltk.download('punkt_tab')
 
 lex = RootLexicon.from_lines(["adak", "elma", "beyaz [P:Adj]", "meyve"])
 

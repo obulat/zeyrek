@@ -13,6 +13,13 @@ will probably change.
 
 ## Basic Usage
 
+Install Zeyrek and the NLTK tokenizer data it uses:
+
+```shell
+pip install zeyrek
+python -m nltk.downloader punkt_tab
+```
+
 To use Zeyrek, first create an instance of `MorphAnalyzer` class:
 
 ```shell
