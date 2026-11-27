@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import collections
 
-from nltk.tokenize import word_tokenize, sent_tokenize
 from zeyrek import tr
 from zeyrek.attributes import SecondaryPos
 from zeyrek.formatters import UDFormatter, DefaultFormatter
@@ -41,11 +40,12 @@ class Parse(NamedTuple):
 def _normalize(word: str) -> str:
     word = tr.normalize_circumflex(tr.lower(word))
     # TODO: Decide what to do with apostrophes
-    word = word.replace("'", "")
+    word = word.replace("'", "").replace("’", "")
     return word
 
 
 def _tokenize_text(text: str) -> list[str]:
+    from nltk.tokenize import word_tokenize
     return word_tokenize(text.replace("'", "").replace("’", ""), language="turkish")
 
 
@@ -105,6 +105,7 @@ class MorphAnalyzer:
         return self.analyzer.analyze(normalized_word)
 
     def _analyze_text(self, text, verbose=False):
+        from nltk.tokenize import sent_tokenize
         result = []
         sentences = sent_tokenize(text, language="turkish")
         for sentence in sentences:
@@ -112,27 +113,26 @@ class MorphAnalyzer:
             result.append((sentence, sentence_analysis))
         return result
 
+    def analyze_word(self, word: str) -> list[Parse]:
+        """
+        Public method that returns the analyses of a single word, without tokenizing it,
+        so NLTK's tokenizer data is not needed.
+        :param word: Word to analyze
+        :return: List of Parse objects; a single 'Unk' Parse if the word is unknown
+        """
+        analysis = [a for a in self._parse(word) if a is not None]
+        if not analysis:
+            return [Parse(word, 'Unk', 'Unk', ['Unk'], 'Unk')]
+        return [Parse(word, a.dict_item.lemma, a.pos.value, [m[0].id_ for m in a.morphemes], self.formatter.format(a))
+                for a in analysis]
+
     def analyze(self, text: str) -> list[list[Parse]]:
         """
         Public method that returns a list of analyses for each word in given text
         :param text: Text to analyze
         :return: List of lists of Parse objects for each word
         """
-        result = []
-        for word in _tokenize_text(text):
-            analysis = self._parse(word)
-            if len(analysis) == 0:
-                result.append([Parse(word, 'Unk', 'Unk', ['Unk'], 'Unk')])
-            word_analysis = []
-            for a in analysis:
-                if a is not None:
-                    formatted = self.formatter.format(a)
-                    morpheme_list = [m[0].id_ for m in a.morphemes]
-                    word_analysis.append(Parse(word, a.dict_item.lemma, a.pos.value, morpheme_list, formatted))
-                else:
-                    word_analysis.append(Parse(word, 'Unk', 'Unk', ["Unk"], 'Unk'))
-            result.append(word_analysis)
-        return result
+        return [self.analyze_word(word) for word in _tokenize_text(text)]
 
     def lemmatize(self, text: str) -> "list[tuple[str, list]] | list[str]":
         """

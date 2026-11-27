@@ -11,6 +11,7 @@ from zeyrek.attributes import (
     RootAttribute,
     SecondaryPos,
     calculate_phonetic_attributes,
+    _cached_phonetic_attributes,
 )
 from zeyrek.conditions import (
     Condition,
@@ -839,7 +840,7 @@ class StemTransitionsMapBased:
         modified_attrs = original_attrs.copy()
         modified_root_state_value: "MorphemeState | None" = None
         unmodified_root_state = None
-        for attr in dict_item.attributes:
+        for attr in sorted(dict_item.attributes, key=lambda attribute: attribute.value):
             if attr == RootAttribute.Voicing:
                 last = dict_item.pronunciation[-1]
                 voiced = tr.voice(last)
@@ -3374,7 +3375,7 @@ class SuffixTransition(MorphemeTransition):
         if lower.startswith(">") or not first_char_is_vowel:
             c = not_have(PhoneticAttribute.ExpectsVowel)
 
-        if (lower.startswith("+") and tr.is_lower(lower[1])) or first_char_is_vowel:
+        if (lower.startswith("+") and len(lower) > 2 and tr.is_vowel(lower[2])) or first_char_is_vowel:
             c = not_have(PhoneticAttribute.ExpectsConsonant)
 
         if c is not None:
@@ -3438,9 +3439,15 @@ class SurfaceTransition:
 def generate_surface(
     transition: SuffixTransition, phonetic_attributes: set[PhoneticAttribute]
 ) -> str:
+    root_attributes = phonetic_attributes
+    root_attributes_key = None
+    suffix_has_vowel = False
     index = 0
     result = []
     for token in transition.token_list:
+        if suffix_has_vowel and token.type_ in ("A_VOWEL", "I_VOWEL"):
+            root_attributes_key = root_attributes_key or frozenset(root_attributes)
+            phonetic_attributes = _cached_phonetic_attributes("".join(result), root_attributes_key)
         if token.type_ == "LETTER":
             result.append(token.letter)
         elif token.type_ == "A_VOWEL":
@@ -3479,6 +3486,7 @@ def generate_surface(
         elif token.type_ in ["LAST_VOICED", "LAST_NOT_VOICED"]:
             ld = token.letter
             result.append(ld)
+        suffix_has_vowel = suffix_has_vowel or (bool(result) and result[-1] in tr.vowels_lower_set)
         index += 1
     return "".join(result)
 
@@ -3570,7 +3578,7 @@ class SearchPath:
             tail,
             stem_transition.to_,
             morphemes_,
-            stem_transition.attrs,
+            set(stem_transition.attrs),
             stem_transition.to_.terminal,
         )
 

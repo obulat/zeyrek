@@ -281,15 +281,23 @@ no_vowel_attrs = [PhoneticAttribute.LastLetterConsonant, PhoneticAttribute.First
                   PhoneticAttribute.HasNoVowel]
 
 
-@functools.lru_cache(maxsize=128, typed=False)
 def calculate_phonetic_attributes(
     word: str,
     predecessor_attrs: "tuple[PhoneticAttribute] | None" = None
 ) -> set[PhoneticAttribute]:
+    # Callers modify the returned set, so each one gets its own copy of the cached value.
+    return set(_cached_phonetic_attributes(word, predecessor_attrs))
+
+
+@functools.lru_cache(maxsize=128, typed=False)
+def _cached_phonetic_attributes(
+    word: str,
+    predecessor_attrs: "tuple[PhoneticAttribute] | None" = None
+) -> frozenset[PhoneticAttribute]:
     p_attrs = set() if predecessor_attrs is None else set(predecessor_attrs)
     # the word should be in lower case
     if len(word) == 0:
-        return p_attrs
+        return frozenset(p_attrs)
     result = set()
     last_letter = word[-1]
     if last_letter in tr.vowels_lower_set:
@@ -322,7 +330,7 @@ def calculate_phonetic_attributes(
         result.discard(PhoneticAttribute.LastLetterVowel)
         result.discard(PhoneticAttribute.ExpectsConsonant)
 
-    return result
+    return frozenset(result)
 
 
 def parse_attr_data(data: str) -> set[RootAttribute]:
@@ -356,7 +364,7 @@ def infer_morphemic_attributes(word: str, pos_data, attrs: "set[RootAttribute] |
             result.add(RootAttribute.Passive_In)
         if last_char_is_vowel or last in ['l', 'r'] and vowel_count > 1:
             result.add(RootAttribute.Causative_t)
-    elif pos_data.primary_pos.value in ['Noun', 'Adjective', 'Duplicator']:
+    elif pos_data.primary_pos in (PrimaryPos.Noun, PrimaryPos.Adjective, PrimaryPos.Duplicator):
         # if a noun or adjective has more than one syllable and last letter is a stop consonant, add voicing.
         if vowel_count > 1 \
             and tr.is_voiceless_stop_consonant(last) \
