@@ -100,7 +100,7 @@ class MorphAnalyzer:
         self.return_all_lemmas = return_all_lemmas
 
     def _parse(self, word: str) -> list[SingleAnalysis]:
-        """ Parses a word and returns SingleAnalysis result. """
+        """Parses a word and returns SingleAnalysis result."""
         normalized_word = _normalize(word)
         return self.analyzer.analyze(normalized_word)
 
@@ -122,15 +122,23 @@ class MorphAnalyzer:
         for word in _tokenize_text(text):
             analysis = self._parse(word)
             if len(analysis) == 0:
-                result.append([Parse(word, 'Unk', 'Unk', ['Unk'], 'Unk')])
+                result.append([Parse(word, "Unk", "Unk", ["Unk"], "Unk")])
             word_analysis = []
             for a in analysis:
                 if a is not None:
                     formatted = self.formatter.format(a)
                     morpheme_list = [m[0].id_ for m in a.morphemes]
-                    word_analysis.append(Parse(word, a.dict_item.lemma, a.pos.value, morpheme_list, formatted))
+                    word_analysis.append(
+                        Parse(
+                            word,
+                            a.dict_item.lemma,
+                            a.pos.value,
+                            morpheme_list,
+                            formatted,
+                        )
+                    )
                 else:
-                    word_analysis.append(Parse(word, 'Unk', 'Unk', ["Unk"], 'Unk'))
+                    word_analysis.append(Parse(word, "Unk", "Unk", ["Unk"], "Unk"))
             result.append(word_analysis)
         return result
 
@@ -164,10 +172,18 @@ class MorphAnalyzer:
     @staticmethod
     def filter_proper_nouns(word: str, analysis: list[SingleAnalysis]):
         if word[0].isupper():
-            only_proper_nouns = [a for a in analysis if a.dict_item.secondary_pos == SecondaryPos.ProperNoun]
+            only_proper_nouns = [
+                a
+                for a in analysis
+                if a.dict_item.secondary_pos == SecondaryPos.ProperNoun
+            ]
             analysis = only_proper_nouns if only_proper_nouns else analysis
         else:
-            without_proper_nouns = [a for a in analysis if a.dict_item.secondary_pos != SecondaryPos.ProperNoun]
+            without_proper_nouns = [
+                a
+                for a in analysis
+                if a.dict_item.secondary_pos != SecondaryPos.ProperNoun
+            ]
             if without_proper_nouns:
                 analysis = without_proper_nouns
         return analysis

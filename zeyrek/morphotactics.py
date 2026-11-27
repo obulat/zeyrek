@@ -56,7 +56,14 @@ class Morpheme(NamedTuple):
 
 
 class MorphemeState:
-    def __init__(self, id_: str, morpheme: Morpheme, terminal=False, derivative=False, pos_root=False):
+    def __init__(
+        self,
+        id_: str,
+        morpheme: Morpheme,
+        terminal=False,
+        derivative=False,
+        pos_root=False,
+    ):
         self.id_ = id_
         self.morpheme = morpheme
         self.terminal = terminal
@@ -71,7 +78,9 @@ class MorphemeState:
     def __repr__(self):
         return f"MorphemeState({self.id_}, {self.morpheme.id_})"
 
-    def add_outgoing(self, *suffix_transitions: "SuffixTransition | list[SuffixTransition]"):
+    def add_outgoing(
+        self, *suffix_transitions: "SuffixTransition | list[SuffixTransition]"
+    ):
         for transition in suffix_transitions:
             if transition in self.outgoing:
                 # Outgoing transition {transition} already exists in {self}")
@@ -88,12 +97,19 @@ class MorphemeState:
             self.incoming.append(transition)
         return self
 
-    def add(self, to_: "MorphemeState", template: str, condition: "Condition | None" = None):
+    def add(
+        self, to_: "MorphemeState", template: str, condition: "Condition | None" = None
+    ):
         transition = SuffixTransition(self, to_, template, condition)
         self.add_outgoing(transition)
         return self
 
-    def add_all(self, transitions: list["tuple[MorphemeState, str, Condition] | tuple[MorphemeState, str]"]):
+    def add_all(
+        self,
+        transitions: list[
+            "tuple[MorphemeState, str, Condition] | tuple[MorphemeState, str]"
+        ],
+    ):
         for transition in transitions:
             self.add(*transition)
 
@@ -833,7 +849,9 @@ class StemTransitionsMapBased:
             )
         return [transition]
 
-    def generate_modified_root_nodes(self, dict_item: DictionaryItem) -> list["StemTransition"]:
+    def generate_modified_root_nodes(
+        self, dict_item: DictionaryItem
+    ) -> list["StemTransition"]:
         result = list(dict_item.pronunciation)
         original_attrs = calculate_phonetic_attributes(dict_item.pronunciation)
         modified_attrs = original_attrs.copy()
@@ -895,9 +913,10 @@ class StemTransitionsMapBased:
                 dict_item, original_attrs
             )
         original = StemTransition(dict_item, unmodified_root_state, original_attrs)
-        modified_root_state: MorphemeState = modified_root_state_value or self.morphotactics.get_root_state(
-                dict_item, modified_attrs
-            )
+        modified_root_state: MorphemeState = (
+            modified_root_state_value
+            or self.morphotactics.get_root_state(dict_item, modified_attrs)
+        )
         modified = StemTransition(
             dict_item, modified_root_state, modified_attrs, surface="".join(result)
         )
@@ -938,7 +957,7 @@ class StemTransitionsMapBased:
             root_for_modified = {
                 PrimaryPos.Noun: nounLastVowelDropRoot_S,
                 PrimaryPos.Adjective: adjLastVowelDropRoot_S,
-                PrimaryPos.PostPositive: adjLastVowelDropRoot_S
+                PrimaryPos.PostPositive: adjLastVowelDropRoot_S,
             }.get(dict_item.primary_pos)
             if root_for_modified is None:
                 raise ValueError(f"No root morpheme state found for {dict_item}")
@@ -1009,7 +1028,7 @@ class StemTransitionsMapBased:
                 f"Lexicon Item with special stem change cannot be handled: {dict_item}"
             )
 
-    def add_stem_transition(self, stem_transition: 'StemTransition'):
+    def add_stem_transition(self, stem_transition: "StemTransition"):
         surface_form = stem_transition.surface
         if surface_form in self.multi_stems:
             self.multi_stems[surface_form].append(stem_transition)
@@ -1020,7 +1039,7 @@ class StemTransitionsMapBased:
         else:
             self.single_stems[surface_form] = stem_transition
 
-    def remove_stem_node(self, stem_transition: 'StemTransition'):
+    def remove_stem_node(self, stem_transition: "StemTransition"):
         surface_form = stem_transition.surface
         if surface_form in self.multi_stems:
             self.multi_stems["surface_form"].remove(stem_transition)
@@ -1033,7 +1052,7 @@ class StemTransitionsMapBased:
         # if (!differentStemItems.containsEntry(stemTransition.item, stemTransition)) {
         #   differentStemItems.remove(stemTransition.item, stemTransition)
 
-    def transitions_from_stem(self, stem: str) -> list['StemTransition']:
+    def transitions_from_stem(self, stem: str) -> list["StemTransition"]:
         if stem in self.single_stems:
             return [self.single_stems.get(stem)]
         elif stem in self.multi_stems:
@@ -1041,7 +1060,7 @@ class StemTransitionsMapBased:
         else:
             return []
 
-    def prefix_matches(self, prefix: str) -> list['StemTransition']:
+    def prefix_matches(self, prefix: str) -> list["StemTransition"]:
         matches = []
         current_string = ""
         for letter in prefix:
@@ -1049,7 +1068,9 @@ class StemTransitionsMapBased:
             matches.extend(self.transitions_from_stem(current_string))
         return matches
 
-    def transitions_from_item(self, dict_item: DictionaryItem) -> list['StemTransition']:
+    def transitions_from_item(
+        self, dict_item: DictionaryItem
+    ) -> list["StemTransition"]:
         if dict_item in self.different_stem_items:
             return self.different_stem_items.get(dict_item)
         transitions = self.transitions_from_stem(dict_item.root)
@@ -1271,8 +1292,8 @@ class TurkishMorphotactics:
 
         equCond1 = (
             ContainsMorpheme(adj, futPart, presPart, narrPart, pastPart)
-                .not_()
-                .or_(ContainsMorphemeSequence(able, verb, pastPart))
+            .not_()
+            .or_(ContainsMorphemeSequence(able, verb, pastPart))
         )
 
         equCond = PreviousMorphemeIs(a3pl).or_(equCond1)  # allow `yapabildiğince`
@@ -1425,17 +1446,17 @@ class TurkishMorphotactics:
             ness_S,
             "lI~k",
             NoSurfaceAfterDerivation()
-                .and_not(containsNess)
-                .and_not(emptyAdjNounSeq)
-                .and_not(abbreviation),
+            .and_not(containsNess)
+            .and_not(emptyAdjNounSeq)
+            .and_not(abbreviation),
         )
         nom_ST.add(
             ness_S,
             "lI!ğ",
             NoSurfaceAfterDerivation()
-                .and_not(containsNess)
-                .and_not(emptyAdjNounSeq)
-                .and_not(abbreviation),
+            .and_not(containsNess)
+            .and_not(emptyAdjNounSeq)
+            .and_not(abbreviation),
         )
 
         # connect `ness` to the noun root.
@@ -1502,8 +1523,8 @@ class TurkishMorphotactics:
             justLike_S,
             "ImsI",
             not_have(PhoneticAttribute.LastLetterVowel)
-                .and_(noSurfaceAfterDerivation)
-                .and_not(ContainsMorpheme(justLike, futPart, pastPart, presPart, adj)),
+            .and_(noSurfaceAfterDerivation)
+            .and_not(ContainsMorpheme(justLike, futPart, pastPart, presPart, adj)),
         )
 
         nom_ST.add(
@@ -1647,8 +1668,8 @@ class TurkishMorphotactics:
             justLike_S,
             "ImsI",
             not_have(PhoneticAttribute.LastLetterVowel)
-                .and_(NoSurfaceAfterDerivation())
-                .and_(ContainsMorpheme(justLike).not_()),
+            .and_(NoSurfaceAfterDerivation())
+            .and_(ContainsMorpheme(justLike).not_()),
         )
 
         adjectiveRoot_ST.add(become_S, "lAş", NoSurfaceAfterDerivation())
@@ -1687,8 +1708,8 @@ class TurkishMorphotactics:
             justLike_S,
             "ImsI",
             not_have(PhoneticAttribute.LastLetterVowel)
-                .and_(NoSurfaceAfterDerivation())
-                .and_(ContainsMorpheme(justLike).not_()),
+            .and_(NoSurfaceAfterDerivation())
+            .and_(ContainsMorpheme(justLike).not_()),
         )
 
     def connect_verb_after_noun_adj_states(self):
@@ -1729,8 +1750,8 @@ class TurkishMorphotactics:
 
         allowA3plTrans = (
             noFamily.and_not(PreviousGroupContains(a3pl_S))
-                .and_not(ContainsMorphemeSequence(p3pl, nom))
-                .and_not(verbDeriv)
+            .and_not(ContainsMorphemeSequence(p3pl, nom))
+            .and_not(verbDeriv)
         )
 
         allowA2plTrans = noFamily.and_not(ContainsMorphemeSequence(p2pl, nom)).and_not(
@@ -1739,8 +1760,8 @@ class TurkishMorphotactics:
 
         allowA1plTrans = (
             noFamily.and_not(ContainsMorphemeSequence(p1sg, nom))
-                .and_not(ContainsMorphemeSequence(p1pl, nom))
-                .and_not(verbDeriv)
+            .and_not(ContainsMorphemeSequence(p1pl, nom))
+            .and_not(verbDeriv)
         )
         # elma-yım
         nPresent_S.add(nA1sg_ST, "+yIm", allowA1sgTrans)
@@ -1758,8 +1779,9 @@ class TurkishMorphotactics:
             nA3pl_ST,
             "lAr",
             not_have(RootAttribute.CompoundP3sg)
-                # do not allow "okumak-lar"
-                .and_not(PreviousGroupContainsMorpheme(inf1)).and_(allowA3plTrans),
+            # do not allow "okumak-lar"
+            .and_not(PreviousGroupContainsMorpheme(inf1))
+            .and_(allowA3plTrans),
         )
 
         # elma-ydı-m. Do not allow "elmaya-yım" (Oflazer accepts this)
@@ -2469,8 +2491,8 @@ class TurkishMorphotactics:
             vCausT_S,
             "t",
             HasRootAttribute(RootAttribute.Causative_t)
-                .or_(LastDerivationIs(vCausTir_S))
-                .and_not(LastDerivationIsAny(vCausT_S, vPass_S, vAble_S)),
+            .or_(LastDerivationIs(vCausTir_S))
+            .and_not(LastDerivationIsAny(vCausT_S, vPass_S, vAble_S)),
         )
 
         verbRoot_S.add(
@@ -2747,8 +2769,8 @@ class TurkishMorphotactics:
             vPass_S,
             "+nIl",
             PreviousStateIsAny(vCausT_S, vCausTir_S)
-                .or_(not_have(RootAttribute.Passive_In))
-                .and_not(ContainsMorpheme(pass_)),
+            .or_(not_have(RootAttribute.Passive_In))
+            .and_not(ContainsMorpheme(pass_)),
         )
         vPass_S.add_empty(verbRoot_S)
 
@@ -3175,7 +3197,9 @@ class TurkishMorphotactics:
         verbLastVowelDropUnmodRoot_S.copy_outgoing_transitions_from(verbRoot_S)
         verbLastVowelDropUnmodRoot_S.remove_transitions_to(pass_)
 
-    def get_root_state(self, dict_item: DictionaryItem, attrs: "set[PhoneticAttribute] | None" = None):
+    def get_root_state(
+        self, dict_item: DictionaryItem, attrs: "set[PhoneticAttribute] | None" = None
+    ):
         root_ = self.item_root_states.get(dict_item.id_)
         attrs = (
             attrs.copy()
@@ -3262,7 +3286,10 @@ class MorphemeTransition:
     """
 
     def __init__(
-        self, from_: MorphemeState, to_: MorphemeState, condition: "Condition | None" = None
+        self,
+        from_: MorphemeState,
+        to_: MorphemeState,
+        condition: "Condition | None" = None,
     ):
         self.from_ = from_
         self.to_ = to_
@@ -3290,10 +3317,14 @@ class StemTransition(MorphemeTransition):
         super().__init__(root_S, to_, None)
         if surface:
             if tr.is_upper(surface[0]):
-                print(f"Something wrong, generating StemTransition capitalized: {surface}")
+                print(
+                    f"Something wrong, generating StemTransition capitalized: {surface}"
+                )
         else:
             if tr.is_upper(dict_item.root[0]):
-                print(f"Something ELSE is wrong: generating StemTransition capitalized from dictitem: {dict_item.root}")
+                print(
+                    f"Something ELSE is wrong: generating StemTransition capitalized from dictitem: {dict_item.root}"
+                )
         self.surface = surface if surface is not None else dict_item.root
         self.dict_item = dict_item
         self.attrs = (
@@ -3329,7 +3360,7 @@ class SuffixTransition(MorphemeTransition):
         from_: MorphemeState,
         to_: MorphemeState,
         surface_template: str = "",
-        condition: "Condition | None" = None
+        condition: "Condition | None" = None,
     ):
         if from_ is None or to_ is None:
             raise ValueError(f"Suffix transition cannot have empty from and to points")
@@ -3453,7 +3484,6 @@ def generate_surface(
             else:
                 raise ValueError(f"Cannot generate A form from {phonetic_attributes}")
         elif token.type_ == "I_VOWEL":
-
             if index == 0 and PhoneticAttribute.LastLetterVowel in phonetic_attributes:
                 continue
             elif PhoneticAttribute.LastVowelFrontal in phonetic_attributes:
@@ -3582,7 +3612,11 @@ class SearchPath:
     def __repr__(self):
         return f"SearchPath({self.dict_item.id_}) (-{self.tail})({self.transitions})"
 
-    def copy(self, surface_node: SurfaceTransition, pa: "set[PhoneticAttribute] | None" = None) -> "SearchPath":
+    def copy(
+        self,
+        surface_node: SurfaceTransition,
+        pa: "set[PhoneticAttribute] | None" = None,
+    ) -> "SearchPath":
         phonetic_attributes = (
             calculate_phonetic_attributes(
                 surface_node.surface, tuple(self.phonetic_attributes)
@@ -3593,7 +3627,7 @@ class SearchPath:
         is_terminal = surface_node.state.terminal
         hist = self.transitions[:]
         hist.append(surface_node)
-        new_tail = self.tail[len(surface_node.surface):]
+        new_tail = self.tail[len(surface_node.surface) :]
         path = SearchPath(
             new_tail, surface_node.state, hist, phonetic_attributes.copy(), is_terminal
         )
