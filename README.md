@@ -54,6 +54,15 @@ then returns a list of tuples, with each word and a list of its possible lemmas:
 [('benim', ['ben'])]
 ```
 
+A lemma is the root of the word, and derivational suffixes can change its meaning a lot. `derived_lemmas`
+returns, for each analysis of a word, the lemmas from the root to the stem after the last derivational
+suffix. The last one is the word without its inflectional suffixes:
+
+```pycon
+>>> analyzer.derived_lemmas("çekilişle")
+[['çekiliş'], ['çekil', 'çekiliş'], ['çek', 'çekil', 'çekiliş']]
+```
+
 
 ## Credits
 

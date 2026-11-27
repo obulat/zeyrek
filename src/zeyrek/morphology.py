@@ -1,5 +1,6 @@
 """Main module."""
 
+import itertools
 import re
 from typing import ClassVar, NamedTuple
 
@@ -68,6 +69,28 @@ def _read_number(number: str) -> tuple[str, SecondaryPos]:
     *whole, last = re.split(r"[.,]", number)
     kind = SecondaryPos.Real if whole else SecondaryPos.Cardinal
     return turkish_numbers_to_string(last), kind
+
+
+def _derived_lemmas(analysis: SingleAnalysis) -> list[str]:
+    """
+    The lemma, then the stem after each derivational suffix, as Zemberek's
+    `SingleAnalysis.getLemmas` does.
+    """
+
+    def unvoice(stem: str) -> str:
+        # "çocukluğ-umuz" is "çocukluk" without its suffixes.
+        return stem[:-1] + "k" if stem.endswith("ğ") else stem
+
+    lemmas = [analysis.dict_item.normalized_lemma]
+    surfaces = [surface for _, surface in analysis.morphemes]
+    boundaries = [*analysis.group_boundaries, len(surfaces)]
+    stem = "".join(surfaces[: boundaries[1]])
+    for start, end in itertools.pairwise(boundaries[1:]):
+        lemma = unvoice(stem + surfaces[start])
+        if lemma not in lemmas:
+            lemmas.append(lemma)
+        stem += "".join(surfaces[start:end])
+    return lemmas
 
 
 class MorphAnalyzer:
@@ -227,6 +250,25 @@ class MorphAnalyzer:
             else:
                 analysis = self.filter_proper_nouns(word, analysis)
                 result.append(analysis[0].dict_item.lemma if analysis else word)
+        return result
+
+    def derived_lemmas(self, word: str) -> list[list[str]]:
+        """
+        Lemmas of a word for each of its analyses, from the root to the stem after
+        the last derivational suffix. That last stem is the word without its
+        inflectional suffixes, so it keeps the word's meaning.
+
+            >>> analyzer.derived_lemmas("çekilişle")
+            [['çekiliş'], ['çekil', 'çekiliş'], ['çek', 'çekil', 'çekiliş']]
+
+        :param word: Word to analyze
+        :return: A list of lemmas for each analysis; empty if the word is unknown
+        """
+        result = []
+        for analysis in self._parse(word):
+            lemmas = _derived_lemmas(analysis)
+            if lemmas not in result:
+                result.append(lemmas)
         return result
 
     @staticmethod
