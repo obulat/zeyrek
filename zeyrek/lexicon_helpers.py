@@ -2,51 +2,63 @@ import re
 from pathlib import Path
 
 from zeyrek import tr
-from zeyrek.attributes import PrimaryPos, SecondaryPos, PosInfo, primary_pos_set, secondary_pos_set
+from zeyrek.attributes import (
+    PrimaryPos,
+    SecondaryPos,
+    PosInfo,
+    primary_pos_set,
+    secondary_pos_set,
+)
 
-RESOURCES_DIR = Path(__file__).parent / 'resources'
+RESOURCES_DIR = Path(__file__).parent / "resources"
 
 
 def load_dict(path):
     result = {}
-    with open(path, 'r', encoding='utf8') as inf:
+    with open(path, "r", encoding="utf8") as inf:
         for line in inf:
-            if line.strip().startswith('##') or len(line.strip()) == 0:
+            if line.strip().startswith("##") or len(line.strip()) == 0:
                 continue
-            k, v = [_.strip() for _ in line.split('=')]
+            k, v = [_.strip() for _ in line.split("=")]
             result[k] = v
     return result
 
 
-tr_letter_pron = load_dict(RESOURCES_DIR / "tr" / "phonetics" / "turkish-letter-names.txt")
-en_letter_pron = load_dict(Path(RESOURCES_DIR / "tr" / "phonetics" / "turkish-letter-names.txt"))
-en_phones_to_tr = load_dict(Path(RESOURCES_DIR / "tr" / "phonetics" / "english-phones-to-turkish.txt"))
+tr_letter_pron = load_dict(
+    RESOURCES_DIR / "tr" / "phonetics" / "turkish-letter-names.txt"
+)
+en_letter_pron = load_dict(
+    Path(RESOURCES_DIR / "tr" / "phonetics" / "turkish-letter-names.txt")
+)
+en_phones_to_tr = load_dict(
+    Path(RESOURCES_DIR / "tr" / "phonetics" / "english-phones-to-turkish.txt")
+)
 
 
 def to_turkish_letter_pronunciation(word):
-    if bool(re.search(r'\d', word)):
+    if bool(re.search(r"\d", word)):
         return to_turkish_letter_pronunciation_with_digit(word)
     result = []
     for i in range(len(word)):
         c = word[i].lower()
-        if c == '-':
+        if c == "-":
             continue
         if c in tr_letter_pron:
-            if i == len(word) - 1 and c == 'k':
+            if i == len(word) - 1 and c == "k":
                 result.append("ka")
             else:
                 result.append(tr_letter_pron[c])
         else:
             print(f"Cannot guess pronunciation of letter {c} in : {word}")
-    return ''.join(result)
+    return "".join(result)
 
 
 def to_turkish_letter_pronunciation_with_digit(word):
-    pieces = re.split(r'(\d+)', word)
+    pieces = re.split(r"(\d+)", word)
     result = []
     i = 0
     for piece in pieces:
-        if bool(re.search(r'\d', piece)):
+        if bool(re.search(r"\d", piece)):
             result.append(turkish_numbers_to_string(piece))
             i += 1
             continue
@@ -56,11 +68,33 @@ def to_turkish_letter_pronunciation_with_digit(word):
             result.append(replace_english_specific_chars(piece))
         i += 1
 
-    return ''.join(result)  # replace('[ ]+', '')
+    return "".join(result)  # replace('[ ]+', '')
 
 
-singleDigitNumbers = ["", "bir", "iki", "üç", "dört", "beş", "altı", "yedi", "sekiz", "dokuz"]
-tenToNinety = ["", "on", "yirmi", "otuz", "kırk", "elli", "altmış", "yetmiş", "seksen", "doksan"]
+singleDigitNumbers = [
+    "",
+    "bir",
+    "iki",
+    "üç",
+    "dört",
+    "beş",
+    "altı",
+    "yedi",
+    "sekiz",
+    "dokuz",
+]
+tenToNinety = [
+    "",
+    "on",
+    "yirmi",
+    "otuz",
+    "kırk",
+    "elli",
+    "altmış",
+    "yetmiş",
+    "seksen",
+    "doksan",
+]
 thousands = ["", "bin", "milyon", "milyar", "trilyon", "katrilyon"]
 
 
@@ -70,7 +104,7 @@ def convert_three_digit(threeDigitNumber):
     :param threeDigitNumber: a three digit number to convert to words.
     :return: turkish string representation of the input number.
     """
-    result = ''
+    result = ""
 
     hundreds = threeDigitNumber // 100
     tens = threeDigitNumber // 10
@@ -109,7 +143,13 @@ def convert_to_string(number):
             if group_of_three == 1 and counter == 1:
                 result = thousands[counter] + " " + result
             else:
-                result = convert_three_digit(group_of_three) + " " + thousands[counter] + " " + result
+                result = (
+                    convert_three_digit(group_of_three)
+                    + " "
+                    + thousands[counter]
+                    + " "
+                    + result
+                )
         counter += 1
         current_pos /= 1000
 
@@ -126,7 +166,7 @@ def turkish_numbers_to_string(word):
     result = []
     i = 0
     for c in word:
-        if c != '0':
+        if c != "0":
             break
         result.append("sıfır")
         i += 0
@@ -134,16 +174,12 @@ def turkish_numbers_to_string(word):
     if len(rest) > 0:
         result.append(convert_to_string(int(rest)))  # TODO: probably error, was blank
     # result.append(int(rest))
-    return ' '.join(result)
+    return " ".join(result)
 
 
 def replace_english_specific_chars(word):
-    replacement = {'w': 'v',
-                   'q': 'k',
-                   'x': 'ks',
-                   '-': '',
-                   "\\": ''}
-    return ''.join([replacement.get(sym, sym) for sym in word])
+    replacement = {"w": "v", "q": "k", "x": "ks", "-": "", "\\": ""}
+    return "".join([replacement.get(sym, sym) for sym in word])
 
 
 def guess_for_abbreviation(word):
@@ -162,29 +198,38 @@ def guess_for_abbreviation(word):
 #  A function that parses raw word and metadata information. Represents a single line in dictionary.
 def parse_line_data(line):
     from .lexicon import MetaDataId
+
     word = line.split(" ")[0]
     metadata = {}
     if len(word) == 0:
         raise ValueError(f"Line {line} has no word data")
-    meta = line[len(word):].strip()
+    meta = line[len(word) :].strip()
     if len(meta) == 0:
-        return {'word': word, 'metadata': metadata}
-    if not meta.startswith('[') or not meta.endswith(']'):
-        raise ValueError(f"Malformed metadata, missing brackets. Should be: [metadata]. Line: {line}")
+        return {"word": word, "metadata": metadata}
+    if not meta.startswith("[") or not meta.endswith("]"):
+        raise ValueError(
+            f"Malformed metadata, missing brackets. Should be: [metadata]. Line: {line}"
+        )
     meta = meta[1:-1]
-    for chunk in meta.split(';'):
-        if ':' not in chunk:
-            raise ValueError(f"Line {line} has malformed metadata chunk {chunk}. It should have a ':' symbol.")
-        token_id_str, chunk_data = [_.strip() for _ in chunk.split(':')]
+    for chunk in meta.split(";"):
+        if ":" not in chunk:
+            raise ValueError(
+                f"Line {line} has malformed metadata chunk {chunk}. It should have a ':' symbol."
+            )
+        token_id_str, chunk_data = [_.strip() for _ in chunk.split(":")]
         if len(chunk_data) == 0:
-            raise ValueError(f"Line {line} has malformed metadata chunk {chunk} with no chunk data available")
+            raise ValueError(
+                f"Line {line} has malformed metadata chunk {chunk} with no chunk data available"
+            )
         data_id = MetaDataId(token_id_str)
         metadata[data_id] = chunk_data
 
-    return {'word': word, 'metadata': metadata}
+    return {"word": word, "metadata": metadata}
 
 
-def generate_dict_id(lemma: str, primary_pos: PrimaryPos, secondary_pos: SecondaryPos, index: int):
+def generate_dict_id(
+    lemma: str, primary_pos: PrimaryPos, secondary_pos: SecondaryPos, index: int
+):
     result = f"{lemma}_{primary_pos.name}"
     if secondary_pos is not None and secondary_pos != SecondaryPos.NONE:
         result = f"{result}_{secondary_pos.name}"
@@ -194,7 +239,11 @@ def generate_dict_id(lemma: str, primary_pos: PrimaryPos, secondary_pos: Seconda
 
 
 def is_verb(word):
-    return len(word) > 3 and (word.endswith('mek') or word.endswith('mak')) and tr.is_lower(word[0])
+    return (
+        len(word) > 3
+        and (word.endswith("mek") or word.endswith("mak"))
+        and tr.is_lower(word[0])
+    )
 
 
 def infer_primary_pos(word):
@@ -228,17 +277,17 @@ def generate_root(word, pos_info):
 def get_pos_data(pos_str, word):
     if pos_str is None:
         # infer the type
-        return PosInfo(infer_primary_pos(word),
-                       infer_secondary_pos(word)
-                       )
+        return PosInfo(infer_primary_pos(word), infer_secondary_pos(word))
     primary_pos = None
     secondary_pos = None
-    tokens = [_.strip() for _ in pos_str.split(',')]
+    tokens = [_.strip() for _ in pos_str.split(",")]
     if len(tokens) > 2:
         raise ValueError(f"Only two POS tokens are allowed in data chunk: {pos_str}")
     for token in tokens:
         if token not in primary_pos_set and token not in secondary_pos_set:
-            raise ValueError(f"Unrecognized pos data [{token}] in data chunk: {pos_str}")
+            raise ValueError(
+                f"Unrecognized pos data [{token}] in data chunk: {pos_str}"
+            )
 
         #  Ques POS causes some trouble here. Because it is defined in both primary and secondary pos.
     for token in tokens:

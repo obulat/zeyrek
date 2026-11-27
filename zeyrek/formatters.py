@@ -8,13 +8,13 @@ cases = ["Nom", "Dat", "Acc", "Abl", "Loc", "Ins", "Gen", "Equ"]
 
 
 def format_dict_item(lemma, ppos, spos) -> str:
-    """ Formats information about analysis dictionary item. """
-    spos_string = '' if spos is None else f',{spos}'
-    return f'[{lemma}:{ppos}{spos_string}] '
+    """Formats information about analysis dictionary item."""
+    spos_string = "" if spos is None else f",{spos}"
+    return f"[{lemma}:{ppos}{spos_string}] "
 
 
 class Formatter:
-    """ Abstract formatter class. """
+    """Abstract formatter class."""
 
     def format(self, analysis: SingleAnalysis) -> str:
         raise NotImplementedError
@@ -25,21 +25,21 @@ class Formatter:
 
 class UDFormatter(Formatter, ABC):
     possessives = {
-        'P1sg': ('|Number[psor]=Sing', '|Person[psor]=1'),
-        'P1pl': ('|Number[psor]=Plur', '|Person[psor]=1'),
-        'P2sg': ('|Number[psor]=Sing', '|Person[psor]=2'),
-        'P2pl': ('|Number[psor]=Plur', '|Person[psor]=2'),
-        'P3sg': ('|Number[psor]=Sing', '|Person[psor]=3'),
-        'P3pl': ('|Number[psor]=Plur', '|Person[psor]=3')
+        "P1sg": ("|Number[psor]=Sing", "|Person[psor]=1"),
+        "P1pl": ("|Number[psor]=Plur", "|Person[psor]=1"),
+        "P2sg": ("|Number[psor]=Sing", "|Person[psor]=2"),
+        "P2pl": ("|Number[psor]=Plur", "|Person[psor]=2"),
+        "P3sg": ("|Number[psor]=Sing", "|Person[psor]=3"),
+        "P3pl": ("|Number[psor]=Plur", "|Person[psor]=3"),
     }
 
     agreement_values = {
-        'A1sg': ('Sing', '1'),
-        'A1pl': ('Plur', '1'),
-        'A2sg': ('Sing', '2'),
-        'A2pl': ('Plur', '2'),
-        'A3sg': ('Sing', '3'),
-        'A3pl': ('Plur', '3')
+        "A1sg": ("Sing", "1"),
+        "A1pl": ("Plur", "1"),
+        "A2sg": ("Sing", "2"),
+        "A2pl": ("Plur", "2"),
+        "A3sg": ("Sing", "3"),
+        "A3pl": ("Plur", "3"),
     }
 
     def __init__(self, add_surface=True):
@@ -47,12 +47,12 @@ class UDFormatter(Formatter, ABC):
 
     def format_adj(self, analysis: SingleAnalysis) -> str:
         ids = [m.id_ for m in analysis.morphemes]
-        case = ''
-        number = ''
-        person = ''
-        npsor = ''
-        psor = ''
-        if 'Noun' not in ids:
+        case = ""
+        number = ""
+        person = ""
+        npsor = ""
+        psor = ""
+        if "Noun" not in ids:
             return self.format(analysis)
 
         for m_id in ids:
@@ -67,18 +67,18 @@ class UDFormatter(Formatter, ABC):
                 else:
                     npsor, psor = possessive
         nadj_str = "Case={case}|Number={number}|{npsor}|Person={person}{psor}"
-        return nadj_str.format(case=case, number=number,
-                               npsor=npsor, person=person,
-                               psor=psor)
+        return nadj_str.format(
+            case=case, number=number, npsor=npsor, person=person, psor=psor
+        )
 
     @staticmethod
     def format_noun(analysis: SingleAnalysis) -> str:
         noun_str = "{}Case={}|Number={}{}|Person={}{}"
-        case = ''
-        number = ''
-        person = ''
-        number_psor = ''
-        person_psor = ''
+        case = ""
+        number = ""
+        person = ""
+        number_psor = ""
+        person_psor = ""
         for m in analysis.morphemes:
             morph = m[0]
             # print("\tMorph id: ", morph.id_)
@@ -91,12 +91,12 @@ class UDFormatter(Formatter, ABC):
             if agreement_value is not None:
                 number, person = agreement_value
 
-        if case == '':
-            case = 'Nom'
+        if case == "":
+            case = "Nom"
         if analysis.dict_item.secondary_pos == SecondaryPos.Abbreviation:
             abbr = "Abbr=Yes|"
         else:
-            abbr = ''
+            abbr = ""
         return noun_str.format(abbr, case, number, number_psor, person, person_psor)
 
     @staticmethod
@@ -107,56 +107,62 @@ class UDFormatter(Formatter, ABC):
     def format_pron(analysis: SingleAnalysis) -> str:
         prontypestr = analysis.dict_item.secondary_pos.value
 
-        if prontypestr == 'Demons':
+        if prontypestr == "Demons":
             prontype = "|PronType=Dem"
         elif prontypestr == "Pers":
             prontype = f"|PronType=Prs"
-        elif prontypestr == 'Ques':
-            prontype = ''
-        elif prontypestr == 'Reflex':
+        elif prontypestr == "Ques":
+            prontype = ""
+        elif prontypestr == "Reflex":
             prontype = "|Reflex=Yes"
         else:
             prontype = f"|PronType={prontypestr}"
-        person = ''
-        number = ''
-        case = ''
-        number_psor = ''
-        person_psor = ''
+        person = ""
+        number = ""
+        case = ""
+        number_psor = ""
+        person_psor = ""
         for m in analysis.morphemes:
             morph = m[0]
             agreement_value = UDFormatter.agreement_values.get(morph.id_)
             if agreement_value is not None:
                 number, person = agreement_value
-            if prontypestr in ["Reflex", 'Quant']:
+            if prontypestr in ["Reflex", "Quant"]:
                 psor = UDFormatter.possessives.get(morph.id_)
                 if psor is not None:
                     number_psor, person_psor = psor
             if morph.id_ in cases:
                 case = morph.id_
-        if case == '':
-            case = 'Nom'
+        if case == "":
+            case = "Nom"
         pron_str = "Case={case}|Number={number}{number_psor}|Person={person}{person_psor}{prontype}"
 
-        return pron_str.format(case=case, number=number, number_psor=number_psor, person_psor=person_psor,
-                               person=person, prontype=prontype)
+        return pron_str.format(
+            case=case,
+            number=number,
+            number_psor=number_psor,
+            person_psor=person_psor,
+            person=person,
+            prontype=prontype,
+        )
 
     @staticmethod
     def format_verb(analysis: SingleAnalysis) -> str:
-        aspect = ''
-        mood = ''
-        number = ''
-        person = ''
-        polarity = ''
-        tense = ''
-        case = ''
-        verb_form = ''
-        number_psor = ''
-        person_psor = ''
-        evident = ''
-        voice = ''
-        register = ''
+        aspect = ""
+        mood = ""
+        number = ""
+        person = ""
+        polarity = ""
+        tense = ""
+        case = ""
+        verb_form = ""
+        number_psor = ""
+        person_psor = ""
+        evident = ""
+        voice = ""
+        register = ""
 
-        last_part = ''
+        last_part = ""
         morph_ids = [_[0].id_ for _ in analysis.morphemes]
 
         for k, m in enumerate(analysis.morphemes):
@@ -170,84 +176,84 @@ class UDFormatter(Formatter, ABC):
             possessive_value = UDFormatter.possessives.get(morph.id_)
             if possessive_value is not None:
                 number_psor, person_psor = possessive_value
-            if morph.id_ == 'Prog1':
+            if morph.id_ == "Prog1":
                 register = "|Polite=Infm"
-            elif morph.id_ == 'Prog2':
+            elif morph.id_ == "Prog2":
                 register = "|Polite=Form"
-            if morph.id_ in ['Past', 'Pres', 'Fut']:
-                if tense == 'Past' and morph.id_ == 'Past':
-                    tense = 'Pqp'
+            if morph.id_ in ["Past", "Pres", "Fut"]:
+                if tense == "Past" and morph.id_ == "Past":
+                    tense = "Pqp"
 
-                elif tense == '':
+                elif tense == "":
                     tense = morph.id_
                 # if verb_form == 'Part':
                 #     tense = 'Pqp'
-            if morph.id_ == 'PastPart':
-                tense = 'Past'
+            if morph.id_ == "PastPart":
+                tense = "Past"
             elif morph.id_ == "FutPart":
                 tense = "Fut"
-                verb_form = 'Part'
-            if morph.id_ == 'Aor':
-                aspect = 'Hab'
-            elif morph.id_ == 'AorPart':
-                aspect = 'Hab'
-                verb_form = 'Part'
-            elif morph.id_ == 'NarrPart':
-                tense = 'Past'
                 verb_form = "Part"
-                evident = '|Evident=Nfh'
-            if morph.id_ == 'Caus':
-                voice = '|Voice=Cau'
-            elif morph.id_ == 'Narr':
-                if 'Past' not in morph_ids:
+            if morph.id_ == "Aor":
+                aspect = "Hab"
+            elif morph.id_ == "AorPart":
+                aspect = "Hab"
+                verb_form = "Part"
+            elif morph.id_ == "NarrPart":
+                tense = "Past"
+                verb_form = "Part"
+                evident = "|Evident=Nfh"
+            if morph.id_ == "Caus":
+                voice = "|Voice=Cau"
+            elif morph.id_ == "Narr":
+                if "Past" not in morph_ids:
                     evident = "|Evident=Nfh"
-                tense = 'Past'
+                tense = "Past"
             elif morph.id_ == "Pass":
                 voice = "|Voice=Pass"
             if morph.id_ in ["PresPart", "PastPart"]:
                 verb_form = "Part"
-            if morph.id_ == 'Noun' and verb_form == '':
-                verb_form = 'Vnoun'
+            if morph.id_ == "Noun" and verb_form == "":
+                verb_form = "Vnoun"
             if morph.id_ == "Opt":
-                mood = 'Opt'
+                mood = "Opt"
             elif morph.id_ in ["Desr", "Cond"]:
-                mood = 'Cnd'
-            elif morph.id_ in ['Unable', 'Able']:
-                mood = 'Pot'
+                mood = "Cnd"
+            elif morph.id_ in ["Unable", "Able"]:
+                mood = "Pot"
             elif morph.id_ == "Imp":
                 mood = "Imp"
-            if morph.id_ in ["Neg", 'Unable']:
+            if morph.id_ in ["Neg", "Unable"]:
                 polarity = "Neg"
-            if morph.id_ in ['Prog1', 'Prog2']:
-                aspect = 'Prog'
-            if morph.id_ == 'Adv':
+            if morph.id_ in ["Prog1", "Prog2"]:
+                aspect = "Prog"
+            if morph.id_ == "Adv":
                 verb_form = "Conv"
         if polarity.strip() == "":
             polarity = "Pos"
-        if tense.strip() == '':
-            tense = 'Pres'
-        if mood.strip() == '':
-            mood = 'Ind'
-        if aspect.strip() == '':
+        if tense.strip() == "":
+            tense = "Pres"
+        if mood.strip() == "":
+            mood = "Ind"
+        if aspect.strip() == "":
             aspect = "Perf"
 
-        if verb_form != '':
+        if verb_form != "":
             last_part += f"|VerbForm={verb_form}"
-            if verb_form == 'Vnoun' and case == '':
-                case = '|Case=Nom'
-        if number != '':
-            number = "|Number=" + number if verb_form == '' else ''
-        if person != '':
-            person = "|Person=" + person if verb_form == '' else ''
-        if 'Noun' in morph_ids:
-            noun_deriv = morph_ids.index('Noun')
+            if verb_form == "Vnoun" and case == "":
+                case = "|Case=Nom"
+        if number != "":
+            number = "|Number=" + number if verb_form == "" else ""
+        if person != "":
+            person = "|Person=" + person if verb_form == "" else ""
+        if "Noun" in morph_ids:
+            noun_deriv = morph_ids.index("Noun")
             for id_ in morph_ids[noun_deriv:]:
                 if id_ in cases:
                     case = f"|Case={id_}"
-                if case == '':
+                if case == "":
                     case = "|Case=Nom"
-        if 'Fut' in morph_ids and 'Past' in morph_ids:
-            tense = 'Fut,Past'
+        if "Fut" in morph_ids and "Past" in morph_ids:
+            tense = "Fut,Past"
         return (
             "Aspect={aspect}{evident}{case}|Mood={mood}"
             "{number_psor}{number}{person_psor}{person}"
@@ -286,8 +292,11 @@ class UDFormatter(Formatter, ABC):
         #     )  # TODO: check name works
         # else:
         #     result = f"{result}] "
-        result = format_dict_item(analysis.dict_item.lemma, analysis.dict_item.primary_pos.value,
-                                  analysis.dict_item.secondary_pos.value)
+        result = format_dict_item(
+            analysis.dict_item.lemma,
+            analysis.dict_item.primary_pos.value,
+            analysis.dict_item.secondary_pos.value,
+        )
         result += self.format_morphemes(stem=analysis.stem, surfaces=analysis.morphemes)
         return result
 
@@ -321,13 +330,14 @@ class DefaultFormatter(Formatter, ABC):
     def format(self, analysis: SingleAnalysis) -> str:
         result = f"[{analysis.dict_item.lemma}:{analysis.dict_item.primary_pos.value}"
         if analysis.dict_item.secondary_pos != SecondaryPos.NONE:
-            result = (
-                f"{result},{analysis.dict_item.secondary_pos.value}] "
-            )  # TODO: check name works
+            result = f"{result},{analysis.dict_item.secondary_pos.value}] "  # TODO: check name works
         else:
             result = f"{result}] "
-        result = format_dict_item(analysis.dict_item.lemma, analysis.dict_item.primary_pos.value,
-                                  analysis.dict_item.secondary_pos.value)
+        result = format_dict_item(
+            analysis.dict_item.lemma,
+            analysis.dict_item.primary_pos.value,
+            analysis.dict_item.secondary_pos.value,
+        )
         result += self.format_morphemes(stem=analysis.stem, surfaces=analysis.morphemes)
         return result
 
