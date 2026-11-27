@@ -220,3 +220,21 @@ def test_adjectives_get_voicing(analyzer, word, lemma):
 @pytest.mark.parametrize("word", ["bozuku", "ortakı", "yumuşakı"])
 def test_unvoiced_adjective_before_a_vowel_is_rejected(analyzer, word):
     assert [parse.lemma for parse in analyzer.analyze_word(word)] == ["Unk"]
+
+
+@pytest.mark.parametrize(
+    "word, lemmas",
+    [
+        # https://github.com/obulat/zeyrek/issues/19
+        ("çekilişle", ["çek", "çekil", "çekiliş"]),
+        ("çocukluğumuz", ["çocuk", "çocukluk"]),
+        ("gidişte", ["git", "gidiş"]),
+        ("kitabımda", ["kitap"]),
+    ],
+)
+def test_derived_lemmas(analyzer, word, lemmas):
+    assert lemmas in analyzer.derived_lemmas(word)
+
+
+def test_derived_lemmas_of_an_unknown_word(analyzer):
+    assert analyzer.derived_lemmas("xqzt") == []
