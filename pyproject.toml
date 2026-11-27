@@ -58,9 +58,6 @@ build-backend = "uv_build"
 [tool.uv]
 default-groups = ["dev", "docs"]
 
-[tool.uv.build-backend]
-module-root = ""
-
 [tool.ruff.lint]
 extend-select = ["I", "UP", "B"]
 
