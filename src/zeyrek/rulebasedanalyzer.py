@@ -42,15 +42,12 @@ class RuleBasedAnalyzer:
             length = len(candidate.surface)
             tail = word[length:]
             paths.append(SearchPath.initial(candidate, tail))
-        # search graph.
-        result_paths = self.search(paths)
+        return [parse_analysis(path) for path in self.search(paths)]
 
-        # generate results from successful paths.
-        result = []
-        for path in result_paths:
-            analysis = parse_analysis(path)
-            result.append(analysis)
-        return result
+    def analyze_with_stem(self, stem_transition, ending: str):
+        """Analyses the ending of a word whose stem is not in the lexicon."""
+        paths = [SearchPath.initial(stem_transition, ending)]
+        return [parse_analysis(path) for path in self.search(paths)]
 
     def search(self, current_paths):
         # searches through morphotactics graph.

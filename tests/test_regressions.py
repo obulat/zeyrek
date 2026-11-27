@@ -7,6 +7,7 @@ import pytest
 
 import zeyrek
 from zeyrek.attributes import PhoneticAttribute, calculate_phonetic_attributes
+from zeyrek.lexicon_helpers import turkish_numbers_to_string
 from zeyrek.morphology import MorphAnalyzer
 
 FIRST_10K = Path(zeyrek.__file__).parent / "resources" / "tr" / "first-10K"
@@ -106,6 +107,51 @@ def test_analyze_word_needs_no_tokenizer():
 @pytest.mark.parametrize("word", ["Ankara'da", "Ankara’da"])
 def test_analyze_word_drops_apostrophes(analyzer, word):
     assert "Ankara" in {parse.lemma for parse in analyzer.analyze_word(word)}
+
+
+@pytest.mark.parametrize(
+    "word, formatted",
+    [
+        # https://github.com/obulat/zeyrek/issues/9
+        ("Melik'in", "[Melik:Noun,Prop] melik:Noun+A3sg+in:Gen"),
+        ("Melikşah’ın", "[Melikşah:Noun,Prop] melikşah:Noun+A3sg+ın:Gen"),
+        ("Ali'nin", "[Ali:Noun,Prop] ali:Noun+A3sg+nin:Gen"),
+        ("XYZ'de", "[XYZ:Noun,Abbrv] xyz:Noun+A3sg+de:Loc"),
+        # https://github.com/obulat/zeyrek/issues/15
+        ("3", "[3:Num,Card] 3:Num"),
+        ("3'te", "[3:Num,Card] 3:Num|Zero→Noun+A3sg+te:Loc"),
+        ("1990'larda", "[1990:Num,Card] 1990:Num|Zero→Noun+lar:A3pl+da:Loc"),
+        ("1.000'den", "[1.000:Num,Card] 1.000:Num|Zero→Noun+A3sg+den:Abl"),
+        ("3,5'ten", "[3,5:Num,Real] 3,5:Num|Zero→Noun+A3sg+ten:Abl"),
+    ],
+)
+def test_words_missing_from_the_lexicon(analyzer, word, formatted):
+    assert formatted in [parse.formatted for parse in analyzer.analyze_word(word)]
+
+
+def test_apostrophe_keeps_the_root_from_the_lexicon(analyzer):
+    assert {parse.lemma for parse in analyzer.analyze_word("istanbul'daki")} == {
+        "İstanbul"
+    }
+
+
+def test_analyze_keeps_apostrophes_for_the_analyzer(analyzer):
+    words = analyzer.analyze("3'te Melik’in evindeydim.")
+    assert [result[0].lemma for result in words] == ["3", "Melik", "ev", "."]
+
+
+@pytest.mark.parametrize(
+    "number, words",
+    [
+        ("125", "yüz yirmi beş"),
+        ("1990", "bin dokuz yüz doksan"),
+        ("1000000", "bir milyon"),
+        ("05", "sıfır beş"),
+        ("00", "sıfır sıfır"),
+    ],
+)
+def test_numbers_in_words(number, words):
+    assert turkish_numbers_to_string(number) == words
 
 
 @pytest.mark.parametrize(

@@ -107,7 +107,7 @@ def convert_three_digit(threeDigitNumber):
     result = ""
 
     hundreds = threeDigitNumber // 100
-    tens = threeDigitNumber // 10
+    tens = threeDigitNumber // 10 % 10
     single_digit = threeDigitNumber % 10
 
     if hundreds != 0:
@@ -151,12 +151,10 @@ def convert_to_string(number):
                     + result
                 )
         counter += 1
-        current_pos /= 1000
+        current_pos //= 1000
 
-    if number < 0:
-        return "eksi " + result.strip()
-    else:
-        return result.strip()
+    result = " ".join(result.split())
+    return "eksi " + result if number < 0 else result
 
 
 def turkish_numbers_to_string(word):
@@ -164,15 +162,14 @@ def turkish_numbers_to_string(word):
     word = word.removeprefix("+")
     result = []
     i = 0
-    for c in word:
+    for c in word[:-1]:
         if c != "0":
             break
         result.append("sıfır")
-        i += 0
+        i += 1
     rest = word[i:]
     if len(rest) > 0:
-        result.append(convert_to_string(int(rest)))  # TODO: probably error, was blank
-    # result.append(int(rest))
+        result.append(convert_to_string(int(rest)))
     return " ".join(result)
 
 
