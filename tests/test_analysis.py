@@ -12,7 +12,7 @@ from zeyrek.morphotactics import StemTransition, SearchPath, root_S, noun_S, Mor
     SuffixTransition, morphemes, equ_ST, TurkishMorphotactics, adjectiveRoot_ST
 
 import nltk
-nltk.download('punkt')
+nltk.download('punkt_tab')
 
 
 @pytest.fixture

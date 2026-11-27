@@ -42,6 +42,12 @@ To install Zeyrek, run this command in your terminal:
 $ pip install zeyrek
 ```
 
+Zeyrek uses NLTK's Punkt tokenizer to split texts into sentences and words. Download its data once:
+
+```shell
+$ python -m nltk.downloader punkt_tab
+```
+
 ## User Guide
 
 Zeyrek's morphological analyzer returns instances of Parse object (based on pymorphy2's Parse),

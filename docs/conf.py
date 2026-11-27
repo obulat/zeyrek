@@ -6,10 +6,12 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+from importlib import metadata
+
 project = 'Zeyrek'
 copyright = '2024, Olga Bulat'
 author = 'Olga Bulat'
-release = '0.1.4-alpha'
+release = metadata.version("zeyrek")
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
