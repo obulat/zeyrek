@@ -1,5 +1,6 @@
-from zeyrek import MorphAnalyzer
 import nltk
+
+from zeyrek import MorphAnalyzer
 
 nltk.download("punkt")
 

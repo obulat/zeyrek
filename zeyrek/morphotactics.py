@@ -1,46 +1,45 @@
-from typing import NamedTuple
+from typing import ClassVar, NamedTuple
 
 # sys.path.pop(0)
 # print(sys.path)
 # print(os.path.dirname(__file__))
-
 from zeyrek import tr
 from zeyrek.attributes import (
-    PrimaryPos,
     PhoneticAttribute,
+    PrimaryPos,
     RootAttribute,
     SecondaryPos,
-    calculate_phonetic_attributes,
     _cached_phonetic_attributes,
+    calculate_phonetic_attributes,
 )
 from zeyrek.conditions import (
     Condition,
-    not_have,
-    has,
     ContainsMorpheme,
-    NotCondition,
-    SecondaryPosIs,
-    PreviousGroupContainsMorpheme,
     ContainsMorphemeSequence,
-    NoSurfaceAfterDerivation,
+    CurrentGroupContainsAny,
+    DictionaryItemIs,
+    DictionaryItemIsAny,
+    HasAnySuffixSurface,
+    HasPhoneticAttribute,
+    HasRootAttribute,
+    HasTail,
     HasTailSequence,
     LastDerivationIs,
-    PreviousMorphemeIs,
-    DictionaryItemIs,
-    PreviousMorphemeIsAny,
-    CurrentGroupContainsAny,
-    PreviousGroupContains,
-    PreviousStateIsAny,
-    RootSurfaceIsAny,
-    RootSurfaceIs,
     LastDerivationIsAny,
+    NoSurfaceAfterDerivation,
+    NotCondition,
+    PreviousGroupContains,
+    PreviousGroupContainsMorpheme,
+    PreviousMorphemeIs,
+    PreviousMorphemeIsAny,
     PreviousStateIs,
-    HasRootAttribute,
-    DictionaryItemIsAny,
-    HasPhoneticAttribute,
-    HasTail,
-    HasAnySuffixSurface,
+    PreviousStateIsAny,
     PreviousStateIsNot,
+    RootSurfaceIs,
+    RootSurfaceIsAny,
+    SecondaryPosIs,
+    has,
+    not_have,
 )
 from zeyrek.lexicon import DictionaryItem, RootLexicon
 
@@ -786,7 +785,7 @@ class StemTransitionsMapBased:
     Most of the time a single StemNode is generated.
     """
 
-    modifiers = {
+    modifiers: ClassVar[set[RootAttribute]] = {
         RootAttribute.Doubling,
         RootAttribute.LastVowelDrop,
         RootAttribute.ProgressiveVowelDrop,
@@ -795,7 +794,7 @@ class StemTransitionsMapBased:
         RootAttribute.CompoundP3sg,
         RootAttribute.CompoundP3sgRoot,
     }
-    special_roots = {
+    special_roots: ClassVar[set[str]] = {
         "içeri_Noun",
         "içeri_Adj",
         "dışarı_Adj",
@@ -856,7 +855,7 @@ class StemTransitionsMapBased:
         result = list(dict_item.pronunciation)
         original_attrs = calculate_phonetic_attributes(dict_item.pronunciation)
         modified_attrs = original_attrs.copy()
-        modified_root_state_value: "MorphemeState | None" = None
+        modified_root_state_value: MorphemeState | None = None
         unmodified_root_state = None
         for attr in sorted(dict_item.attributes, key=lambda attribute: attribute.value):
             if attr == RootAttribute.Voicing:
@@ -3364,7 +3363,7 @@ class SuffixTransition(MorphemeTransition):
         condition: "Condition | None" = None,
     ):
         if from_ is None or to_ is None:
-            raise ValueError(f"Suffix transition cannot have empty from and to points")
+            raise ValueError("Suffix transition cannot have empty from and to points")
         super().__init__(from_, to_, condition)
         self.surface_template = surface_template
         self.condition = condition
@@ -3399,7 +3398,7 @@ class SuffixTransition(MorphemeTransition):
     # TODO: consider moving this to morphotactics somehow.
     def parse_conditions_from_template(self):
         if not self.surface_template:
-            return None
+            return
         lower = tr.lower(self.surface_template)
         c = None
         first_char_is_vowel = tr.is_vowel(lower[0])

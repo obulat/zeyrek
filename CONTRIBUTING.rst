@@ -81,6 +81,13 @@ Ready to contribute? Here's how to set up `trLemmer` for local development.
     $ uv run pytest
     $ uv run --python 3.10 pytest
 
+   Format and lint the code with Ruff. To run it on every commit, install the
+   pre-commit hooks once::
+
+    $ uv run ruff format
+    $ uv run ruff check --fix
+    $ uvx pre-commit install
+
    Build the docs once, or serve them with live reload::
 
     $ uv run make -C docs html

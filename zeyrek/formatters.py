@@ -1,4 +1,5 @@
 from abc import ABC
+from typing import ClassVar
 
 from zeyrek.attributes import SecondaryPos
 from zeyrek.morphotactics import Morpheme
@@ -24,7 +25,7 @@ class Formatter:
 
 
 class UDFormatter(Formatter, ABC):
-    possessives = {
+    possessives: ClassVar[dict[str, tuple[str, str]]] = {
         "P1sg": ("|Number[psor]=Sing", "|Person[psor]=1"),
         "P1pl": ("|Number[psor]=Plur", "|Person[psor]=1"),
         "P2sg": ("|Number[psor]=Sing", "|Person[psor]=2"),
@@ -33,7 +34,7 @@ class UDFormatter(Formatter, ABC):
         "P3pl": ("|Number[psor]=Plur", "|Person[psor]=3"),
     }
 
-    agreement_values = {
+    agreement_values: ClassVar[dict[str, tuple[str, str]]] = {
         "A1sg": ("Sing", "1"),
         "A1pl": ("Plur", "1"),
         "A2sg": ("Sing", "2"),
@@ -110,7 +111,7 @@ class UDFormatter(Formatter, ABC):
         if prontypestr == "Demons":
             prontype = "|PronType=Dem"
         elif prontypestr == "Pers":
-            prontype = f"|PronType=Prs"
+            prontype = "|PronType=Prs"
         elif prontypestr == "Ques":
             prontype = ""
         elif prontypestr == "Reflex":
@@ -255,23 +256,9 @@ class UDFormatter(Formatter, ABC):
         if "Fut" in morph_ids and "Past" in morph_ids:
             tense = "Fut,Past"
         return (
-            "Aspect={aspect}{evident}{case}|Mood={mood}"
-            "{number_psor}{number}{person_psor}{person}"
-            "|Polarity={polarity}{register}|Tense={tense}{last_part}{voice}".format(
-                aspect=aspect,
-                evident=evident,
-                case=case,
-                mood=mood,
-                number_psor=number_psor,
-                number=number,
-                person_psor=person_psor,
-                person=person,
-                polarity=polarity,
-                register=register,
-                tense=tense,
-                last_part=last_part,
-                voice=voice,
-            )
+            f"Aspect={aspect}{evident}{case}|Mood={mood}"
+            f"{number_psor}{number}{person_psor}{person}"
+            f"|Polarity={polarity}{register}|Tense={tense}{last_part}{voice}"
         )
 
     def format(self, analysis: SingleAnalysis) -> str:
