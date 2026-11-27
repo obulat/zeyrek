@@ -3,9 +3,9 @@ from pathlib import Path
 
 from zeyrek import tr
 from zeyrek.attributes import (
+    PosInfo,
     PrimaryPos,
     SecondaryPos,
-    PosInfo,
     primary_pos_set,
     secondary_pos_set,
 )
@@ -15,7 +15,7 @@ RESOURCES_DIR = Path(__file__).parent / "resources"
 
 def load_dict(path):
     result = {}
-    with open(path, "r", encoding="utf8") as inf:
+    with open(path, encoding="utf8") as inf:
         for line in inf:
             if line.strip().startswith("##") or len(line.strip()) == 0:
                 continue
@@ -161,8 +161,7 @@ def convert_to_string(number):
 
 def turkish_numbers_to_string(word):
     """Methods converts a String containing an integer to a Strings."""
-    if word.startswith("+"):
-        word = word[1:]
+    word = word.removeprefix("+")
     result = []
     i = 0
     for c in word:
@@ -239,11 +238,7 @@ def generate_dict_id(
 
 
 def is_verb(word):
-    return (
-        len(word) > 3
-        and (word.endswith("mek") or word.endswith("mak"))
-        and tr.is_lower(word[0])
-    )
+    return len(word) > 3 and (word.endswith(("mek", "mak"))) and tr.is_lower(word[0])
 
 
 def infer_primary_pos(word):

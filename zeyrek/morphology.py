@@ -1,15 +1,13 @@
-# -*- coding: utf-8 -*-
-import collections
+"""Main module."""
+
+from typing import ClassVar, NamedTuple
 
 from zeyrek import tr
 from zeyrek.attributes import SecondaryPos
-from zeyrek.formatters import UDFormatter, DefaultFormatter
+from zeyrek.formatters import DefaultFormatter, Formatter, UDFormatter
 from zeyrek.lexicon import RootLexicon
-from zeyrek.morphotactics import TurkishMorphotactics, Morpheme
+from zeyrek.morphotactics import Morpheme, TurkishMorphotactics
 from zeyrek.rulebasedanalyzer import RuleBasedAnalyzer, SingleAnalysis
-from typing import NamedTuple
-
-"""Main module."""
 
 
 class Parse(NamedTuple):
@@ -81,7 +79,7 @@ class MorphAnalyzer:
     Each method uses method _parse to get SingleAnalysis for the word
     """
 
-    formatters = {"UD": UDFormatter}
+    formatters: ClassVar[dict[str, type[Formatter]]] = {"UD": UDFormatter}
 
     def __init__(
         self,

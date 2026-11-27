@@ -1,22 +1,22 @@
+import logging
 from typing import NamedTuple
 
 from zeyrek.attributes import (
     PhoneticAttribute,
-    calculate_phonetic_attributes,
-    RootAttribute,
     PrimaryPos,
+    RootAttribute,
+    calculate_phonetic_attributes,
 )
 from zeyrek.lexicon import DictionaryItem
 from zeyrek.morphotactics import (
-    SurfaceTransition,
+    Morpheme,
     SearchPath,
+    SuffixTransition,
+    SurfaceTransition,
     generate_surface,
     nom,
     pnon,
-    Morpheme,
-    SuffixTransition,
 )
-import logging
 
 logger = logging.getLogger(__name__)
 
