@@ -4,7 +4,9 @@
 
 __author__ = """Olga Bulat"""
 __email__ = 'obulat@gmail.com'
-__version__ = '0.1.2'
+from importlib.metadata import version
+
+__version__ = version("zeyrek")
 
 from .morphology import MorphAnalyzer
 
