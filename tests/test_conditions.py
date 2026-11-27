@@ -1,70 +1,67 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """Tests for `zeyrek.conditions` module."""
 
+import nltk
 import pytest
+
 from zeyrek.attributes import (
-    RootAttribute,
     PhoneticAttribute,
+    RootAttribute,
     calculate_phonetic_attributes,
 )
 from zeyrek.conditions import (
     CombinedCondition,
-    has,
-    HasRootAttribute,
-    DictionaryItemIs,
-    not_have,
-    HasPhoneticAttribute,
-    DictionaryItemIsAny,
-    NoSurfaceAfterDerivation,
-    HasAnySuffixSurface,
-    HasTail,
-    PreviousMorphemeIs,
-    PreviousStateIs,
-    LastDerivationIs,
-    HasDerivation,
-    PreviousStateIsNot,
-    HasTailSequence,
-    ContainsMorphemeSequence,
-    LastDerivationIsAny,
-    PreviousGroupContains,
-    CurrentGroupContainsAny,
-    PreviousGroupContainsMorpheme,
     ContainsMorpheme,
+    ContainsMorphemeSequence,
+    CurrentGroupContainsAny,
+    DictionaryItemIs,
+    DictionaryItemIsAny,
+    HasAnySuffixSurface,
+    HasDerivation,
+    HasPhoneticAttribute,
+    HasRootAttribute,
+    HasTail,
+    HasTailSequence,
+    LastDerivationIs,
+    LastDerivationIsAny,
+    NoSurfaceAfterDerivation,
+    PreviousGroupContains,
+    PreviousGroupContainsMorpheme,
+    PreviousMorphemeIs,
     PreviousMorphemeIsAny,
+    PreviousStateIs,
     PreviousStateIsAny,
+    PreviousStateIsNot,
+    has,
+    not_have,
 )
 from zeyrek.lexicon import RootLexicon
 from zeyrek.morphology import MorphAnalyzer
 from zeyrek.morphotactics import (
     SearchPath,
     StemTransition,
-    noun_S,
-    SurfaceTransition,
     SuffixTransition,
-    adjectiveRoot_ST,
-    verbRoot_S,
-    become_S,
-    vPast_S,
-    past,
-    verb,
-    vCausTir_S,
-    nom_ST,
-    vAgt_S,
-    a3sg_S,
-    pnon_S,
-    morphemes,
-    agt,
+    SurfaceTransition,
     a3sg,
-    noun,
-    pnon,
+    a3sg_S,
+    adjectiveRoot_ST,
+    agt,
+    become_S,
+    morphemes,
     nom,
-    vPass_S,
+    nom_ST,
+    noun,
+    noun_S,
+    past,
+    pnon,
+    pnon_S,
     vAble_S,
+    vAgt_S,
+    vCausTir_S,
+    verb,
+    verbRoot_S,
+    vPass_S,
+    vPast_S,
 )
-
-import nltk
 
 nltk.download("punkt_tab")
 

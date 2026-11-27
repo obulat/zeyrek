@@ -1,6 +1,4 @@
-from typing import Union
-
-from zeyrek.attributes import RootAttribute, PhoneticAttribute
+from zeyrek.attributes import PhoneticAttribute, RootAttribute
 
 
 class Condition:
@@ -75,7 +73,7 @@ def has(attribute):
         return HasPhoneticAttribute(attribute)
 
 
-def not_have(attribute: Union[RootAttribute, PhoneticAttribute]):
+def not_have(attribute: RootAttribute | PhoneticAttribute):
     if type(attribute) == RootAttribute:
         return HasRootAttribute(attribute).not_()
     else:
@@ -177,7 +175,9 @@ class HasTailSequence(Condition):
             return False
         return all(
             form.morpheme == morph
-            for form, morph in zip(forms[-len(self.morphemes) :], self.morphemes)
+            for form, morph in zip(
+                forms[-len(self.morphemes) :], self.morphemes, strict=False
+            )
         )
 
     def __repr__(self):

@@ -1,22 +1,22 @@
+import logging
 from typing import NamedTuple
 
 from zeyrek.attributes import (
     PhoneticAttribute,
-    calculate_phonetic_attributes,
-    RootAttribute,
     PrimaryPos,
+    RootAttribute,
+    calculate_phonetic_attributes,
 )
 from zeyrek.lexicon import DictionaryItem
 from zeyrek.morphotactics import (
-    SurfaceTransition,
+    Morpheme,
     SearchPath,
+    SuffixTransition,
+    SurfaceTransition,
     generate_surface,
     nom,
     pnon,
-    Morpheme,
-    SuffixTransition,
 )
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +74,7 @@ class RuleBasedAnalyzer:
                     continue
                 # Creates new paths with outgoing and matching transitions.
                 new_paths = self.advance(path)
-                logger.debug(f"\n--\nNew paths are: ")
+                logger.debug("\n--\nNew paths are: ")
                 for p in new_paths:
                     logger.debug(f"-- {p}")
                 logger.debug("")
@@ -153,7 +153,7 @@ class RuleBasedAnalyzer:
             p = path.copy(surface_transition, attributes)
             logger.debug(f"P path: {p}")
             new_paths.append(p)
-        logger.debug(f"FINAL: ")
+        logger.debug("FINAL: ")
         for i, p in enumerate(new_paths):
             logger.debug(f"\t {i}: {p}")
         # print()

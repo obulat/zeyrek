@@ -1,36 +1,23 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """Tests for `zeyrek` package."""
 
+import nltk
 import pytest
 
 from zeyrek.attributes import (
-    SecondaryPos,
     PrimaryPos,
+    SecondaryPos,
     calculate_phonetic_attributes,
-    RootAttribute,
-    PhoneticAttribute,
 )
 from zeyrek.lexicon import DictionaryItem, RootLexicon
 from zeyrek.morphology import MorphAnalyzer
 from zeyrek.morphotactics import (
-    StemTransition,
-    SearchPath,
-    root_S,
-    noun_S,
     MorphemeState,
-    p2sg_S,
-    loc_ST,
-    a3pl_S,
-    SuffixTransition,
-    morphemes,
-    equ_ST,
+    SearchPath,
+    StemTransition,
     TurkishMorphotactics,
     adjectiveRoot_ST,
+    root_S,
 )
-
-import nltk
 
 nltk.download("punkt_tab")
 
@@ -84,7 +71,7 @@ def test_stem_transition():
     word_line = "beyaz [P:Adj]"
     lexicon = RootLexicon.from_lines([word_line])
     morphotactics = TurkishMorphotactics(lexicon=lexicon)
-    dict_item = lexicon.get_matching_items("beyaz")[0]
+    lexicon.get_matching_items("beyaz")[0]
     transition = morphotactics.stem_transitions.prefix_matches("beyaz")[0]
     assert transition.to_ == adjectiveRoot_ST
     assert str(transition) == "<(Dict: beyaz [P:Adj]):beyaz → [adjectiveRoot_ST:Adj]>"

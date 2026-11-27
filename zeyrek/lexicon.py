@@ -1,21 +1,22 @@
 from enum import Enum
 from pathlib import Path
+from typing import ClassVar
 
-from zeyrek.attributes import (
-    RootAttribute,
-    PrimaryPos,
-    SecondaryPos,
-    parse_attr_data,
-    infer_morphemic_attributes,
-)
 from zeyrek import tr
+from zeyrek.attributes import (
+    PrimaryPos,
+    RootAttribute,
+    SecondaryPos,
+    infer_morphemic_attributes,
+    parse_attr_data,
+)
 from zeyrek.lexicon_helpers import (
-    to_turkish_letter_pronunciation,
-    guess_for_abbreviation,
-    parse_line_data,
     generate_dict_id,
     generate_root,
     get_pos_data,
+    guess_for_abbreviation,
+    parse_line_data,
+    to_turkish_letter_pronunciation,
 )
 
 
@@ -118,7 +119,7 @@ class TextLexiconProcessor:
                 pronunciation=pronunciation,
                 index=index,
             )
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - skip a bad dictionary line and keep loading
             print(
                 f"Could not create {word}/{index}/ {type(index)} dictionary item, error: {e} "
             )
@@ -153,7 +154,7 @@ class TextLexiconProcessor:
                     r
                 )  # check lexicon for [kuyruk]
                 if len(ref_items) > 0:
-                    ref_item = sorted(ref_items, key=lambda ref: ref.index)[0]
+                    ref_item = min(ref_items, key=lambda ref: ref.index)
                     attr_set = ref_item.attributes.copy()
                 else:
                     attr_set = infer_morphemic_attributes(root, pos_info, set())
@@ -231,7 +232,7 @@ class DictionaryItem:
         self.root = root
         self.index = index
         self.id_ = self.generate_id()
-        self.ref_item: "DictionaryItem | None" = None
+        self.ref_item: DictionaryItem | None = None
 
     def __str__(self):
         return f"{self.lemma} [P:{self.primary_pos.value}]"
@@ -267,7 +268,7 @@ class DictionaryItem:
 
 class RootLexicon:
     RESOURCES_DIR = Path(__file__).parent / "resources"
-    DEFAULT_DICTIONARY_RESOURCES = [
+    DEFAULT_DICTIONARY_RESOURCES: ClassVar[list[str]] = [
         "tr/master-dictionary.dict",
         "tr/non-tdk.dict",
         "tr/proper.dict",

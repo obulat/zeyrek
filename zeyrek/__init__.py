@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Top-level package for Turkish Lemmatizer."""
 
 __author__ = """Olga Bulat"""

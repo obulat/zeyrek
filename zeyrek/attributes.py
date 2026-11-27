@@ -1,7 +1,6 @@
 import functools
 from enum import Enum, auto
-from typing import Set, NamedTuple
-
+from typing import NamedTuple
 
 from zeyrek import tr
 
@@ -400,7 +399,7 @@ def infer_morphemic_attributes(
             and RootAttribute.InverseHarmony not in result
         ):
             result.add(RootAttribute.Voicing)
-        if len(word) > 1 and (word.endswith("nk") or word.endswith("og")):
+        if len(word) > 1 and (word.endswith(("nk", "og"))):
             if (
                 RootAttribute.NoVoicing not in result
                 and pos_data.secondary_pos != SecondaryPos.ProperNoun
