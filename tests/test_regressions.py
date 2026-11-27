@@ -5,10 +5,11 @@ from pathlib import Path
 
 import pytest
 
+import zeyrek
 from zeyrek.attributes import PhoneticAttribute, calculate_phonetic_attributes
 from zeyrek.morphology import MorphAnalyzer
 
-FIRST_10K = Path(__file__).parent.parent / "zeyrek" / "resources" / "tr" / "first-10K"
+FIRST_10K = Path(zeyrek.__file__).parent / "resources" / "tr" / "first-10K"
 
 
 @pytest.fixture(scope="module")

@@ -81,7 +81,7 @@ If you are proposing a feature:
 
    ```shell
    uv run make -C docs html
-   uv run sphinx-autobuild docs/ docs/_build/ --watch zeyrek/
+   uv run sphinx-autobuild docs/ docs/_build/ --watch src/zeyrek/
    ```
 
 5. Commit your changes, push your branch to GitHub, and open a pull request.
