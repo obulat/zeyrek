@@ -7,6 +7,7 @@ import pytest
 
 import zeyrek
 from zeyrek.attributes import PhoneticAttribute, calculate_phonetic_attributes
+from zeyrek.lexicon import RootLexicon
 from zeyrek.lexicon_helpers import turkish_numbers_to_string
 from zeyrek.morphology import MorphAnalyzer
 
@@ -257,3 +258,9 @@ def test_ottoman_compounds(analyzer, word, lemma):
 
 def test_hyphen_without_an_izafet_is_still_unknown(analyzer):
     assert [parse.lemma for parse in analyzer.analyze_word("ev-ler")] == ["Unk"]
+
+
+def test_an_analyzer_with_its_own_lexicon_does_not_change_other_analyzers():
+    MorphAnalyzer(lexicon=RootLexicon.from_lines(["beyaz [P:Adj]"]))
+    formatted = {parse.formatted for parse in MorphAnalyzer().analyze_word("onun")}
+    assert "[o:Pron,Pers] o:Pron+A3sg+nun:Gen" in formatted

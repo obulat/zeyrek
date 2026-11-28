@@ -341,442 +341,13 @@ desr = add_morpheme("Desire", "Desr", None, False, False)
 # oku-malı
 neces = add_morpheme("Necessity", "Neces", None, False, False)
 
-# MorphemeState = namedtuple("MorphemeState", "id morpheme terminal derivative posRoot")
-
 # -------------- States ----------------------------
 # _ST = Terminal state _S = Non Terminal State.
 # A terminal state means that a walk in the graph can end there.
 
-# root of the graph.
+# The root of the graph. Stem transitions start here and nothing connects to it,
+# so all analyzers can share it.
 root_S = MorphemeState("root_S", root, False, False, False)
-puncRoot_ST = MorphemeState("puncRoot_ST", punc, True, False, True)
-
-# -------------- Noun States ------------------------
-
-noun_S = MorphemeState("noun_S", noun, False, False, True)
-nounCompoundRoot_S = MorphemeState("nounCompoundRoot_S", noun, False, False, True)
-nounSuRoot_S = MorphemeState("nounSuRoot_S", noun, False, False, True)
-nounInf1Root_S = MorphemeState("nounInf1Root_S", noun, False, False, True)
-nounActOfRoot_S = MorphemeState("nounActOfRoot_S", noun, False, False, True)
-
-# Number-Person agreement
-
-a3sg_S = MorphemeState("a3sg_S", a3sg, False, False, False)
-a3sgSu_S = MorphemeState("a3sgSu_S", a3sg, False, False, False)
-a3sgCompound_S = MorphemeState("a3sgCompound_S", a3sg, False, False, False)
-a3sgInf1_S = MorphemeState("a3sgInf1_S", a3sg, False, False, False)
-a3sgActOf_S = MorphemeState("a3sgActOf_S", a3sg, False, False, False)
-a3pl_S = MorphemeState("a3pl_S", a3pl, False, False, False)
-a3plActOf_S = MorphemeState("a3plActOf_S", a3pl, False, False, False)
-a3plCompound_S = MorphemeState("a3plCompound_S", a3pl, False, False, False)
-a3plCompound2_S = MorphemeState("a3plCompound2_S", a3pl, False, False, False)
-
-# Possessive
-
-pnon_S = MorphemeState("pnon_S", pnon, False, False, False)
-pnonCompound_S = MorphemeState("pnonCompound_S", pnon, False, False, False)
-pnonCompound2_S = MorphemeState("pnonCompound2_S", pnon, False, False, False)
-pnonInf1_S = MorphemeState("pnonInf1_S", pnon, False, False, False)
-pnonActOf = MorphemeState("pnonActOf", pnon, False, False, False)
-p1sg_S = MorphemeState("p1sg_S", p1sg, False, False, False)
-p2sg_S = MorphemeState("p2sg_S", p2sg, False, False, False)
-p3sg_S = MorphemeState("p3sg_S", p3sg, False, False, False)
-p1pl_S = MorphemeState("p1pl_S", p1pl, False, False, False)
-p2pl_S = MorphemeState("p2pl_S", p2pl, False, False, False)
-p3pl_S = MorphemeState("p3pl_S", p3pl, False, False, False)
-
-# Case
-
-nom_ST = MorphemeState("nom_ST", nom, True, False, False)
-nom_S = MorphemeState("nom_S", nom, False, False, False)
-
-dat_ST = MorphemeState("dat_ST", dat, True, False, False)
-abl_ST = MorphemeState("abl_ST", abl, True, False, False)
-loc_ST = MorphemeState("loc_ST", loc, True, False, False)
-ins_ST = MorphemeState("ins_ST", ins, True, False, False)
-acc_ST = MorphemeState("acc_ST", acc, True, False, False)
-gen_ST = MorphemeState("gen_ST", gen, True, False, False)
-equ_ST = MorphemeState("equ_ST", equ, True, False, False)
-
-# MorphemeState = namedtuple("MorphemeState", "id morpheme terminal derivative posRoot")
-
-# Derivation
-
-dim_S = MorphemeState("dim_S", dim, False, True, False)
-ness_S = MorphemeState("ness_S", ness, False, True, False)
-agt_S = MorphemeState("agt_S", agt, False, True, False)
-related_S = MorphemeState("related_S", related, False, True, False)
-rel_S = MorphemeState("rel_S", rel, False, True, False)
-relToPron_S = MorphemeState("relToPron_S", rel, False, True, False)
-with_S = MorphemeState("with_S", with_, False, True, False)
-without_S = MorphemeState("without_S", without, False, True, False)
-justLike_S = MorphemeState("justLike_S", justLike, False, True, False)
-nounZeroDeriv_S = MorphemeState("nounZeroDeriv_S", zero, False, True, False)
-become_S = MorphemeState("become_S", become, False, True, False)
-acquire_S = MorphemeState("acquire_S", acquire, False, True, False)
-
-# MorphemeState = namedtuple("MorphemeState", "id morpheme terminal derivative posRoot")
-
-
-# -------- Morphotactics for modified forms of words like "içeri->içerde"
-nounLastVowelDropRoot_S = MorphemeState(
-    "nounLastVowelDropRoot_S", noun, False, False, True
-)
-adjLastVowelDropRoot_S = MorphemeState(
-    "adjLastVowelDropRoot_S", adj, False, False, True
-)
-postpLastVowelDropRoot_S = MorphemeState(
-    "postpLastVowelDropRoot_S", postp, False, False, True
-)
-a3PlLastVowelDrop_S = MorphemeState("a3PlLastVowelDrop_S", a3pl, False, False, False)
-a3sgLastVowelDrop_S = MorphemeState("a3sgLastVowelDrop_S", a3sg, False, False, False)
-pNonLastVowelDrop_S = MorphemeState("pNonLastVowelDrop_S", pnon, False, False, False)
-zeroLastVowelDrop_S = MorphemeState("zeroLastVowelDrop_S", zero, False, True, False)
-# MorphemeState = namedtuple("MorphemeState", "id morpheme terminal derivative posRoot")
-
-nounProper_S = MorphemeState("nounProper_S", noun, False, False, True)
-nounAbbrv_S = MorphemeState("nounAbbrv_S", noun, False, False, True)
-# this will be used for proper noun separation.
-puncProperSeparator_S = MorphemeState(
-    "puncProperSeparator_S", punc, False, False, False
-)
-
-nounNoSuffix_S = MorphemeState("nounNoSuffix_S", noun, False, False, True)
-nounA3sgNoSuffix_S = MorphemeState("nounA3sgNoSuffix_S", a3sg, False, False, False)
-nounPnonNoSuffix_S = MorphemeState("nounPnonNoSuffix_S", pnon, False, False, False)
-nounNomNoSuffix_ST = MorphemeState("nounNomNoSuffix_S", nom, True, False, False)
-
-# -------------- Adjective States ------------------------
-
-adjectiveRoot_ST = MorphemeState("adjectiveRoot_ST", adj, True, False, True)
-adjAfterVerb_S = MorphemeState("adjAfterVerb_S", adj, False, False, True)
-adjAfterVerb_ST = MorphemeState("adjAfterVerb_ST", adj, True, False, True)
-
-adjZeroDeriv_S = MorphemeState("adjZeroDeriv_S", zero, False, True, False)
-
-# After verb->adj derivations Adj can get possesive suffixes.
-# Such as "oku-duğ-um", "okuyacağı"
-aPnon_ST = MorphemeState("aPnon_ST", pnon, True, False, False)
-aP1sg_ST = MorphemeState("aP1sg_ST", p1sg, True, False, False)
-aP2sg_ST = MorphemeState("aP2sg_ST", p2sg, True, False, False)
-aP3sg_ST = MorphemeState("aP3sg_ST", p3sg, True, False, False)
-aP1pl_ST = MorphemeState("aP3sg_ST", p1pl, True, False, False)
-aP2pl_ST = MorphemeState("aP2pl_ST", p2pl, True, False, False)
-aP3pl_ST = MorphemeState("aP3pl_ST", p3pl, True, False, False)
-
-aLy_S = MorphemeState("aLy_S", ly, False, True, False)
-aAsIf_S = MorphemeState("aAsIf_S", asIf, False, True, False)
-aAgt_S = MorphemeState("aAgt_S", agt, False, True, False)
-
-# --------------------- Numeral Root --------------------------------------------------
-numeralRoot_ST = MorphemeState("numeralRoot_ST", num, True, False, True)
-numZeroDeriv_S = MorphemeState("numZeroDeriv_S", zero, False, True, False)
-
-# -------------- Adjective-Noun connected Verb States ------------------------
-
-nVerb_S = MorphemeState("nVerb_S", verb, False, False, True)
-nVerbDegil_S = MorphemeState("nVerbDegil_S", verb, False, False, True)
-
-nPresent_S = MorphemeState("nPresent_S", pres, False, False, False)
-nPast_S = MorphemeState("nPast_S", past, False, False, False)
-nNarr_S = MorphemeState("nNarr_S", narr, False, False, False)
-nCond_S = MorphemeState("nCond_S", cond, False, False, False)
-nA1sg_ST = MorphemeState("nA1sg_ST", a1sg, True, False, False)
-nA2sg_ST = MorphemeState("nA2sg_ST", a2sg, True, False, False)
-nA1pl_ST = MorphemeState("nA1pl_ST", a1pl, True, False, False)
-nA2pl_ST = MorphemeState("nA2pl_ST", a2pl, True, False, False)
-nA3sg_ST = MorphemeState("nA3sg_ST", a3sg, True, False, False)
-nA3sg_S = MorphemeState("nA3sg_S", a3sg, False, False, False)
-nA3pl_ST = MorphemeState("nA3pl_ST", a3pl, True, False, False)
-
-nCop_ST = MorphemeState("nCop_ST", cop, True, False, False)
-nCopBeforeA3pl_S = MorphemeState("nCopBeforeA3pl_S", cop, False, False, False)
-
-nNeg_S = MorphemeState("nNeg_S", neg, False, False, False)
-
-# ----------- Pronoun states --------------------------
-
-# Pronouns have states similar with Nouns.
-pronPers_S = MorphemeState("pronPers_S", pron, False, False, True)
-
-pronDemons_S = MorphemeState("pronDemons_S", pron, False, False, True)
-pronQuant_S = MorphemeState("pronQuant_S", pron, False, False, True)
-pronQuantModified_S = MorphemeState("pronQuantModified_S", pron, False, False, True)
-pronQues_S = MorphemeState("pronQues_S", pron, False, False, True)
-pronReflex_S = MorphemeState("pronReflex_S", pron, False, False, True)
-
-# used for ben-sen modification
-pronPers_Mod_S = MorphemeState("pronPers_Mod_S", pron, False, False, True)
-# A root for noun->Rel->Pron derivation.
-pronAfterRel_S = MorphemeState("pronAfterRel_S", pron, False, False, True)
-
-pA1sg_S = MorphemeState("pA1sg_S", a1sg, False, False, False)
-pA2sg_S = MorphemeState("pA2sg_S", a2sg, False, False, False)
-
-pA1sgMod_S = MorphemeState("pA1sgMod_S", a1sg, False, False, False)  # for modified ben
-pA2sgMod_S = MorphemeState("pA2sgMod_S", a2sg, False, False, False)  # for modified sen
-
-pA3sg_S = MorphemeState("pA3sg_S", a3sg, False, False, False)
-pA3sgRel_S = MorphemeState("pA3sgRel_S", a3sg, False, False, False)
-pA1pl_S = MorphemeState("pA1pl_S", a1pl, False, False, False)
-pA2pl_S = MorphemeState("pA2pl_S", a2pl, False, False, False)
-
-pA3pl_S = MorphemeState("pA3pl_S", a3pl, False, False, False)
-pA3plRel_S = MorphemeState("pA3plRel_S", a3pl, False, False, False)
-
-pQuantA3sg_S = MorphemeState("pQuantA3sg_S", a3sg, False, False, False)
-pQuantA3pl_S = MorphemeState("pQuantA3pl_S", a3pl, False, False, False)
-pQuantModA3pl_S = MorphemeState(
-    "pQuantModA3pl_S", a3pl, False, False, False
-)  # for birbirleri etc.
-pQuantA1pl_S = MorphemeState("pQuantA1pl_S", a1pl, False, False, False)
-pQuantA2pl_S = MorphemeState("pQuantA2pl_S", a2pl, False, False, False)
-
-pQuesA3sg_S = MorphemeState("pQuesA3sg_S", a3sg, False, False, False)
-pQuesA3pl_S = MorphemeState("pQuesA3pl_S", a3pl, False, False, False)
-
-pReflexA3sg_S = MorphemeState("pReflexA3sg_S", a3sg, False, False, False)
-pReflexA3pl_S = MorphemeState("pReflexA3pl_S", a3pl, False, False, False)
-pReflexA1sg_S = MorphemeState("pReflexA1sg_S", a1sg, False, False, False)
-pReflexA2sg_S = MorphemeState("pReflexA2sg_S", a2sg, False, False, False)
-pReflexA1pl_S = MorphemeState("pReflexA1pl_S", a1pl, False, False, False)
-pReflexA2pl_S = MorphemeState("pReflexA2pl_S", a2pl, False, False, False)
-
-# Possessive
-
-pPnon_S = MorphemeState("pPnon_S", pnon, False, False, False)
-pPnonRel_S = MorphemeState("pPnonRel_S", pnon, False, False, False)
-pPnonMod_S = MorphemeState(
-    "pPnonMod_S", pnon, False, False, False
-)  # for modified ben-sen
-pP1sg_S = MorphemeState("pP1sg_S", p1sg, False, False, False)  # kimim
-pP2sg_S = MorphemeState("pP2sg_S", p2sg, False, False, False)
-pP3sg_S = MorphemeState("pP3sg_S", p3sg, False, False, False)  # for `birisi` etc
-pP1pl_S = MorphemeState("pP1pl_S", p1pl, False, False, False)  # for `birbirimiz` etc
-pP2pl_S = MorphemeState("pP2pl_S", p2pl, False, False, False)  # for `birbiriniz` etc
-pP3pl_S = MorphemeState("pP3pl_S", p3pl, False, False, False)  # for `birileri` etc
-
-# Case
-
-pNom_ST = MorphemeState("pNom_ST", nom, True, False, False)
-pDat_ST = MorphemeState("pDat_ST", dat, True, False, False)
-pAcc_ST = MorphemeState("pAcc_ST", acc, True, False, False)
-pAbl_ST = MorphemeState("pAbl_ST", abl, True, False, False)
-pLoc_ST = MorphemeState("pLoc_ST", loc, True, False, False)
-pGen_ST = MorphemeState("pGen_ST", gen, True, False, False)
-pIns_ST = MorphemeState("pIns_ST", ins, True, False, False)
-pEqu_ST = MorphemeState("pEqu_ST", equ, True, False, False)
-
-pronZeroDeriv_S = MorphemeState("pronZeroDeriv_S", zero, False, True, False)
-
-pvPresent_S = MorphemeState("pvPresent_S", pres, False, False, False)
-pvPast_S = MorphemeState("pvPast_S", past, False, False, False)
-pvNarr_S = MorphemeState("pvNarr_S", narr, False, False, False)
-pvCond_S = MorphemeState("pvCond_S", cond, False, False, False)
-pvA1sg_ST = MorphemeState("pvA1sg_ST", a1sg, True, False, False)
-pvA2sg_ST = MorphemeState("pvA2sg_ST", a2sg, True, False, False)
-pvA3sg_ST = MorphemeState("pvA3sg_ST", a3sg, True, False, False)
-pvA3sg_S = MorphemeState("pvA3sg_S", a3sg, False, False, False)
-pvA1pl_ST = MorphemeState("pvA1pl_ST", a1pl, True, False, False)
-pvA2pl_ST = MorphemeState("pvA2pl_ST", a2pl, True, False, False)
-pvA3pl_ST = MorphemeState("pvA3pl_ST", a3pl, True, False, False)
-
-pvCopBeforeA3pl_S = MorphemeState("pvCopBeforeA3pl_S", cop, False, False, False)
-pvCop_ST = MorphemeState("pvCop_ST", cop, True, False, False)
-
-pvVerbRoot_S = MorphemeState("pvVerbRoot_S", verb, False, False, True)
-# ------------- Adverbs -----------------
-
-advRoot_ST = MorphemeState("advRoot_ST", adv, True, False, True)
-advNounRoot_ST = MorphemeState("advRoot_ST", adv, True, False, True)
-advForVerbDeriv_ST = MorphemeState("advForVerbDeriv_ST", adv, True, False, True)
-
-avNounAfterAdvRoot_ST = MorphemeState("advToNounRoot_ST", noun, False, False, True)
-avA3sg_S = MorphemeState("avA3sg_S", a3sg, False, False, False)
-avPnon_S = MorphemeState("avPnon_S", pnon, False, False, False)
-avDat_ST = MorphemeState("avDat_ST", dat, True, False, False)
-
-avZero_S = MorphemeState("avZero_S", zero, False, True, False)
-avZeroToVerb_S = MorphemeState("avZeroToVerb_S", zero, False, True, False)
-# ------------- Interjection, Conjunctions, Determiner and Duplicator  -----------------
-
-conjRoot_ST = MorphemeState("conjRoot_ST", conj, True, False, True)
-interjRoot_ST = MorphemeState("interjRoot_ST", interj, True, False, True)
-detRoot_ST = MorphemeState("detRoot_ST", det, True, False, True)
-dupRoot_ST = MorphemeState("dupRoot_ST", dup, True, False, True)
-
-# ------------- Post Positive ------------------------------------------------
-
-postpRoot_ST = MorphemeState("postpRoot_ST", postp, True, False, True)
-postpZero_S = MorphemeState("postpZero_S", zero, False, True, False)
-
-po2nRoot_S = MorphemeState("po2nRoot_S", noun, False, False, False)
-
-po2nA3sg_S = MorphemeState("po2nA3sg_S", a3sg, False, False, False)
-po2nA3pl_S = MorphemeState("po2nA3pl_S", a3pl, False, False, False)
-
-po2nP3sg_S = MorphemeState("po2nP3sg_S", p3sg, False, False, False)
-po2nP1sg_S = MorphemeState("po2nP1sg_S", p1sg, False, False, False)
-po2nP2sg_S = MorphemeState("po2nP2sg_S", p2sg, False, False, False)
-po2nP1pl_S = MorphemeState("po2nP1pl_S", p1pl, False, False, False)
-po2nP2pl_S = MorphemeState("po2nP2pl_S", p2pl, False, False, False)
-po2nPnon_S = MorphemeState("po2nPnon_S", pnon, False, False, False)
-
-po2nNom_ST = MorphemeState("po2nNom_ST", nom, True, False, False)
-po2nDat_ST = MorphemeState("po2nDat_ST", dat, True, False, False)
-po2nAbl_ST = MorphemeState("po2nAbl_ST", abl, True, False, False)
-po2nLoc_ST = MorphemeState("po2nLoc_ST", loc, True, False, False)
-po2nIns_ST = MorphemeState("po2nIns_ST", ins, True, False, False)
-po2nAcc_ST = MorphemeState("po2nAcc_ST", acc, True, False, False)
-po2nGen_ST = MorphemeState("po2nGen_ST", gen, True, False, False)
-po2nEqu_ST = MorphemeState("po2nEqu_ST", equ, True, False, False)
-
-# ------------- Verbs -----------------------------------
-
-verbRoot_S = MorphemeState("verbRoot_S", verb, False, False, True)
-verbLastVowelDropModRoot_S = MorphemeState(
-    "verbLastVowelDropModRoot_S", verb, False, False, True
-)
-verbLastVowelDropUnmodRoot_S = MorphemeState(
-    "verbLastVowelDropUnmodRoot_S", verb, False, False, True
-)
-
-vA1sg_ST = MorphemeState("vA1sg_ST", a1sg, True, False, False)
-vA2sg_ST = MorphemeState("vA2sg_ST", a2sg, True, False, False)
-vA3sg_ST = MorphemeState("vA3sg_ST", a3sg, True, False, False)
-vA1pl_ST = MorphemeState("vA1pl_ST", a1pl, True, False, False)
-vA2pl_ST = MorphemeState("vA2pl_ST", a2pl, True, False, False)
-vA3pl_ST = MorphemeState("vA3pl_ST", a3pl, True, False, False)
-
-vPast_S = MorphemeState("vPast_S", past, False, False, False)
-vNarr_S = MorphemeState("vNarr_S", narr, False, False, False)
-vCond_S = MorphemeState("vCond_S", cond, False, False, False)
-vCondAfterPerson_ST = MorphemeState("vCondAfterPerson_ST", cond, True, False, False)
-vPastAfterTense_S = MorphemeState("vPastAfterTense_S", past, False, False, False)
-vNarrAfterTense_S = MorphemeState("vNarrAfterTense_S", narr, False, False, False)
-
-# terminal cases are used if A3pl comes before NarrAfterTense, PastAfterTense or vCond
-vPastAfterTense_ST = MorphemeState("vPastAfterTense_ST", past, True, False, False)
-vNarrAfterTense_ST = MorphemeState("vNarrAfterTense_ST", narr, True, False, False)
-vCond_ST = MorphemeState("vCond_ST", cond, True, False, False)
-
-vProgYor_S = MorphemeState("vProgYor_S", prog1, False, False, False)
-vProgMakta_S = MorphemeState("vProgMakta_S", prog2, False, False, False)
-vFut_S = MorphemeState("vFut_S", fut, False, False, False)
-
-vCop_ST = MorphemeState("vCop_ST", cop, True, False, False)
-vCopBeforeA3pl_S = MorphemeState("vCopBeforeA3pl_S", cop, False, False, False)
-
-vNeg_S = MorphemeState("vNeg_S", neg, False, False, False)
-vUnable_S = MorphemeState("vUnable_S", unable, False, False, False)
-# for negative before progressive-1 "Iyor"
-vNegProg1_S = MorphemeState("vNegProg1_S", neg, False, False, False)
-vUnableProg1_S = MorphemeState("vUnableProg1_S", unable, False, False, False)
-
-vImp_S = MorphemeState("vImp_S", imp, False, False, False)
-vImpYemekYi_S = MorphemeState("vImpYemekYi_S", imp, False, False, False)
-vImpYemekYe_S = MorphemeState("vImpYemekYe_S", imp, False, False, False)
-
-vCausT_S = MorphemeState("vCaus_S", caus, False, True, False)
-vCausTir_S = MorphemeState("vCausTır_S", caus, False, True, False)
-
-vRecip_S = MorphemeState("vRecip_S", recip, False, True, False)
-vImplicitRecipRoot_S = MorphemeState("vImplicitRecipRoot_S", verb, False, False, True)
-
-vReflex_S = MorphemeState("vReflex_S", reflex, False, True, False)
-vImplicitReflexRoot_S = MorphemeState("vImplicitReflexRoot_S", verb, False, False, True)
-
-# for progressive vowel drop.
-verbRoot_VowelDrop_S = MorphemeState("verbRoot_VowelDrop_S", verb, False, False, True)
-
-vAor_S = MorphemeState("vAor_S", aor, False, False, False)
-vAorNeg_S = MorphemeState("vAorNeg_S", aor, False, False, False)
-vAorNegEmpty_S = MorphemeState("vAorNegEmpty_S", aor, False, False, False)
-vAorPartNeg_S = MorphemeState("vAorPartNeg_S", aorPart, False, True, False)
-vAorPart_S = MorphemeState("vAorPart_S", aorPart, False, True, False)
-
-vAble_S = MorphemeState("vAble_S", able, False, True, False)
-vAbleNeg_S = MorphemeState("vAbleNeg_S", able, False, True, False)
-vAbleNegDerivRoot_S = MorphemeState("vAbleNegDerivRoot_S", verb, False, False, True)
-
-vPass_S = MorphemeState("vPass_S", pass_, False, True, False)
-
-vOpt_S = MorphemeState("vOpt_S", opt, False, False, False)
-vDesr_S = MorphemeState("vDesr_S", desr, False, False, False)
-vNeces_S = MorphemeState("vNeces_S", neces, False, False, False)
-
-vInf1_S = MorphemeState("vInf1_S", inf1, False, True, False)
-vInf2_S = MorphemeState("vInf2_S", inf2, False, True, False)
-vInf3_S = MorphemeState("vInf3_S", inf3, False, True, False)
-
-vAgt_S = MorphemeState("vAgt_S", agt, False, True, False)
-vActOf_S = MorphemeState("vActOf_S", actOf, False, True, False)
-
-vPastPart_S = MorphemeState("vPastPart_S", pastPart, False, True, False)
-vFutPart_S = MorphemeState("vFutPart_S", futPart, False, True, False)
-vPresPart_S = MorphemeState("vPresPart_S", presPart, False, True, False)
-vNarrPart_S = MorphemeState("vNarrPart_S", narrPart, False, True, False)
-
-vFeelLike_S = MorphemeState("vFeelLike_S", feelLike, False, True, False)
-
-vNotState_S = MorphemeState("vNotState_S", notState, False, True, False)
-
-vEverSince_S = MorphemeState("vEverSince_S", everSince, False, True, False)
-vRepeat_S = MorphemeState("vRepeat_S", repeat, False, True, False)
-vAlmost_S = MorphemeState("vAlmost_S", almost, False, True, False)
-vHastily_S = MorphemeState("vHastily_S", hastily, False, True, False)
-vStay_S = MorphemeState("vStay_S", stay, False, True, False)
-vStart_S = MorphemeState("vStart_S", start, False, True, False)
-
-vWhile_S = MorphemeState("vWhile_S", while_, False, True, False)
-vWhen_S = MorphemeState("vWhen_S", when, False, True, False)
-vAsIf_S = MorphemeState("vAsIf_S", asIf, False, True, False)
-vSinceDoingSo_S = MorphemeState("vSinceDoingSo_S", sinceDoingSo, False, True, False)
-vAsLongAs_S = MorphemeState("vAsLongAs_S", asLongAs, False, True, False)
-vByDoingSo_S = MorphemeState("vByDoingSo_S", byDoingSo, False, True, False)
-vAdamantly_S = MorphemeState("vAdamantly_S", adamantly, False, True, False)
-vAfterDoing_S = MorphemeState("vAfterDoing_S", afterDoingSo, False, True, False)
-vWithoutHavingDoneSo_S = MorphemeState(
-    "vWithoutHavingDoneSo_S", withoutHavingDoneSo, False, True, False
-)
-vWithoutBeingAbleToHaveDoneSo_S = MorphemeState(
-    "vWithoutBeingAbleToHaveDoneSo_S", withoutBeingAbleToHaveDoneSo, False, True, False
-)
-
-vDeYeRoot_S = MorphemeState("vDeYeRoot_S", verb, False, False, True)
-# -------- Question (mi) -----------------------------------------------
-
-qPresent_S = MorphemeState("qPresent_S", pres, False, False, False)
-qPast_S = MorphemeState("qPast_S", past, False, False, False)
-qNarr_S = MorphemeState("qNarr_S", narr, False, False, False)
-qA1sg_ST = MorphemeState("qA1sg_ST", a1sg, True, False, False)
-qA2sg_ST = MorphemeState("qA2sg_ST", a2sg, True, False, False)
-qA3sg_ST = MorphemeState("qA3sg_ST", a3sg, True, False, False)
-qA1pl_ST = MorphemeState("qA1pl_ST", a1pl, True, False, False)
-qA2pl_ST = MorphemeState("qA2pl_ST", a2pl, True, False, False)
-qA3pl_ST = MorphemeState("qA3pl_ST", a3pl, True, False, False)
-
-qCopBeforeA3pl_S = MorphemeState("qCopBeforeA3pl_S", cop, False, False, False)
-qCop_ST = MorphemeState("qCop_ST", cop, True, False, False)
-
-questionRoot_S = MorphemeState("questionRoot_S", ques, False, False, True)
-# -------- Verb `imek` -----------------------------------------------
-
-imekRoot_S = MorphemeState("imekRoot_S", verb, False, False, True)
-
-imekPast_S = MorphemeState("imekPast_S", past, False, False, False)
-imekNarr_S = MorphemeState("imekNarr_S", narr, False, False, False)
-
-imekCond_S = MorphemeState("imekCond_S", cond, False, False, False)
-
-imekA1sg_ST = MorphemeState("imekA1sg_ST", a1sg, True, False, False)
-imekA2sg_ST = MorphemeState("imekA2sg_ST", a2sg, True, False, False)
-imekA3sg_ST = MorphemeState("imekA3sg_ST", a3sg, True, False, False)
-imekA1pl_ST = MorphemeState("imekA1pl_ST", a1pl, True, False, False)
-imekA2pl_ST = MorphemeState("imekA2pl_ST", a2pl, True, False, False)
-imekA3pl_ST = MorphemeState("imekA3pl_ST", a3pl, True, False, False)
-
-imekCop_ST = MorphemeState("qCop_ST", cop, True, False, False)
 
 
 class StemTransitionsMapBased:
@@ -889,8 +460,12 @@ class StemTransitionsMapBased:
                     if dict_item.primary_pos != PrimaryPos.Verb:
                         original_attrs.add(PhoneticAttribute.ExpectsConsonant)
                     else:
-                        unmodified_root_state = verbLastVowelDropUnmodRoot_S
-                        modified_root_state_value = verbLastVowelDropModRoot_S
+                        unmodified_root_state = (
+                            self.morphotactics.verbLastVowelDropUnmodRoot_S
+                        )
+                        modified_root_state_value = (
+                            self.morphotactics.verbLastVowelDropModRoot_S
+                        )
                 modified_attrs.add(PhoneticAttribute.ExpectsVowel)
                 modified_attrs.add(PhoneticAttribute.CannotTerminate)
             elif attr == RootAttribute.InverseHarmony:
@@ -955,9 +530,9 @@ class StemTransitionsMapBased:
             original = StemTransition(dict_item, unmodified_root_state, original_attrs)
             # TODO: check postpositive case. Maybe it is not required.
             root_for_modified = {
-                PrimaryPos.Noun: nounLastVowelDropRoot_S,
-                PrimaryPos.Adjective: adjLastVowelDropRoot_S,
-                PrimaryPos.PostPositive: adjLastVowelDropRoot_S,
+                PrimaryPos.Noun: self.morphotactics.nounLastVowelDropRoot_S,
+                PrimaryPos.Adjective: self.morphotactics.adjLastVowelDropRoot_S,
+                PrimaryPos.PostPositive: self.morphotactics.adjLastVowelDropRoot_S,
             }.get(dict_item.primary_pos)
             if root_for_modified is None:
                 raise ValueError(f"No root morpheme state found for {dict_item}")
@@ -977,14 +552,14 @@ class StemTransitionsMapBased:
             if dict_item.lemma == "ben":
                 modified = StemTransition(
                     dict_item,
-                    pronPers_Mod_S,
+                    self.morphotactics.pronPers_Mod_S,
                     calculate_phonetic_attributes("ban"),
                     surface="ban",
                 )
             else:
                 modified = StemTransition(
                     dict_item,
-                    pronPers_Mod_S,
+                    self.morphotactics.pronPers_Mod_S,
                     calculate_phonetic_attributes("san"),
                     surface="san",
                 )
@@ -992,31 +567,37 @@ class StemTransitionsMapBased:
             modified.attrs.add(PhoneticAttribute.ModifiedPronoun)
             return [original, modified]
         elif item_id in ["demek_Verb", "yemek_Verb"]:
-            original = StemTransition(dict_item, vDeYeRoot_S, original_attrs)
+            original = StemTransition(
+                dict_item, self.morphotactics.vDeYeRoot_S, original_attrs
+            )
             if dict_item.lemma == "demek":
                 modified = StemTransition(
                     dict_item,
-                    vDeYeRoot_S,
+                    self.morphotactics.vDeYeRoot_S,
                     calculate_phonetic_attributes("di"),
                     surface="di",
                 )
             else:
                 modified = StemTransition(
                     dict_item,
-                    vDeYeRoot_S,
+                    self.morphotactics.vDeYeRoot_S,
                     calculate_phonetic_attributes("yi"),
                     surface="yi",
                 )
             return [original, modified]
         elif item_id == "imek_Verb":
-            original = StemTransition(dict_item, imekRoot_S, original_attrs)
+            original = StemTransition(
+                dict_item, self.morphotactics.imekRoot_S, original_attrs
+            )
             return [original]
         elif item_id in special_item_dict:
-            original = StemTransition(dict_item, pronQuant_S, original_attrs)
+            original = StemTransition(
+                dict_item, self.morphotactics.pronQuant_S, original_attrs
+            )
             modified_root = special_item_dict[item_id]
             modified = StemTransition(
                 dict_item,
-                pronQuantModified_S,
+                self.morphotactics.pronQuantModified_S,
                 calculate_phonetic_attributes(modified_root),
                 surface=modified_root,
             )
@@ -1102,17 +683,528 @@ class StemTransitionsMapBased:
 class TurkishMorphotactics:
     def __init__(self, lexicon: RootLexicon):
         self.lexicon = lexicon
+        self.make_states()
         self.make_graph()
         self.item_root_states = {
-            "değil_Verb": nVerbDegil_S,
-            "imek_Verb": imekRoot_S,
-            "su_Noun": nounSuRoot_S,
-            "akarsu_Noun": nounSuRoot_S,
-            "öyle_Adv": advForVerbDeriv_ST,
-            "böyle_Adv": advForVerbDeriv_ST,
-            "şöyle_Adv": advForVerbDeriv_ST,
+            "değil_Verb": self.nVerbDegil_S,
+            "imek_Verb": self.imekRoot_S,
+            "su_Noun": self.nounSuRoot_S,
+            "akarsu_Noun": self.nounSuRoot_S,
+            "öyle_Adv": self.advForVerbDeriv_ST,
+            "böyle_Adv": self.advForVerbDeriv_ST,
+            "şöyle_Adv": self.advForVerbDeriv_ST,
         }
         self.stem_transitions = StemTransitionsMapBased(self)
+
+    def make_states(self):
+        """
+        Creates the states of the graph. Each analyzer has its own states, so the
+        transitions that one analyzer adds don't change the others.
+        """
+        self.puncRoot_ST = MorphemeState("puncRoot_ST", punc, True, False, True)
+
+        # -------------- Noun States ------------------------
+
+        self.noun_S = MorphemeState("noun_S", noun, False, False, True)
+        self.nounCompoundRoot_S = MorphemeState(
+            "nounCompoundRoot_S", noun, False, False, True
+        )
+        self.nounSuRoot_S = MorphemeState("nounSuRoot_S", noun, False, False, True)
+        self.nounInf1Root_S = MorphemeState("nounInf1Root_S", noun, False, False, True)
+        self.nounActOfRoot_S = MorphemeState(
+            "nounActOfRoot_S", noun, False, False, True
+        )
+
+        # Number-Person agreement
+
+        self.a3sg_S = MorphemeState("a3sg_S", a3sg, False, False, False)
+        self.a3sgSu_S = MorphemeState("a3sgSu_S", a3sg, False, False, False)
+        self.a3sgCompound_S = MorphemeState("a3sgCompound_S", a3sg, False, False, False)
+        self.a3sgInf1_S = MorphemeState("a3sgInf1_S", a3sg, False, False, False)
+        self.a3sgActOf_S = MorphemeState("a3sgActOf_S", a3sg, False, False, False)
+        self.a3pl_S = MorphemeState("a3pl_S", a3pl, False, False, False)
+        self.a3plActOf_S = MorphemeState("a3plActOf_S", a3pl, False, False, False)
+        self.a3plCompound_S = MorphemeState("a3plCompound_S", a3pl, False, False, False)
+        self.a3plCompound2_S = MorphemeState(
+            "a3plCompound2_S", a3pl, False, False, False
+        )
+
+        # Possessive
+
+        self.pnon_S = MorphemeState("pnon_S", pnon, False, False, False)
+        self.pnonCompound_S = MorphemeState("pnonCompound_S", pnon, False, False, False)
+        self.pnonCompound2_S = MorphemeState(
+            "pnonCompound2_S", pnon, False, False, False
+        )
+        self.pnonInf1_S = MorphemeState("pnonInf1_S", pnon, False, False, False)
+        self.pnonActOf = MorphemeState("pnonActOf", pnon, False, False, False)
+        self.p1sg_S = MorphemeState("p1sg_S", p1sg, False, False, False)
+        self.p2sg_S = MorphemeState("p2sg_S", p2sg, False, False, False)
+        self.p3sg_S = MorphemeState("p3sg_S", p3sg, False, False, False)
+        self.p1pl_S = MorphemeState("p1pl_S", p1pl, False, False, False)
+        self.p2pl_S = MorphemeState("p2pl_S", p2pl, False, False, False)
+        self.p3pl_S = MorphemeState("p3pl_S", p3pl, False, False, False)
+
+        # Case
+
+        self.nom_ST = MorphemeState("nom_ST", nom, True, False, False)
+        self.nom_S = MorphemeState("nom_S", nom, False, False, False)
+
+        self.dat_ST = MorphemeState("dat_ST", dat, True, False, False)
+        self.abl_ST = MorphemeState("abl_ST", abl, True, False, False)
+        self.loc_ST = MorphemeState("loc_ST", loc, True, False, False)
+        self.ins_ST = MorphemeState("ins_ST", ins, True, False, False)
+        self.acc_ST = MorphemeState("acc_ST", acc, True, False, False)
+        self.gen_ST = MorphemeState("gen_ST", gen, True, False, False)
+        self.equ_ST = MorphemeState("equ_ST", equ, True, False, False)
+
+        # Derivation
+
+        self.dim_S = MorphemeState("dim_S", dim, False, True, False)
+        self.ness_S = MorphemeState("ness_S", ness, False, True, False)
+        self.agt_S = MorphemeState("agt_S", agt, False, True, False)
+        self.related_S = MorphemeState("related_S", related, False, True, False)
+        self.rel_S = MorphemeState("rel_S", rel, False, True, False)
+        self.relToPron_S = MorphemeState("relToPron_S", rel, False, True, False)
+        self.with_S = MorphemeState("with_S", with_, False, True, False)
+        self.without_S = MorphemeState("without_S", without, False, True, False)
+        self.justLike_S = MorphemeState("justLike_S", justLike, False, True, False)
+        self.nounZeroDeriv_S = MorphemeState(
+            "nounZeroDeriv_S", zero, False, True, False
+        )
+        self.become_S = MorphemeState("become_S", become, False, True, False)
+        self.acquire_S = MorphemeState("acquire_S", acquire, False, True, False)
+
+        # -------- Morphotactics for modified forms of words like "içeri->içerde"
+        self.nounLastVowelDropRoot_S = MorphemeState(
+            "nounLastVowelDropRoot_S", noun, False, False, True
+        )
+        self.adjLastVowelDropRoot_S = MorphemeState(
+            "adjLastVowelDropRoot_S", adj, False, False, True
+        )
+        self.postpLastVowelDropRoot_S = MorphemeState(
+            "postpLastVowelDropRoot_S", postp, False, False, True
+        )
+        self.a3PlLastVowelDrop_S = MorphemeState(
+            "a3PlLastVowelDrop_S", a3pl, False, False, False
+        )
+        self.a3sgLastVowelDrop_S = MorphemeState(
+            "a3sgLastVowelDrop_S", a3sg, False, False, False
+        )
+        self.pNonLastVowelDrop_S = MorphemeState(
+            "pNonLastVowelDrop_S", pnon, False, False, False
+        )
+        self.zeroLastVowelDrop_S = MorphemeState(
+            "zeroLastVowelDrop_S", zero, False, True, False
+        )
+
+        self.nounProper_S = MorphemeState("nounProper_S", noun, False, False, True)
+        self.nounAbbrv_S = MorphemeState("nounAbbrv_S", noun, False, False, True)
+        # this will be used for proper noun separation.
+        self.puncProperSeparator_S = MorphemeState(
+            "puncProperSeparator_S", punc, False, False, False
+        )
+
+        self.nounNoSuffix_S = MorphemeState("nounNoSuffix_S", noun, False, False, True)
+        self.nounA3sgNoSuffix_S = MorphemeState(
+            "nounA3sgNoSuffix_S", a3sg, False, False, False
+        )
+        self.nounPnonNoSuffix_S = MorphemeState(
+            "nounPnonNoSuffix_S", pnon, False, False, False
+        )
+        self.nounNomNoSuffix_ST = MorphemeState(
+            "nounNomNoSuffix_S", nom, True, False, False
+        )
+
+        # -------------- Adjective States ------------------------
+
+        self.adjectiveRoot_ST = MorphemeState(
+            "adjectiveRoot_ST", adj, True, False, True
+        )
+        self.adjAfterVerb_S = MorphemeState("adjAfterVerb_S", adj, False, False, True)
+        self.adjAfterVerb_ST = MorphemeState("adjAfterVerb_ST", adj, True, False, True)
+
+        self.adjZeroDeriv_S = MorphemeState("adjZeroDeriv_S", zero, False, True, False)
+
+        # After verb->adj derivations Adj can get possesive suffixes.
+        # Such as "oku-duğ-um", "okuyacağı"
+        self.aPnon_ST = MorphemeState("aPnon_ST", pnon, True, False, False)
+        self.aP1sg_ST = MorphemeState("aP1sg_ST", p1sg, True, False, False)
+        self.aP2sg_ST = MorphemeState("aP2sg_ST", p2sg, True, False, False)
+        self.aP3sg_ST = MorphemeState("aP3sg_ST", p3sg, True, False, False)
+        self.aP1pl_ST = MorphemeState("aP3sg_ST", p1pl, True, False, False)
+        self.aP2pl_ST = MorphemeState("aP2pl_ST", p2pl, True, False, False)
+        self.aP3pl_ST = MorphemeState("aP3pl_ST", p3pl, True, False, False)
+
+        self.aLy_S = MorphemeState("aLy_S", ly, False, True, False)
+        self.aAsIf_S = MorphemeState("aAsIf_S", asIf, False, True, False)
+        self.aAgt_S = MorphemeState("aAgt_S", agt, False, True, False)
+
+        # --------------------- Numeral Root --------------------------------------------------
+        self.numeralRoot_ST = MorphemeState("numeralRoot_ST", num, True, False, True)
+        self.numZeroDeriv_S = MorphemeState("numZeroDeriv_S", zero, False, True, False)
+
+        # -------------- Adjective-Noun connected Verb States ------------------------
+
+        self.nVerb_S = MorphemeState("nVerb_S", verb, False, False, True)
+        self.nVerbDegil_S = MorphemeState("nVerbDegil_S", verb, False, False, True)
+
+        self.nPresent_S = MorphemeState("nPresent_S", pres, False, False, False)
+        self.nPast_S = MorphemeState("nPast_S", past, False, False, False)
+        self.nNarr_S = MorphemeState("nNarr_S", narr, False, False, False)
+        self.nCond_S = MorphemeState("nCond_S", cond, False, False, False)
+        self.nA1sg_ST = MorphemeState("nA1sg_ST", a1sg, True, False, False)
+        self.nA2sg_ST = MorphemeState("nA2sg_ST", a2sg, True, False, False)
+        self.nA1pl_ST = MorphemeState("nA1pl_ST", a1pl, True, False, False)
+        self.nA2pl_ST = MorphemeState("nA2pl_ST", a2pl, True, False, False)
+        self.nA3sg_ST = MorphemeState("nA3sg_ST", a3sg, True, False, False)
+        self.nA3sg_S = MorphemeState("nA3sg_S", a3sg, False, False, False)
+        self.nA3pl_ST = MorphemeState("nA3pl_ST", a3pl, True, False, False)
+
+        self.nCop_ST = MorphemeState("nCop_ST", cop, True, False, False)
+        self.nCopBeforeA3pl_S = MorphemeState(
+            "nCopBeforeA3pl_S", cop, False, False, False
+        )
+
+        self.nNeg_S = MorphemeState("nNeg_S", neg, False, False, False)
+
+        # ----------- Pronoun states --------------------------
+
+        # Pronouns have states similar with Nouns.
+        self.pronPers_S = MorphemeState("pronPers_S", pron, False, False, True)
+
+        self.pronDemons_S = MorphemeState("pronDemons_S", pron, False, False, True)
+        self.pronQuant_S = MorphemeState("pronQuant_S", pron, False, False, True)
+        self.pronQuantModified_S = MorphemeState(
+            "pronQuantModified_S", pron, False, False, True
+        )
+        self.pronQues_S = MorphemeState("pronQues_S", pron, False, False, True)
+        self.pronReflex_S = MorphemeState("pronReflex_S", pron, False, False, True)
+
+        # used for ben-sen modification
+        self.pronPers_Mod_S = MorphemeState("pronPers_Mod_S", pron, False, False, True)
+        # A root for noun->Rel->Pron derivation.
+        self.pronAfterRel_S = MorphemeState("pronAfterRel_S", pron, False, False, True)
+
+        self.pA1sg_S = MorphemeState("pA1sg_S", a1sg, False, False, False)
+        self.pA2sg_S = MorphemeState("pA2sg_S", a2sg, False, False, False)
+
+        self.pA1sgMod_S = MorphemeState(
+            "pA1sgMod_S", a1sg, False, False, False
+        )  # for modified ben
+        self.pA2sgMod_S = MorphemeState(
+            "pA2sgMod_S", a2sg, False, False, False
+        )  # for modified sen
+
+        self.pA3sg_S = MorphemeState("pA3sg_S", a3sg, False, False, False)
+        self.pA3sgRel_S = MorphemeState("pA3sgRel_S", a3sg, False, False, False)
+        self.pA1pl_S = MorphemeState("pA1pl_S", a1pl, False, False, False)
+        self.pA2pl_S = MorphemeState("pA2pl_S", a2pl, False, False, False)
+
+        self.pA3pl_S = MorphemeState("pA3pl_S", a3pl, False, False, False)
+        self.pA3plRel_S = MorphemeState("pA3plRel_S", a3pl, False, False, False)
+
+        self.pQuantA3sg_S = MorphemeState("pQuantA3sg_S", a3sg, False, False, False)
+        self.pQuantA3pl_S = MorphemeState("pQuantA3pl_S", a3pl, False, False, False)
+        self.pQuantModA3pl_S = MorphemeState(
+            "pQuantModA3pl_S", a3pl, False, False, False
+        )  # for birbirleri etc.
+        self.pQuantA1pl_S = MorphemeState("pQuantA1pl_S", a1pl, False, False, False)
+        self.pQuantA2pl_S = MorphemeState("pQuantA2pl_S", a2pl, False, False, False)
+
+        self.pQuesA3sg_S = MorphemeState("pQuesA3sg_S", a3sg, False, False, False)
+        self.pQuesA3pl_S = MorphemeState("pQuesA3pl_S", a3pl, False, False, False)
+
+        self.pReflexA3sg_S = MorphemeState("pReflexA3sg_S", a3sg, False, False, False)
+        self.pReflexA3pl_S = MorphemeState("pReflexA3pl_S", a3pl, False, False, False)
+        self.pReflexA1sg_S = MorphemeState("pReflexA1sg_S", a1sg, False, False, False)
+        self.pReflexA2sg_S = MorphemeState("pReflexA2sg_S", a2sg, False, False, False)
+        self.pReflexA1pl_S = MorphemeState("pReflexA1pl_S", a1pl, False, False, False)
+        self.pReflexA2pl_S = MorphemeState("pReflexA2pl_S", a2pl, False, False, False)
+
+        # Possessive
+
+        self.pPnon_S = MorphemeState("pPnon_S", pnon, False, False, False)
+        self.pPnonRel_S = MorphemeState("pPnonRel_S", pnon, False, False, False)
+        self.pPnonMod_S = MorphemeState(
+            "pPnonMod_S", pnon, False, False, False
+        )  # for modified ben-sen
+        self.pP1sg_S = MorphemeState("pP1sg_S", p1sg, False, False, False)  # kimim
+        self.pP2sg_S = MorphemeState("pP2sg_S", p2sg, False, False, False)
+        self.pP3sg_S = MorphemeState(
+            "pP3sg_S", p3sg, False, False, False
+        )  # for `birisi` etc
+        self.pP1pl_S = MorphemeState(
+            "pP1pl_S", p1pl, False, False, False
+        )  # for `birbirimiz` etc
+        self.pP2pl_S = MorphemeState(
+            "pP2pl_S", p2pl, False, False, False
+        )  # for `birbiriniz` etc
+        self.pP3pl_S = MorphemeState(
+            "pP3pl_S", p3pl, False, False, False
+        )  # for `birileri` etc
+
+        # Case
+
+        self.pNom_ST = MorphemeState("pNom_ST", nom, True, False, False)
+        self.pDat_ST = MorphemeState("pDat_ST", dat, True, False, False)
+        self.pAcc_ST = MorphemeState("pAcc_ST", acc, True, False, False)
+        self.pAbl_ST = MorphemeState("pAbl_ST", abl, True, False, False)
+        self.pLoc_ST = MorphemeState("pLoc_ST", loc, True, False, False)
+        self.pGen_ST = MorphemeState("pGen_ST", gen, True, False, False)
+        self.pIns_ST = MorphemeState("pIns_ST", ins, True, False, False)
+        self.pEqu_ST = MorphemeState("pEqu_ST", equ, True, False, False)
+
+        self.pronZeroDeriv_S = MorphemeState(
+            "pronZeroDeriv_S", zero, False, True, False
+        )
+
+        self.pvPresent_S = MorphemeState("pvPresent_S", pres, False, False, False)
+        self.pvPast_S = MorphemeState("pvPast_S", past, False, False, False)
+        self.pvNarr_S = MorphemeState("pvNarr_S", narr, False, False, False)
+        self.pvCond_S = MorphemeState("pvCond_S", cond, False, False, False)
+        self.pvA1sg_ST = MorphemeState("pvA1sg_ST", a1sg, True, False, False)
+        self.pvA2sg_ST = MorphemeState("pvA2sg_ST", a2sg, True, False, False)
+        self.pvA3sg_ST = MorphemeState("pvA3sg_ST", a3sg, True, False, False)
+        self.pvA3sg_S = MorphemeState("pvA3sg_S", a3sg, False, False, False)
+        self.pvA1pl_ST = MorphemeState("pvA1pl_ST", a1pl, True, False, False)
+        self.pvA2pl_ST = MorphemeState("pvA2pl_ST", a2pl, True, False, False)
+        self.pvA3pl_ST = MorphemeState("pvA3pl_ST", a3pl, True, False, False)
+
+        self.pvCopBeforeA3pl_S = MorphemeState(
+            "pvCopBeforeA3pl_S", cop, False, False, False
+        )
+        self.pvCop_ST = MorphemeState("pvCop_ST", cop, True, False, False)
+
+        self.pvVerbRoot_S = MorphemeState("pvVerbRoot_S", verb, False, False, True)
+        # ------------- Adverbs -----------------
+
+        self.advRoot_ST = MorphemeState("advRoot_ST", adv, True, False, True)
+        self.advNounRoot_ST = MorphemeState("advRoot_ST", adv, True, False, True)
+        self.advForVerbDeriv_ST = MorphemeState(
+            "advForVerbDeriv_ST", adv, True, False, True
+        )
+
+        self.avNounAfterAdvRoot_ST = MorphemeState(
+            "advToNounRoot_ST", noun, False, False, True
+        )
+        self.avA3sg_S = MorphemeState("avA3sg_S", a3sg, False, False, False)
+        self.avPnon_S = MorphemeState("avPnon_S", pnon, False, False, False)
+        self.avDat_ST = MorphemeState("avDat_ST", dat, True, False, False)
+
+        self.avZero_S = MorphemeState("avZero_S", zero, False, True, False)
+        self.avZeroToVerb_S = MorphemeState("avZeroToVerb_S", zero, False, True, False)
+        # ------------- Interjection, Conjunctions, Determiner and Duplicator  -----------------
+
+        self.conjRoot_ST = MorphemeState("conjRoot_ST", conj, True, False, True)
+        self.interjRoot_ST = MorphemeState("interjRoot_ST", interj, True, False, True)
+        self.detRoot_ST = MorphemeState("detRoot_ST", det, True, False, True)
+        self.dupRoot_ST = MorphemeState("dupRoot_ST", dup, True, False, True)
+
+        # ------------- Post Positive ------------------------------------------------
+
+        self.postpRoot_ST = MorphemeState("postpRoot_ST", postp, True, False, True)
+        self.postpZero_S = MorphemeState("postpZero_S", zero, False, True, False)
+
+        self.po2nRoot_S = MorphemeState("po2nRoot_S", noun, False, False, False)
+
+        self.po2nA3sg_S = MorphemeState("po2nA3sg_S", a3sg, False, False, False)
+        self.po2nA3pl_S = MorphemeState("po2nA3pl_S", a3pl, False, False, False)
+
+        self.po2nP3sg_S = MorphemeState("po2nP3sg_S", p3sg, False, False, False)
+        self.po2nP1sg_S = MorphemeState("po2nP1sg_S", p1sg, False, False, False)
+        self.po2nP2sg_S = MorphemeState("po2nP2sg_S", p2sg, False, False, False)
+        self.po2nP1pl_S = MorphemeState("po2nP1pl_S", p1pl, False, False, False)
+        self.po2nP2pl_S = MorphemeState("po2nP2pl_S", p2pl, False, False, False)
+        self.po2nPnon_S = MorphemeState("po2nPnon_S", pnon, False, False, False)
+
+        self.po2nNom_ST = MorphemeState("po2nNom_ST", nom, True, False, False)
+        self.po2nDat_ST = MorphemeState("po2nDat_ST", dat, True, False, False)
+        self.po2nAbl_ST = MorphemeState("po2nAbl_ST", abl, True, False, False)
+        self.po2nLoc_ST = MorphemeState("po2nLoc_ST", loc, True, False, False)
+        self.po2nIns_ST = MorphemeState("po2nIns_ST", ins, True, False, False)
+        self.po2nAcc_ST = MorphemeState("po2nAcc_ST", acc, True, False, False)
+        self.po2nGen_ST = MorphemeState("po2nGen_ST", gen, True, False, False)
+        self.po2nEqu_ST = MorphemeState("po2nEqu_ST", equ, True, False, False)
+
+        # ------------- Verbs -----------------------------------
+
+        self.verbRoot_S = MorphemeState("verbRoot_S", verb, False, False, True)
+        self.verbLastVowelDropModRoot_S = MorphemeState(
+            "verbLastVowelDropModRoot_S", verb, False, False, True
+        )
+        self.verbLastVowelDropUnmodRoot_S = MorphemeState(
+            "verbLastVowelDropUnmodRoot_S", verb, False, False, True
+        )
+
+        self.vA1sg_ST = MorphemeState("vA1sg_ST", a1sg, True, False, False)
+        self.vA2sg_ST = MorphemeState("vA2sg_ST", a2sg, True, False, False)
+        self.vA3sg_ST = MorphemeState("vA3sg_ST", a3sg, True, False, False)
+        self.vA1pl_ST = MorphemeState("vA1pl_ST", a1pl, True, False, False)
+        self.vA2pl_ST = MorphemeState("vA2pl_ST", a2pl, True, False, False)
+        self.vA3pl_ST = MorphemeState("vA3pl_ST", a3pl, True, False, False)
+
+        self.vPast_S = MorphemeState("vPast_S", past, False, False, False)
+        self.vNarr_S = MorphemeState("vNarr_S", narr, False, False, False)
+        self.vCond_S = MorphemeState("vCond_S", cond, False, False, False)
+        self.vCondAfterPerson_ST = MorphemeState(
+            "vCondAfterPerson_ST", cond, True, False, False
+        )
+        self.vPastAfterTense_S = MorphemeState(
+            "vPastAfterTense_S", past, False, False, False
+        )
+        self.vNarrAfterTense_S = MorphemeState(
+            "vNarrAfterTense_S", narr, False, False, False
+        )
+
+        # terminal cases are used if A3pl comes before NarrAfterTense, PastAfterTense or vCond
+        self.vPastAfterTense_ST = MorphemeState(
+            "vPastAfterTense_ST", past, True, False, False
+        )
+        self.vNarrAfterTense_ST = MorphemeState(
+            "vNarrAfterTense_ST", narr, True, False, False
+        )
+        self.vCond_ST = MorphemeState("vCond_ST", cond, True, False, False)
+
+        self.vProgYor_S = MorphemeState("vProgYor_S", prog1, False, False, False)
+        self.vProgMakta_S = MorphemeState("vProgMakta_S", prog2, False, False, False)
+        self.vFut_S = MorphemeState("vFut_S", fut, False, False, False)
+
+        self.vCop_ST = MorphemeState("vCop_ST", cop, True, False, False)
+        self.vCopBeforeA3pl_S = MorphemeState(
+            "vCopBeforeA3pl_S", cop, False, False, False
+        )
+
+        self.vNeg_S = MorphemeState("vNeg_S", neg, False, False, False)
+        self.vUnable_S = MorphemeState("vUnable_S", unable, False, False, False)
+        # for negative before progressive-1 "Iyor"
+        self.vNegProg1_S = MorphemeState("vNegProg1_S", neg, False, False, False)
+        self.vUnableProg1_S = MorphemeState(
+            "vUnableProg1_S", unable, False, False, False
+        )
+
+        self.vImp_S = MorphemeState("vImp_S", imp, False, False, False)
+        self.vImpYemekYi_S = MorphemeState("vImpYemekYi_S", imp, False, False, False)
+        self.vImpYemekYe_S = MorphemeState("vImpYemekYe_S", imp, False, False, False)
+
+        self.vCausT_S = MorphemeState("vCaus_S", caus, False, True, False)
+        self.vCausTir_S = MorphemeState("vCausTır_S", caus, False, True, False)
+
+        self.vRecip_S = MorphemeState("vRecip_S", recip, False, True, False)
+        self.vImplicitRecipRoot_S = MorphemeState(
+            "vImplicitRecipRoot_S", verb, False, False, True
+        )
+
+        self.vReflex_S = MorphemeState("vReflex_S", reflex, False, True, False)
+        self.vImplicitReflexRoot_S = MorphemeState(
+            "vImplicitReflexRoot_S", verb, False, False, True
+        )
+
+        # for progressive vowel drop.
+        self.verbRoot_VowelDrop_S = MorphemeState(
+            "verbRoot_VowelDrop_S", verb, False, False, True
+        )
+
+        self.vAor_S = MorphemeState("vAor_S", aor, False, False, False)
+        self.vAorNeg_S = MorphemeState("vAorNeg_S", aor, False, False, False)
+        self.vAorNegEmpty_S = MorphemeState("vAorNegEmpty_S", aor, False, False, False)
+        self.vAorPartNeg_S = MorphemeState("vAorPartNeg_S", aorPart, False, True, False)
+        self.vAorPart_S = MorphemeState("vAorPart_S", aorPart, False, True, False)
+
+        self.vAble_S = MorphemeState("vAble_S", able, False, True, False)
+        self.vAbleNeg_S = MorphemeState("vAbleNeg_S", able, False, True, False)
+        self.vAbleNegDerivRoot_S = MorphemeState(
+            "vAbleNegDerivRoot_S", verb, False, False, True
+        )
+
+        self.vPass_S = MorphemeState("vPass_S", pass_, False, True, False)
+
+        self.vOpt_S = MorphemeState("vOpt_S", opt, False, False, False)
+        self.vDesr_S = MorphemeState("vDesr_S", desr, False, False, False)
+        self.vNeces_S = MorphemeState("vNeces_S", neces, False, False, False)
+
+        self.vInf1_S = MorphemeState("vInf1_S", inf1, False, True, False)
+        self.vInf2_S = MorphemeState("vInf2_S", inf2, False, True, False)
+        self.vInf3_S = MorphemeState("vInf3_S", inf3, False, True, False)
+
+        self.vAgt_S = MorphemeState("vAgt_S", agt, False, True, False)
+        self.vActOf_S = MorphemeState("vActOf_S", actOf, False, True, False)
+
+        self.vPastPart_S = MorphemeState("vPastPart_S", pastPart, False, True, False)
+        self.vFutPart_S = MorphemeState("vFutPart_S", futPart, False, True, False)
+        self.vPresPart_S = MorphemeState("vPresPart_S", presPart, False, True, False)
+        self.vNarrPart_S = MorphemeState("vNarrPart_S", narrPart, False, True, False)
+
+        self.vFeelLike_S = MorphemeState("vFeelLike_S", feelLike, False, True, False)
+
+        self.vNotState_S = MorphemeState("vNotState_S", notState, False, True, False)
+
+        self.vEverSince_S = MorphemeState("vEverSince_S", everSince, False, True, False)
+        self.vRepeat_S = MorphemeState("vRepeat_S", repeat, False, True, False)
+        self.vAlmost_S = MorphemeState("vAlmost_S", almost, False, True, False)
+        self.vHastily_S = MorphemeState("vHastily_S", hastily, False, True, False)
+        self.vStay_S = MorphemeState("vStay_S", stay, False, True, False)
+        self.vStart_S = MorphemeState("vStart_S", start, False, True, False)
+
+        self.vWhile_S = MorphemeState("vWhile_S", while_, False, True, False)
+        self.vWhen_S = MorphemeState("vWhen_S", when, False, True, False)
+        self.vAsIf_S = MorphemeState("vAsIf_S", asIf, False, True, False)
+        self.vSinceDoingSo_S = MorphemeState(
+            "vSinceDoingSo_S", sinceDoingSo, False, True, False
+        )
+        self.vAsLongAs_S = MorphemeState("vAsLongAs_S", asLongAs, False, True, False)
+        self.vByDoingSo_S = MorphemeState("vByDoingSo_S", byDoingSo, False, True, False)
+        self.vAdamantly_S = MorphemeState("vAdamantly_S", adamantly, False, True, False)
+        self.vAfterDoing_S = MorphemeState(
+            "vAfterDoing_S", afterDoingSo, False, True, False
+        )
+        self.vWithoutHavingDoneSo_S = MorphemeState(
+            "vWithoutHavingDoneSo_S", withoutHavingDoneSo, False, True, False
+        )
+        self.vWithoutBeingAbleToHaveDoneSo_S = MorphemeState(
+            "vWithoutBeingAbleToHaveDoneSo_S",
+            withoutBeingAbleToHaveDoneSo,
+            False,
+            True,
+            False,
+        )
+
+        self.vDeYeRoot_S = MorphemeState("vDeYeRoot_S", verb, False, False, True)
+        # -------- Question (mi) -----------------------------------------------
+
+        self.qPresent_S = MorphemeState("qPresent_S", pres, False, False, False)
+        self.qPast_S = MorphemeState("qPast_S", past, False, False, False)
+        self.qNarr_S = MorphemeState("qNarr_S", narr, False, False, False)
+        self.qA1sg_ST = MorphemeState("qA1sg_ST", a1sg, True, False, False)
+        self.qA2sg_ST = MorphemeState("qA2sg_ST", a2sg, True, False, False)
+        self.qA3sg_ST = MorphemeState("qA3sg_ST", a3sg, True, False, False)
+        self.qA1pl_ST = MorphemeState("qA1pl_ST", a1pl, True, False, False)
+        self.qA2pl_ST = MorphemeState("qA2pl_ST", a2pl, True, False, False)
+        self.qA3pl_ST = MorphemeState("qA3pl_ST", a3pl, True, False, False)
+
+        self.qCopBeforeA3pl_S = MorphemeState(
+            "qCopBeforeA3pl_S", cop, False, False, False
+        )
+        self.qCop_ST = MorphemeState("qCop_ST", cop, True, False, False)
+
+        self.questionRoot_S = MorphemeState("questionRoot_S", ques, False, False, True)
+        # -------- Verb `imek` -----------------------------------------------
+
+        self.imekRoot_S = MorphemeState("imekRoot_S", verb, False, False, True)
+
+        self.imekPast_S = MorphemeState("imekPast_S", past, False, False, False)
+        self.imekNarr_S = MorphemeState("imekNarr_S", narr, False, False, False)
+
+        self.imekCond_S = MorphemeState("imekCond_S", cond, False, False, False)
+
+        self.imekA1sg_ST = MorphemeState("imekA1sg_ST", a1sg, True, False, False)
+        self.imekA2sg_ST = MorphemeState("imekA2sg_ST", a2sg, True, False, False)
+        self.imekA3sg_ST = MorphemeState("imekA3sg_ST", a3sg, True, False, False)
+        self.imekA1pl_ST = MorphemeState("imekA1pl_ST", a1pl, True, False, False)
+        self.imekA2pl_ST = MorphemeState("imekA2pl_ST", a2pl, True, False, False)
+        self.imekA3pl_ST = MorphemeState("imekA3pl_ST", a3pl, True, False, False)
+
+        self.imekCop_ST = MorphemeState("qCop_ST", cop, True, False, False)
 
     def make_graph(self):
         self.connect_noun_states()
@@ -1138,11 +1230,11 @@ class TurkishMorphotactics:
         """
 
         # ev-ε-?-?
-        noun_S.add_empty(a3sg_S, not_have(RootAttribute.ImplicitPlural))
+        self.noun_S.add_empty(self.a3sg_S, not_have(RootAttribute.ImplicitPlural))
 
         # ev-ler-?-?.
-        noun_S.add(
-            a3pl_S,
+        self.noun_S.add(
+            self.a3pl_S,
             "lAr",
             not_have(RootAttribute.ImplicitPlural).and_(
                 not_have(RootAttribute.CompoundP3sg)
@@ -1150,70 +1242,74 @@ class TurkishMorphotactics:
         )
 
         # Allow only implicit plural `hayvanat`.
-        noun_S.add_empty(a3pl_S, has(RootAttribute.ImplicitPlural))
+        self.noun_S.add_empty(self.a3pl_S, has(RootAttribute.ImplicitPlural))
 
         # --- Compound Handling ---------
         # for compound roots like "zeytinyağ-" generate two transitions
         # NounCompound--(ε)--> a3sgCompound --(ε)--> pNonCompound_S --> Nom_S
-        nounCompoundRoot_S.add_empty(
-            a3sgCompound_S, has(RootAttribute.CompoundP3sgRoot)
+        self.nounCompoundRoot_S.add_empty(
+            self.a3sgCompound_S, has(RootAttribute.CompoundP3sgRoot)
         )
 
-        a3sgCompound_S.add_empty(pnonCompound_S)
-        a3sgCompound_S.add(p3pl_S, "lArI")
+        self.a3sgCompound_S.add_empty(self.pnonCompound_S)
+        self.a3sgCompound_S.add(self.p3pl_S, "lArI")
 
         # ---- For compound derivations -----------------
-        pnonCompound_S.add_empty(nom_S)
-        nom_S.add(become_S, "lAş")
-        nom_S.add(acquire_S, "lAn")
+        self.pnonCompound_S.add_empty(self.nom_S)
+        self.nom_S.add(self.become_S, "lAş")
+        self.nom_S.add(self.acquire_S, "lAn")
         # for "zeytinyağlı"
-        nom_S.add(with_S, "lI", ContainsMorpheme(with_, without).not_())
+        self.nom_S.add(self.with_S, "lI", ContainsMorpheme(with_, without).not_())
         # for "zeytinyağsız"
-        nom_S.add(without_S, "sIz", ContainsMorpheme(with_, without).not_())
+        self.nom_S.add(self.without_S, "sIz", ContainsMorpheme(with_, without).not_())
         # for "zeytinyağlık"
         not_ = NotCondition
         containsNess = ContainsMorpheme(ness)
-        nom_S.add(ness_S, "lI~k", not_(containsNess))
-        nom_S.add(ness_S, "lI!ğ", not_(containsNess))
+        self.nom_S.add(self.ness_S, "lI~k", not_(containsNess))
+        self.nom_S.add(self.ness_S, "lI!ğ", not_(containsNess))
         # for "zeytinyağcı"
-        nom_S.add(agt_S, ">cI", not_(ContainsMorpheme(agt)))
+        self.nom_S.add(self.agt_S, ">cI", not_(ContainsMorpheme(agt)))
         # for "zeytinyağsı"
-        nom_S.add(justLike_S, "+msI", not_(ContainsMorpheme(justLike)))
+        self.nom_S.add(self.justLike_S, "+msI", not_(ContainsMorpheme(justLike)))
         # for "zeytinyağcık"
-        nom_S.add(
-            dim_S, ">cI~k", HasAnySuffixSurface().not_().and_not(ContainsMorpheme(dim))
+        self.nom_S.add(
+            self.dim_S,
+            ">cI~k",
+            HasAnySuffixSurface().not_().and_not(ContainsMorpheme(dim)),
         )
-        nom_S.add(
-            dim_S, ">cI!ğ", HasAnySuffixSurface().not_().and_not(ContainsMorpheme(dim))
+        self.nom_S.add(
+            self.dim_S,
+            ">cI!ğ",
+            HasAnySuffixSurface().not_().and_not(ContainsMorpheme(dim)),
         )
         # "zeytinyağcağız"
-        nom_S.add(dim_S, "cAğIz", HasAnySuffixSurface().not_())
+        self.nom_S.add(self.dim_S, "cAğIz", HasAnySuffixSurface().not_())
 
         # for compound roots like "zeytinyağ-lar-ı" generate two transition
-        # NounCompound--(lAr)--> a3plCompound ---> p3sg_S, P1sg etc.
-        nounCompoundRoot_S.add(
-            a3plCompound_S, "lAr", has(RootAttribute.CompoundP3sgRoot)
+        # NounCompound--(lAr)--> a3plCompound ---> self.p3sg_S, P1sg etc.
+        self.nounCompoundRoot_S.add(
+            self.a3plCompound_S, "lAr", has(RootAttribute.CompoundP3sgRoot)
         )
 
         # but for pnon connection, we use lArI
-        nounCompoundRoot_S.add(
-            a3plCompound2_S, "lArI", has(RootAttribute.CompoundP3sgRoot)
+        self.nounCompoundRoot_S.add(
+            self.a3plCompound2_S, "lArI", has(RootAttribute.CompoundP3sgRoot)
         )
 
-        a3plCompound_S.add_all(
+        self.a3plCompound_S.add_all(
             [
-                (p3sg_S, "I"),
-                (p2sg_S, "In"),
-                (p1sg_S, "Im"),
-                (p1pl_S, "ImIz"),
-                (p2pl_S, "InIz"),
-                (p3pl_S, "I"),
+                (self.p3sg_S, "I"),
+                (self.p2sg_S, "In"),
+                (self.p1sg_S, "Im"),
+                (self.p1pl_S, "ImIz"),
+                (self.p2pl_S, "InIz"),
+                (self.p3pl_S, "I"),
             ]
         )
 
         # this path is used for plural analysis (A3pl+Pnon+Nom) of compound words.
-        a3plCompound2_S.add_empty(pnonCompound2_S)
-        pnonCompound2_S.add_empty(nom_ST)
+        self.a3plCompound2_S.add_empty(self.pnonCompound2_S)
+        self.pnonCompound2_S.add_empty(self.nom_ST)
 
         # ------
 
@@ -1222,73 +1318,73 @@ class TurkishMorphotactics:
         abbreviation = SecondaryPosIs(SecondaryPos.Abbreviation)
         possessionCond = not_have(RootAttribute.FamilyMember).and_not(abbreviation)
 
-        a3sg_S.add_all(
+        self.a3sg_S.add_all(
             [
-                (pnon_S, "", not_have(RootAttribute.FamilyMember)),  # ev
-                (p1sg_S, "Im", possessionCond),  # evim
+                (self.pnon_S, "", not_have(RootAttribute.FamilyMember)),  # ev
+                (self.p1sg_S, "Im", possessionCond),  # evim
                 (
-                    p2sg_S,
+                    self.p2sg_S,
                     "In",
                     possessionCond.and_not(PreviousGroupContainsMorpheme(justLike)),
                 ),  # evin
-                (p3sg_S, "+sI", possessionCond),  # evi, odası
+                (self.p3sg_S, "+sI", possessionCond),  # evi, odası
                 (
-                    p3sg_S,
+                    self.p3sg_S,
                     "",
                     has(RootAttribute.CompoundP3sg),
                 ),  # "zeytinyağı" has two analyses. Pnon and P3sg.
-                (p1pl_S, "ImIz", possessionCond),  # evimiz
+                (self.p1pl_S, "ImIz", possessionCond),  # evimiz
                 (
-                    p2pl_S,
+                    self.p2pl_S,
                     "InIz",
                     possessionCond.and_not(PreviousGroupContainsMorpheme(justLike)),
                 ),  # eviniz
-                (p3pl_S, "lArI", possessionCond),
+                (self.p3pl_S, "lArI", possessionCond),
             ]
         )  # evleri
 
         # ev-ler-ε-?
-        a3pl_S.add_empty(pnon_S, not_have(RootAttribute.FamilyMember))
+        self.a3pl_S.add_empty(self.pnon_S, not_have(RootAttribute.FamilyMember))
 
         # ev-ler-im-?
-        a3pl_S.add_all(
+        self.a3pl_S.add_all(
             [
-                (p1sg_S, "Im", possessionCond),
-                (p2sg_S, "In", possessionCond),
+                (self.p1sg_S, "Im", possessionCond),
+                (self.p2sg_S, "In", possessionCond),
                 (
-                    p1sg_S,
+                    self.p1sg_S,
                     "",
                     has(RootAttribute.ImplicitP1sg),
                 ),  # for words like "annemler"
                 (
-                    p2sg_S,
+                    self.p2sg_S,
                     "",
                     has(RootAttribute.ImplicitP2sg),
                 ),  # for words like "annenler"
-                (p3sg_S, "I", possessionCond),
-                (p1pl_S, "ImIz", possessionCond),
-                (p2pl_S, "InIz", possessionCond),
-                (p3pl_S, "I", possessionCond),
+                (self.p3sg_S, "I", possessionCond),
+                (self.p1pl_S, "ImIz", possessionCond),
+                (self.p2pl_S, "InIz", possessionCond),
+                (self.p3pl_S, "I", possessionCond),
             ]
         )
 
         # --- handle su - akarsu roots. ----
-        nounSuRoot_S.add_empty(a3sgSu_S)
-        nounSuRoot_S.add(a3pl_S, "lar")
-        a3sgSu_S.add_all(
+        self.nounSuRoot_S.add_empty(self.a3sgSu_S)
+        self.nounSuRoot_S.add(self.a3pl_S, "lar")
+        self.a3sgSu_S.add_all(
             [
-                (pnon_S, ""),
-                (p1sg_S, "yum"),
-                (p2sg_S, "yun"),
-                (p3sg_S, "yu"),
-                (p1pl_S, "yumuz"),
-                (p2pl_S, "yunuz"),
-                (p3pl_S, "lArI"),
+                (self.pnon_S, ""),
+                (self.p1sg_S, "yum"),
+                (self.p2sg_S, "yun"),
+                (self.p3sg_S, "yu"),
+                (self.p1pl_S, "yumuz"),
+                (self.p2pl_S, "yunuz"),
+                (self.p3pl_S, "lArI"),
             ]
         )
 
         # ev-?-ε-ε (ev, evler).
-        pnon_S.add_empty(nom_ST, not_have(RootAttribute.FamilyMember))
+        self.pnon_S.add_empty(self.nom_ST, not_have(RootAttribute.FamilyMember))
 
         equCond1 = (
             ContainsMorpheme(adj, futPart, presPart, narrPart, pastPart)
@@ -1299,46 +1395,50 @@ class TurkishMorphotactics:
         equCond = PreviousMorphemeIs(a3pl).or_(equCond1)  # allow `yapabildiğince`
 
         # Not allow "zetinyağı-ya" etc.
-        pnon_S.add_all(
+        self.pnon_S.add_all(
             [
-                (dat_ST, "+yA", not_have(RootAttribute.CompoundP3sg)),  # ev-e
-                (abl_ST, ">dAn", not_have(RootAttribute.CompoundP3sg)),  # ev-den
-                (loc_ST, ">dA", not_have(RootAttribute.CompoundP3sg)),  # evde
-                (acc_ST, "+yI", not_have(RootAttribute.CompoundP3sg)),  # evi
-                (gen_ST, "+nIn", PreviousStateIsNot(a3sgSu_S)),  # evin, zeytinyağının
-                (gen_ST, "yIn", PreviousStateIs(a3sgSu_S)),  # suyun
+                (self.dat_ST, "+yA", not_have(RootAttribute.CompoundP3sg)),  # ev-e
+                (self.abl_ST, ">dAn", not_have(RootAttribute.CompoundP3sg)),  # ev-den
+                (self.loc_ST, ">dA", not_have(RootAttribute.CompoundP3sg)),  # evde
+                (self.acc_ST, "+yI", not_have(RootAttribute.CompoundP3sg)),  # evi
                 (
-                    equ_ST,
+                    self.gen_ST,
+                    "+nIn",
+                    PreviousStateIsNot(self.a3sgSu_S),
+                ),  # evin, zeytinyağının
+                (self.gen_ST, "yIn", PreviousStateIs(self.a3sgSu_S)),  # suyun
+                (
+                    self.equ_ST,
                     ">cA",
                     not_have(RootAttribute.CompoundP3sg).and_(equCond),
                 ),  # evce
-                (ins_ST, "+ylA"),  # evle, zeytinyağıyla
+                (self.ins_ST, "+ylA"),  # evle, zeytinyağıyla
             ]
         )
-        pnon_S.add_all(
+        self.pnon_S.add_all(
             [
                 (
-                    dat_ST,
+                    self.dat_ST,
                     "+nA",
                     HasRootAttribute(RootAttribute.CompoundP3sg),
                 ),  # zeytinyağı-na
                 (
-                    abl_ST,
+                    self.abl_ST,
                     "+ndAn",
                     HasRootAttribute(RootAttribute.CompoundP3sg),
                 ),  # zeytinyağı-ndan
                 (
-                    loc_ST,
+                    self.loc_ST,
                     "+ndA",
                     HasRootAttribute(RootAttribute.CompoundP3sg),
                 ),  # zeytinyağı-nda
                 (
-                    equ_ST,
+                    self.equ_ST,
                     "+ncA",
                     HasRootAttribute(RootAttribute.CompoundP3sg).and_(equCond),
                 ),  # zeytinyağı-nca
                 (
-                    acc_ST,
+                    self.acc_ST,
                     "+nI",
                     HasRootAttribute(RootAttribute.CompoundP3sg),
                 ),  # zeytinyağı-nı
@@ -1347,83 +1447,93 @@ class TurkishMorphotactics:
         # This transition is for words like "içeri" or "dışarı".
         # Those words implicitly contains Dative suffix.
         # But It is also possible to add dative suffix +yA to those words such as "içeri-ye".
-        pnon_S.add_empty(dat_ST, HasRootAttribute(RootAttribute.ImplicitDative))
+        self.pnon_S.add_empty(
+            self.dat_ST, HasRootAttribute(RootAttribute.ImplicitDative)
+        )
 
-        p1sg_S.add_all(
+        self.p1sg_S.add_all(
             [
-                (nom_ST, ""),  # evim
-                (dat_ST, "A"),  # evime
-                (loc_ST, "dA"),  # evimde
-                (abl_ST, "dAn"),  # evimden
-                (ins_ST, "lA"),  # evimle
-                (gen_ST, "In"),  # evimin
-                (equ_ST, "cA", equCond.or_(ContainsMorpheme(pastPart))),  # evimce
-                (acc_ST, "I"),  # evimi
+                (self.nom_ST, ""),  # evim
+                (self.dat_ST, "A"),  # evime
+                (self.loc_ST, "dA"),  # evimde
+                (self.abl_ST, "dAn"),  # evimden
+                (self.ins_ST, "lA"),  # evimle
+                (self.gen_ST, "In"),  # evimin
+                (self.equ_ST, "cA", equCond.or_(ContainsMorpheme(pastPart))),  # evimce
+                (self.acc_ST, "I"),  # evimi
             ]
         )
 
-        p2sg_S.add_all(
+        self.p2sg_S.add_all(
             [
-                (nom_ST, ""),  # evin
-                (dat_ST, "A"),  # evine
-                (loc_ST, "dA"),  # evinde
-                (abl_ST, "dAn"),  # evinden
-                (ins_ST, "lA"),  # evinle
-                (gen_ST, "In"),  # evinin
-                (equ_ST, "cA", equCond.or_(ContainsMorpheme(pastPart))),  # evince
-                (acc_ST, "I"),  # evini
+                (self.nom_ST, ""),  # evin
+                (self.dat_ST, "A"),  # evine
+                (self.loc_ST, "dA"),  # evinde
+                (self.abl_ST, "dAn"),  # evinden
+                (self.ins_ST, "lA"),  # evinle
+                (self.gen_ST, "In"),  # evinin
+                (self.equ_ST, "cA", equCond.or_(ContainsMorpheme(pastPart))),  # evince
+                (self.acc_ST, "I"),  # evini
             ]
         )
 
-        p3sg_S.add_all(
+        self.p3sg_S.add_all(
             [
-                (nom_ST, ""),  # evi
-                (dat_ST, "nA"),  # evine
-                (loc_ST, "ndA"),  # evinde
-                (abl_ST, "ndAn"),  # evinden
-                (ins_ST, "ylA"),  # eviyle
-                (gen_ST, "nIn"),  # evinin
-                (equ_ST, "ncA", equCond.or_(ContainsMorpheme(pastPart))),  # evince
-                (acc_ST, "nI"),  # evini
+                (self.nom_ST, ""),  # evi
+                (self.dat_ST, "nA"),  # evine
+                (self.loc_ST, "ndA"),  # evinde
+                (self.abl_ST, "ndAn"),  # evinden
+                (self.ins_ST, "ylA"),  # eviyle
+                (self.gen_ST, "nIn"),  # evinin
+                (self.equ_ST, "ncA", equCond.or_(ContainsMorpheme(pastPart))),  # evince
+                (self.acc_ST, "nI"),  # evini
             ]
         )
 
-        p1pl_S.add_all(
+        self.p1pl_S.add_all(
             [
-                (nom_ST, ""),  # evimiz
-                (dat_ST, "A"),  # evimize
-                (loc_ST, "dA"),  # evimizde
-                (abl_ST, "dAn"),  # evimizden
-                (ins_ST, "lA"),  # evimizden
-                (gen_ST, "In"),  # evimizin
-                (equ_ST, "cA", equCond.or_(ContainsMorpheme(pastPart))),  # evimizce
-                (acc_ST, "I"),  # evimizi
+                (self.nom_ST, ""),  # evimiz
+                (self.dat_ST, "A"),  # evimize
+                (self.loc_ST, "dA"),  # evimizde
+                (self.abl_ST, "dAn"),  # evimizden
+                (self.ins_ST, "lA"),  # evimizden
+                (self.gen_ST, "In"),  # evimizin
+                (
+                    self.equ_ST,
+                    "cA",
+                    equCond.or_(ContainsMorpheme(pastPart)),
+                ),  # evimizce
+                (self.acc_ST, "I"),  # evimizi
             ]
         )
-        p2pl_S.add_all(
+        self.p2pl_S.add_all(
             [
-                (nom_ST, ""),  # eviniz
-                (dat_ST, "A"),  # evinize
-                (loc_ST, "dA"),  # evinizde
-                (abl_ST, "dAn"),  # evinizden
-                (ins_ST, "lA"),  # evinizle
-                (gen_ST, "In"),  # evinizin
-                (equ_ST, "cA", equCond.or_(ContainsMorpheme(pastPart))),  # evinizce
-                (acc_ST, "I"),  # evinizi
+                (self.nom_ST, ""),  # eviniz
+                (self.dat_ST, "A"),  # evinize
+                (self.loc_ST, "dA"),  # evinizde
+                (self.abl_ST, "dAn"),  # evinizden
+                (self.ins_ST, "lA"),  # evinizle
+                (self.gen_ST, "In"),  # evinizin
+                (
+                    self.equ_ST,
+                    "cA",
+                    equCond.or_(ContainsMorpheme(pastPart)),
+                ),  # evinizce
+                (self.acc_ST, "I"),  # evinizi
             ]
         )
 
-        p3pl_S.add_all(
+        self.p3pl_S.add_all(
             [
-                (nom_ST, ""),  # evleri
-                (dat_ST, "nA"),  # evlerine
-                (loc_ST, "ndA"),  # evlerinde
-                (abl_ST, "ndAn"),  # evlerinden
-                (ins_ST, "ylA"),  # evleriyle
-                (gen_ST, "nIn"),  # evlerinin
+                (self.nom_ST, ""),  # evleri
+                (self.dat_ST, "nA"),  # evlerine
+                (self.loc_ST, "ndA"),  # evlerinde
+                (self.abl_ST, "ndAn"),  # evlerinden
+                (self.ins_ST, "ylA"),  # evleriyle
+                (self.gen_ST, "nIn"),  # evlerinin
                 # For now we omit equCond check because adj+..+A3pl+..+Equ fails.
-                (equ_ST, "+ncA"),  # evlerince.
-                (acc_ST, "nI"),  # evlerini
+                (self.equ_ST, "+ncA"),  # evlerince.
+                (self.acc_ST, "nI"),  # evlerini
             ]
         )
 
@@ -1431,27 +1541,33 @@ class TurkishMorphotactics:
         # There are two almost identical suffix transitions with templates ">cI~k" and ">cI!ğ"
         # This was necessary for some simplification during analysis. This way there will be only one
         # surface form generated for each transition.
-        nom_ST.add(dim_S, ">cI~k", HasAnySuffixSurface().not_().and_not(abbreviation))
-        nom_ST.add(dim_S, ">cI!ğ", HasAnySuffixSurface().not_().and_not(abbreviation))
+        self.nom_ST.add(
+            self.dim_S, ">cI~k", HasAnySuffixSurface().not_().and_not(abbreviation)
+        )
+        self.nom_ST.add(
+            self.dim_S, ">cI!ğ", HasAnySuffixSurface().not_().and_not(abbreviation)
+        )
 
         # ev-ε-ε-ε-ceğiz (evceğiz)
-        nom_ST.add(dim_S, "cAğIz", HasAnySuffixSurface().not_().and_not(abbreviation))
+        self.nom_ST.add(
+            self.dim_S, "cAğIz", HasAnySuffixSurface().not_().and_not(abbreviation)
+        )
 
         # connect dim to the noun root.
-        dim_S.add_empty(noun_S)
+        self.dim_S.add_empty(self.noun_S)
 
         emptyAdjNounSeq = ContainsMorphemeSequence(adj, zero, noun, a3sg, pnon, nom)
 
-        nom_ST.add(
-            ness_S,
+        self.nom_ST.add(
+            self.ness_S,
             "lI~k",
             NoSurfaceAfterDerivation()
             .and_not(containsNess)
             .and_not(emptyAdjNounSeq)
             .and_not(abbreviation),
         )
-        nom_ST.add(
-            ness_S,
+        self.nom_ST.add(
+            self.ness_S,
             "lI!ğ",
             NoSurfaceAfterDerivation()
             .and_not(containsNess)
@@ -1460,58 +1576,60 @@ class TurkishMorphotactics:
         )
 
         # connect `ness` to the noun root.
-        ness_S.add_empty(noun_S)
+        self.ness_S.add_empty(self.noun_S)
 
-        nom_ST.add(
-            agt_S, ">cI", NoSurfaceAfterDerivation().and_not(ContainsMorpheme(adj, agt))
+        self.nom_ST.add(
+            self.agt_S,
+            ">cI",
+            NoSurfaceAfterDerivation().and_not(ContainsMorpheme(adj, agt)),
         )
 
         # connect `ness` to the noun root.
-        agt_S.add_empty(noun_S)
+        self.agt_S.add_empty(self.noun_S)
 
         # here we do not allow an adjective to pass here.
         # such as, adj->zero->noun->ε-ε-ε->zero->Verb is not acceptable because there is already a
         # adj->zero->Verb path.
 
         noun2VerbZeroDerivationCondition = HasTail().and_not(
-            NoSurfaceAfterDerivation().and_(LastDerivationIs(adjZeroDeriv_S))
+            NoSurfaceAfterDerivation().and_(LastDerivationIs(self.adjZeroDeriv_S))
         )
-        nom_ST.add_empty(nounZeroDeriv_S, noun2VerbZeroDerivationCondition)
+        self.nom_ST.add_empty(self.nounZeroDeriv_S, noun2VerbZeroDerivationCondition)
 
         # elma-ya-yım elma-ya-ydı
-        dat_ST.add_empty(nounZeroDeriv_S, noun2VerbZeroDerivationCondition)
+        self.dat_ST.add_empty(self.nounZeroDeriv_S, noun2VerbZeroDerivationCondition)
 
         # elma-dan-ım elma-dan-dı
-        abl_ST.add_empty(nounZeroDeriv_S, noun2VerbZeroDerivationCondition)
+        self.abl_ST.add_empty(self.nounZeroDeriv_S, noun2VerbZeroDerivationCondition)
 
         # elma-da-yım elma-da-ydı
-        loc_ST.add_empty(nounZeroDeriv_S, noun2VerbZeroDerivationCondition)
+        self.loc_ST.add_empty(self.nounZeroDeriv_S, noun2VerbZeroDerivationCondition)
 
         # elma-yla-yım elma-yla-ydı
-        ins_ST.add_empty(nounZeroDeriv_S, noun2VerbZeroDerivationCondition)
+        self.ins_ST.add_empty(self.nounZeroDeriv_S, noun2VerbZeroDerivationCondition)
 
         # elma-nın-ım elma-nın-dı
-        gen_ST.add_empty(nounZeroDeriv_S, noun2VerbZeroDerivationCondition)
+        self.gen_ST.add_empty(self.nounZeroDeriv_S, noun2VerbZeroDerivationCondition)
 
-        nounZeroDeriv_S.add_empty(nVerb_S)
+        self.nounZeroDeriv_S.add_empty(self.nVerb_S)
 
         # meyve-li
 
         noSurfaceAfterDerivation = NoSurfaceAfterDerivation()
-        nom_ST.add(
-            with_S,
+        self.nom_ST.add(
+            self.with_S,
             "lI",
             noSurfaceAfterDerivation.and_not(ContainsMorpheme(with_, without)),
         )
 
-        nom_ST.add(
-            without_S,
+        self.nom_ST.add(
+            self.without_S,
             "sIz",
             noSurfaceAfterDerivation.and_not(ContainsMorpheme(with_, without, inf1)),
         )
 
-        nom_ST.add(
-            justLike_S,
+        self.nom_ST.add(
+            self.justLike_S,
             "+msI",
             noSurfaceAfterDerivation.and_not(
                 ContainsMorpheme(justLike, futPart, pastPart, presPart, adj)
@@ -1519,31 +1637,31 @@ class TurkishMorphotactics:
         )
 
         # TODO: test order
-        nom_ST.add(
-            justLike_S,
+        self.nom_ST.add(
+            self.justLike_S,
             "ImsI",
             not_have(PhoneticAttribute.LastLetterVowel)
             .and_(noSurfaceAfterDerivation)
             .and_not(ContainsMorpheme(justLike, futPart, pastPart, presPart, adj)),
         )
 
-        nom_ST.add(
-            related_S,
+        self.nom_ST.add(
+            self.related_S,
             "sAl",
             noSurfaceAfterDerivation.and_not(ContainsMorpheme(with_, without, related)),
         )
 
         # connect With to Adjective root.
-        with_S.add_empty(adjectiveRoot_ST)
-        without_S.add_empty(adjectiveRoot_ST)
-        related_S.add_empty(adjectiveRoot_ST)
+        self.with_S.add_empty(self.adjectiveRoot_ST)
+        self.without_S.add_empty(self.adjectiveRoot_ST)
+        self.related_S.add_empty(self.adjectiveRoot_ST)
 
-        justLike_S.add_empty(adjectiveRoot_ST)
+        self.justLike_S.add_empty(self.adjectiveRoot_ST)
 
         # meyve-de-ki
         notRelRepetition = HasTailSequence(rel, adj, zero, noun, a3sg, pnon, loc).not_()
-        loc_ST.add(rel_S, "ki", notRelRepetition)
-        rel_S.add_empty(adjectiveRoot_ST)
+        self.loc_ST.add(self.rel_S, "ki", notRelRepetition)
+        self.rel_S.add_empty(self.adjectiveRoot_ST)
 
         # for covering dünkü, anki, yarınki etc. Unlike Oflazer, We also allow dündeki etc.
         # TODO: Use a more general grouping, not using Secondary Pos
@@ -1559,153 +1677,151 @@ class TurkishMorphotactics:
         beri = self.lexicon.get_item_by_id("beri_Noun")
 
         time2 = DictionaryItemIsAny(dun, gun, bugun)
-        nom_ST.add(rel_S, "ki", time.and_not(time2))
-        nom_ST.add(rel_S, "ki", DictionaryItemIsAny(ileri, geri, ote, beri))
-        nom_ST.add(rel_S, "kü", time2.and_(time))
+        self.nom_ST.add(self.rel_S, "ki", time.and_not(time2))
+        self.nom_ST.add(self.rel_S, "ki", DictionaryItemIsAny(ileri, geri, ote, beri))
+        self.nom_ST.add(self.rel_S, "kü", time2.and_(time))
 
         # After Genitive suffix, Rel suffix makes a Pronoun derivation.
-        gen_ST.add(relToPron_S, "ki")
-        relToPron_S.add_empty(pronAfterRel_S)
+        self.gen_ST.add(self.relToPron_S, "ki")
+        self.relToPron_S.add_empty(self.pronAfterRel_S)
 
         verbDeriv = ContainsMorpheme(inf1, inf2, inf3, pastPart, futPart)
 
-        nom_ST.add(
-            become_S,
+        self.nom_ST.add(
+            self.become_S,
             "lAş",
             noSurfaceAfterDerivation.and_not(ContainsMorpheme(adj)).and_not(verbDeriv),
         )
-        become_S.add_empty(verbRoot_S)
+        self.become_S.add_empty(self.verbRoot_S)
 
-        nom_ST.add(
-            acquire_S,
+        self.nom_ST.add(
+            self.acquire_S,
             "lAn",
             noSurfaceAfterDerivation.and_not(ContainsMorpheme(adj)).and_not(verbDeriv),
         )
 
-        acquire_S.add_empty(verbRoot_S)
+        self.acquire_S.add_empty(self.verbRoot_S)
 
         # Inf1 mak makes noun derivation. However, it cannot get any possessive or plural suffix.
         # Also cannot be followed by Dat, Gen, Acc case suffixes.
         # So we create a path only for it.
-        nounInf1Root_S.add_empty(a3sgInf1_S)
-        a3sgInf1_S.add_empty(pnonInf1_S)
-        pnonInf1_S.add_empty(nom_ST)
-        pnonInf1_S.add(abl_ST, "tAn")
+        self.nounInf1Root_S.add_empty(self.a3sgInf1_S)
+        self.a3sgInf1_S.add_empty(self.pnonInf1_S)
+        self.pnonInf1_S.add_empty(self.nom_ST)
+        self.pnonInf1_S.add(self.abl_ST, "tAn")
 
-        pnonInf1_S.add(loc_ST, "tA")
-        pnonInf1_S.add(ins_ST, "lA")
+        self.pnonInf1_S.add(self.loc_ST, "tA")
+        self.pnonInf1_S.add(self.ins_ST, "lA")
 
-        nounActOfRoot_S.add_empty(a3sgActOf_S)
-        nounActOfRoot_S.add(a3plActOf_S, "lar")
-        a3sgActOf_S.add_empty(pnonActOf)
-        a3plActOf_S.add_empty(pnonActOf)
-        pnonActOf.add_empty(nom_ST)
+        self.nounActOfRoot_S.add_empty(self.a3sgActOf_S)
+        self.nounActOfRoot_S.add(self.a3plActOf_S, "lar")
+        self.a3sgActOf_S.add_empty(self.pnonActOf)
+        self.a3plActOf_S.add_empty(self.pnonActOf)
+        self.pnonActOf.add_empty(self.nom_ST)
 
-    @staticmethod
-    def connect_last_vowel_drop_words():
-        nounLastVowelDropRoot_S.add_empty(a3sgLastVowelDrop_S)
-        nounLastVowelDropRoot_S.add(a3PlLastVowelDrop_S, "lAr")
-        a3sgLastVowelDrop_S.add_empty(pNonLastVowelDrop_S)
-        a3PlLastVowelDrop_S.add_empty(pNonLastVowelDrop_S)
-        pNonLastVowelDrop_S.add(loc_ST, ">dA")
-        pNonLastVowelDrop_S.add(abl_ST, ">dAn")
+    def connect_last_vowel_drop_words(self):
+        self.nounLastVowelDropRoot_S.add_empty(self.a3sgLastVowelDrop_S)
+        self.nounLastVowelDropRoot_S.add(self.a3PlLastVowelDrop_S, "lAr")
+        self.a3sgLastVowelDrop_S.add_empty(self.pNonLastVowelDrop_S)
+        self.a3PlLastVowelDrop_S.add_empty(self.pNonLastVowelDrop_S)
+        self.pNonLastVowelDrop_S.add(self.loc_ST, ">dA")
+        self.pNonLastVowelDrop_S.add(self.abl_ST, ">dAn")
 
-        adjLastVowelDropRoot_S.add_empty(zeroLastVowelDrop_S)
-        postpLastVowelDropRoot_S.add_empty(zeroLastVowelDrop_S)
-        zeroLastVowelDrop_S.add_empty(nounLastVowelDropRoot_S)
+        self.adjLastVowelDropRoot_S.add_empty(self.zeroLastVowelDrop_S)
+        self.postpLastVowelDropRoot_S.add_empty(self.zeroLastVowelDrop_S)
+        self.zeroLastVowelDrop_S.add_empty(self.nounLastVowelDropRoot_S)
 
-    @staticmethod
-    def connect_proper_nouns_and_abbreviations():
+    def connect_proper_nouns_and_abbreviations(self):
         # ---- Proper noun handling -------
         # TODO: consider adding single quote after an overhaul.
-        # nounProper_S.add(puncProperSeparator_S, "'")
-        nounProper_S.add_empty(a3sg_S)
-        nounProper_S.add(a3pl_S, "lAr")
-        puncProperSeparator_S.add_empty(a3sg_S)
-        puncProperSeparator_S.add(a3pl_S, "lAr")
+        # self.nounProper_S.add(self.puncProperSeparator_S, "'")
+        self.nounProper_S.add_empty(self.a3sg_S)
+        self.nounProper_S.add(self.a3pl_S, "lAr")
+        self.puncProperSeparator_S.add_empty(self.a3sg_S)
+        self.puncProperSeparator_S.add(self.a3pl_S, "lAr")
 
         # ---- Abbreviation Handling -------
         # TODO: consider restricting possessive, most derivation and plural suffixes.
-        nounAbbrv_S.add_empty(a3sg_S)
-        nounAbbrv_S.add(a3pl_S, "lAr")
+        self.nounAbbrv_S.add_empty(self.a3sg_S)
+        self.nounAbbrv_S.add(self.a3pl_S, "lAr")
 
         # ----- This is for catching words that cannot have a suffix.
-        nounNoSuffix_S.add_empty(nounA3sgNoSuffix_S)
-        nounA3sgNoSuffix_S.add_empty(nounPnonNoSuffix_S)
-        nounPnonNoSuffix_S.add_empty(nounNomNoSuffix_ST)
+        self.nounNoSuffix_S.add_empty(self.nounA3sgNoSuffix_S)
+        self.nounA3sgNoSuffix_S.add_empty(self.nounPnonNoSuffix_S)
+        self.nounPnonNoSuffix_S.add_empty(self.nounNomNoSuffix_ST)
 
     def connect_adjective_states(self):
         # zero morpheme derivation. Words like "yeşil-i" requires Adj to Noun conversion.
         # Since noun suffixes are not derivational a "Zero" morpheme is used for this.
         # Transition has a HasTail() condition because Adj->Zero->Noun+A3sg+Pnon+Nom) is not allowed.
-        adjectiveRoot_ST.add_empty(adjZeroDeriv_S, HasTail())
+        self.adjectiveRoot_ST.add_empty(self.adjZeroDeriv_S, HasTail())
 
-        adjZeroDeriv_S.add_empty(noun_S)
+        self.adjZeroDeriv_S.add_empty(self.noun_S)
 
-        adjZeroDeriv_S.add_empty(nVerb_S)
+        self.adjZeroDeriv_S.add_empty(self.nVerb_S)
 
-        adjectiveRoot_ST.add(aLy_S, ">cA")
-        aLy_S.add_empty(advRoot_ST)
+        self.adjectiveRoot_ST.add(self.aLy_S, ">cA")
+        self.aLy_S.add_empty(self.advRoot_ST)
 
-        adjectiveRoot_ST.add(
-            aAsIf_S, ">cA", ContainsMorpheme(asIf, ly, agt, with_, justLike).not_()
+        self.adjectiveRoot_ST.add(
+            self.aAsIf_S, ">cA", ContainsMorpheme(asIf, ly, agt, with_, justLike).not_()
         )
 
-        aAsIf_S.add_empty(adjectiveRoot_ST)
+        self.aAsIf_S.add_empty(self.adjectiveRoot_ST)
 
-        adjectiveRoot_ST.add(
-            aAgt_S, ">cI", ContainsMorpheme(asIf, ly, agt, with_, justLike).not_()
+        self.adjectiveRoot_ST.add(
+            self.aAgt_S, ">cI", ContainsMorpheme(asIf, ly, agt, with_, justLike).not_()
         )
-        aAgt_S.add_empty(noun_S)
+        self.aAgt_S.add_empty(self.noun_S)
 
-        adjectiveRoot_ST.add(
-            justLike_S,
+        self.adjectiveRoot_ST.add(
+            self.justLike_S,
             "+msI",
             NoSurfaceAfterDerivation().and_(ContainsMorpheme(justLike).not_()),
         )
 
-        adjectiveRoot_ST.add(
-            justLike_S,
+        self.adjectiveRoot_ST.add(
+            self.justLike_S,
             "ImsI",
             not_have(PhoneticAttribute.LastLetterVowel)
             .and_(NoSurfaceAfterDerivation())
             .and_(ContainsMorpheme(justLike).not_()),
         )
 
-        adjectiveRoot_ST.add(become_S, "lAş", NoSurfaceAfterDerivation())
-        adjectiveRoot_ST.add(acquire_S, "lAn", NoSurfaceAfterDerivation())
+        self.adjectiveRoot_ST.add(self.become_S, "lAş", NoSurfaceAfterDerivation())
+        self.adjectiveRoot_ST.add(self.acquire_S, "lAn", NoSurfaceAfterDerivation())
 
         c1 = PreviousMorphemeIsAny(futPart, pastPart)
 
-        adjAfterVerb_S.add_empty(aPnon_ST, c1)
-        adjAfterVerb_S.add(aP1sg_ST, "Im", c1)
-        adjAfterVerb_S.add(aP2sg_ST, "In", c1)
-        adjAfterVerb_S.add(aP3sg_ST, "I", c1)
-        adjAfterVerb_S.add(aP1pl_ST, "ImIz", c1)
-        adjAfterVerb_S.add(aP2pl_ST, "InIz", c1)
-        adjAfterVerb_S.add(aP3pl_ST, "lArI", c1)
+        self.adjAfterVerb_S.add_empty(self.aPnon_ST, c1)
+        self.adjAfterVerb_S.add(self.aP1sg_ST, "Im", c1)
+        self.adjAfterVerb_S.add(self.aP2sg_ST, "In", c1)
+        self.adjAfterVerb_S.add(self.aP3sg_ST, "I", c1)
+        self.adjAfterVerb_S.add(self.aP1pl_ST, "ImIz", c1)
+        self.adjAfterVerb_S.add(self.aP2pl_ST, "InIz", c1)
+        self.adjAfterVerb_S.add(self.aP3pl_ST, "lArI", c1)
 
-        adjectiveRoot_ST.add(ness_S, "lI~k")
-        adjectiveRoot_ST.add(ness_S, "lI!ğ")
+        self.adjectiveRoot_ST.add(self.ness_S, "lI~k")
+        self.adjectiveRoot_ST.add(self.ness_S, "lI!ğ")
 
-        adjAfterVerb_ST.add(ness_S, "lI~k", PreviousMorphemeIs(aorPart))
-        adjAfterVerb_ST.add(ness_S, "lI!ğ", PreviousMorphemeIs(aorPart))
+        self.adjAfterVerb_ST.add(self.ness_S, "lI~k", PreviousMorphemeIs(aorPart))
+        self.adjAfterVerb_ST.add(self.ness_S, "lI!ğ", PreviousMorphemeIs(aorPart))
 
     def connect_numeral_states(self):
-        numeralRoot_ST.add(ness_S, "lI~k")
-        numeralRoot_ST.add(ness_S, "lI!ğ")
-        numeralRoot_ST.add_empty(numZeroDeriv_S, HasTail())
-        numZeroDeriv_S.add_empty(noun_S)
-        numZeroDeriv_S.add_empty(nVerb_S)
+        self.numeralRoot_ST.add(self.ness_S, "lI~k")
+        self.numeralRoot_ST.add(self.ness_S, "lI!ğ")
+        self.numeralRoot_ST.add_empty(self.numZeroDeriv_S, HasTail())
+        self.numZeroDeriv_S.add_empty(self.noun_S)
+        self.numZeroDeriv_S.add_empty(self.nVerb_S)
 
-        numeralRoot_ST.add(
-            justLike_S,
+        self.numeralRoot_ST.add(
+            self.justLike_S,
             "+msI",
             NoSurfaceAfterDerivation().and_(ContainsMorpheme(justLike).not_()),
         )
 
-        numeralRoot_ST.add(
-            justLike_S,
+        self.numeralRoot_ST.add(
+            self.justLike_S,
             "ImsI",
             not_have(PhoneticAttribute.LastLetterVowel)
             .and_(NoSurfaceAfterDerivation())
@@ -1714,28 +1830,28 @@ class TurkishMorphotactics:
 
     def connect_verb_after_noun_adj_states(self):
         # elma-..-ε-yım
-        nVerb_S.add_empty(nPresent_S)
+        self.nVerb_S.add_empty(self.nPresent_S)
 
         # elma-ydı, çorap-tı
-        nVerb_S.add(nPast_S, "+y>dI")
+        self.nVerb_S.add(self.nPast_S, "+y>dI")
         # elma-ymış
-        nVerb_S.add(nNarr_S, "+ymIş")
+        self.nVerb_S.add(self.nNarr_S, "+ymIş")
 
-        nVerb_S.add(nCond_S, "+ysA")
+        self.nVerb_S.add(self.nCond_S, "+ysA")
 
-        nVerb_S.add(vWhile_S, "+yken")
+        self.nVerb_S.add(self.vWhile_S, "+yken")
 
         # word "değil" is special. It contains negative suffix implicitly. Also it behaves like
         # noun->Verb Zero morpheme derivation. because it cannot have most Verb suffixes.
         # So we connect it to a separate root state "nVerbDegil" instead of Verb
         degilRoot = self.lexicon.get_item_by_id("değil_Verb")
-        nVerbDegil_S.add_empty(nNeg_S, DictionaryItemIs(degilRoot))
-        # copy transitions from nVerb_S
-        nNeg_S.copy_outgoing_transitions_from(nVerb_S)
+        self.nVerbDegil_S.add_empty(self.nNeg_S, DictionaryItemIs(degilRoot))
+        # copy transitions from self.nVerb_S
+        self.nNeg_S.copy_outgoing_transitions_from(self.nVerb_S)
 
         noFamily = not_have(RootAttribute.FamilyMember)
         # for preventing elmamım, elmamdım
-        # pP1sg_S, pDat_ST, pA1sg_S, pA1pl_S, pA3pl_S, pP2sg_S, pP1pl_S, pP3sg_S, pP1sg_S
+        # self.pP1sg_S, self.pDat_ST, self.pA1sg_S, self.pA1pl_S, self.pA3pl_S, self.pP2sg_S, self.pP1pl_S, self.pP3sg_S, self.pP1sg_S
         # TODO: below causes "beklemedeyiz" to fail.
 
         verbDeriv = ContainsMorpheme(inf1, inf2, inf3, pastPart, futPart)
@@ -1749,7 +1865,7 @@ class TurkishMorphotactics:
         )
 
         allowA3plTrans = (
-            noFamily.and_not(PreviousGroupContains(a3pl_S))
+            noFamily.and_not(PreviousGroupContains(self.a3pl_S))
             .and_not(ContainsMorphemeSequence(p3pl, nom))
             .and_not(verbDeriv)
         )
@@ -1764,19 +1880,19 @@ class TurkishMorphotactics:
             .and_not(verbDeriv)
         )
         # elma-yım
-        nPresent_S.add(nA1sg_ST, "+yIm", allowA1sgTrans)
-        nPresent_S.add(nA2sg_ST, "sIn", allowA2sgTrans)
+        self.nPresent_S.add(self.nA1sg_ST, "+yIm", allowA1sgTrans)
+        self.nPresent_S.add(self.nA2sg_ST, "sIn", allowA2sgTrans)
 
         # elma-ε-ε-dır to non terminal A3sg. We do not allow ending with A3sg from empty Present tense.
-        nPresent_S.add_empty(nA3sg_S)
+        self.nPresent_S.add_empty(self.nA3sg_S)
 
         # we allow `değil` to end with terminal A3sg from Present tense.
-        nPresent_S.add_empty(nA3sg_ST, DictionaryItemIs(degilRoot))
+        self.nPresent_S.add_empty(self.nA3sg_ST, DictionaryItemIs(degilRoot))
 
         # elma-lar, elma-da-lar as Verb.
         # TODO: consider disallowing this for "elmalar" case.
-        nPresent_S.add(
-            nA3pl_ST,
+        self.nPresent_S.add(
+            self.nA3pl_ST,
             "lAr",
             not_have(RootAttribute.CompoundP3sg)
             # do not allow "okumak-lar"
@@ -1785,74 +1901,78 @@ class TurkishMorphotactics:
         )
 
         # elma-ydı-m. Do not allow "elmaya-yım" (Oflazer accepts this)
-        nPast_S.add(nA1sg_ST, "m", allowA1sgTrans)
-        nNarr_S.add(nA1sg_ST, "Im", allowA1sgTrans)
+        self.nPast_S.add(self.nA1sg_ST, "m", allowA1sgTrans)
+        self.nNarr_S.add(self.nA1sg_ST, "Im", allowA1sgTrans)
 
-        nPast_S.add(nA2sg_ST, "n", allowA2sgTrans)
-        nNarr_S.add(nA2sg_ST, "sIn", allowA2sgTrans)
+        self.nPast_S.add(self.nA2sg_ST, "n", allowA2sgTrans)
+        self.nNarr_S.add(self.nA2sg_ST, "sIn", allowA2sgTrans)
 
-        nPast_S.add(nA1pl_ST, "k", allowA1plTrans)
-        nNarr_S.add(nA1pl_ST, "Iz", allowA1plTrans)
-        nPresent_S.add(nA1pl_ST, "+yIz", allowA1plTrans)
+        self.nPast_S.add(self.nA1pl_ST, "k", allowA1plTrans)
+        self.nNarr_S.add(self.nA1pl_ST, "Iz", allowA1plTrans)
+        self.nPresent_S.add(self.nA1pl_ST, "+yIz", allowA1plTrans)
 
-        nPast_S.add(nA2pl_ST, "InIz", allowA2plTrans)
-        nNarr_S.add(nA2pl_ST, "sInIz", allowA2plTrans)
-        nPresent_S.add(nA2pl_ST, "sInIz", allowA2plTrans)
+        self.nPast_S.add(self.nA2pl_ST, "InIz", allowA2plTrans)
+        self.nNarr_S.add(self.nA2pl_ST, "sInIz", allowA2plTrans)
+        self.nPresent_S.add(self.nA2pl_ST, "sInIz", allowA2plTrans)
 
         # elma-ydı-lar.
-        nPast_S.add(
-            nA3pl_ST, "lAr", not_have(RootAttribute.CompoundP3sg).and_(allowA3plTrans)
+        self.nPast_S.add(
+            self.nA3pl_ST,
+            "lAr",
+            not_have(RootAttribute.CompoundP3sg).and_(allowA3plTrans),
         )
         # elma-ymış-lar.
-        nNarr_S.add(
-            nA3pl_ST, "lAr", not_have(RootAttribute.CompoundP3sg).and_(allowA3plTrans)
+        self.nNarr_S.add(
+            self.nA3pl_ST,
+            "lAr",
+            not_have(RootAttribute.CompoundP3sg).and_(allowA3plTrans),
         )
 
         # elma-ydı-ε
-        nPast_S.add_empty(nA3sg_ST)
+        self.nPast_S.add_empty(self.nA3sg_ST)
         # elma-ymış-ε
-        nNarr_S.add_empty(nA3sg_ST)
+        self.nNarr_S.add_empty(self.nA3sg_ST)
 
         # narr+cons is allowed but not past+cond
-        nNarr_S.add(nCond_S, "sA")
+        self.nNarr_S.add(self.nCond_S, "sA")
 
-        nCond_S.add(nA1sg_ST, "m", allowA1sgTrans)
-        nCond_S.add(nA2sg_ST, "n", allowA2sgTrans)
-        nCond_S.add(nA1pl_ST, "k", allowA1plTrans)
-        nCond_S.add(nA2pl_ST, "nIz", allowA2plTrans)
-        nCond_S.add_empty(nA3sg_ST)
-        nCond_S.add(nA3pl_ST, "lAr")
+        self.nCond_S.add(self.nA1sg_ST, "m", allowA1sgTrans)
+        self.nCond_S.add(self.nA2sg_ST, "n", allowA2sgTrans)
+        self.nCond_S.add(self.nA1pl_ST, "k", allowA1plTrans)
+        self.nCond_S.add(self.nA2pl_ST, "nIz", allowA2plTrans)
+        self.nCond_S.add_empty(self.nA3sg_ST)
+        self.nCond_S.add(self.nA3pl_ST, "lAr")
 
         # for not allowing "elma-ydı-m-dır"
 
         rejectNoCopula = CurrentGroupContainsAny(
-            nPast_S, nCond_S, nCopBeforeA3pl_S
+            self.nPast_S, self.nCond_S, self.nCopBeforeA3pl_S
         ).not_()
 
         # elma-yım-dır
-        nA1sg_ST.add(nCop_ST, "dIr", rejectNoCopula)
+        self.nA1sg_ST.add(self.nCop_ST, "dIr", rejectNoCopula)
         # elmasındır
-        nA2sg_ST.add(nCop_ST, "dIr", rejectNoCopula)
+        self.nA2sg_ST.add(self.nCop_ST, "dIr", rejectNoCopula)
         # elmayızdır
-        nA1pl_ST.add(nCop_ST, "dIr", rejectNoCopula)
+        self.nA1pl_ST.add(self.nCop_ST, "dIr", rejectNoCopula)
         # elmasınızdır
-        nA2pl_ST.add(nCop_ST, "dIr", rejectNoCopula)
+        self.nA2pl_ST.add(self.nCop_ST, "dIr", rejectNoCopula)
 
-        nA3sg_S.add(nCop_ST, ">dIr", rejectNoCopula)
+        self.nA3sg_S.add(self.nCop_ST, ">dIr", rejectNoCopula)
 
-        nA3pl_ST.add(nCop_ST, "dIr", rejectNoCopula)
+        self.nA3pl_ST.add(self.nCop_ST, "dIr", rejectNoCopula)
 
         asIfCond = PreviousMorphemeIsAny(narr)
-        nA3sg_ST.add(vAsIf_S, ">cAsInA", asIfCond)
-        nA1sg_ST.add(vAsIf_S, ">cAsInA", asIfCond)
-        nA2sg_ST.add(vAsIf_S, ">cAsInA", asIfCond)
-        nA1pl_ST.add(vAsIf_S, ">cAsInA", asIfCond)
-        nA2pl_ST.add(vAsIf_S, ">cAsInA", asIfCond)
-        nA3pl_ST.add(vAsIf_S, ">cAsInA", asIfCond)
+        self.nA3sg_ST.add(self.vAsIf_S, ">cAsInA", asIfCond)
+        self.nA1sg_ST.add(self.vAsIf_S, ">cAsInA", asIfCond)
+        self.nA2sg_ST.add(self.vAsIf_S, ">cAsInA", asIfCond)
+        self.nA1pl_ST.add(self.vAsIf_S, ">cAsInA", asIfCond)
+        self.nA2pl_ST.add(self.vAsIf_S, ">cAsInA", asIfCond)
+        self.nA3pl_ST.add(self.vAsIf_S, ">cAsInA", asIfCond)
 
         # Copula can come before A3pl.
-        nPresent_S.add(nCopBeforeA3pl_S, ">dIr")
-        nCopBeforeA3pl_S.add(nA3pl_ST, "lAr")
+        self.nPresent_S.add(self.nCopBeforeA3pl_S, ">dIr")
+        self.nCopBeforeA3pl_S.add(self.nA3pl_ST, "lAr")
 
     def connect_pronoun_states(self):
         # ----------- Personal Pronouns ----------------------------
@@ -1865,48 +1985,48 @@ class TurkishMorphotactics:
         falan = self.lexicon.get_item_by_id("falan_Pron_Pers")
         falanca = self.lexicon.get_item_by_id("falanca_Pron_Pers")
 
-        pronPers_S.add_empty(pA1sg_S, DictionaryItemIs(ben))
-        pronPers_S.add_empty(pA2sg_S, DictionaryItemIs(sen))
-        pronPers_S.add_empty(pA3sg_S, DictionaryItemIsAny(o, falan, falanca))
-        pronPers_S.add(
-            pA3pl_S, "nlAr", DictionaryItemIs(o)
+        self.pronPers_S.add_empty(self.pA1sg_S, DictionaryItemIs(ben))
+        self.pronPers_S.add_empty(self.pA2sg_S, DictionaryItemIs(sen))
+        self.pronPers_S.add_empty(self.pA3sg_S, DictionaryItemIsAny(o, falan, falanca))
+        self.pronPers_S.add(
+            self.pA3pl_S, "nlAr", DictionaryItemIs(o)
         )  # Oflazer does not have "onlar" as Pronoun root.
 
-        pronPers_S.add(pA3pl_S, "lAr", DictionaryItemIsAny(falan, falanca))
-        pronPers_S.add_empty(pA1pl_S, DictionaryItemIs(biz))
-        pronPers_S.add(pA1pl_S, "lAr", DictionaryItemIs(biz))
-        pronPers_S.add_empty(pA2pl_S, DictionaryItemIs(siz))
-        pronPers_S.add(pA2pl_S, "lAr", DictionaryItemIs(siz))
+        self.pronPers_S.add(self.pA3pl_S, "lAr", DictionaryItemIsAny(falan, falanca))
+        self.pronPers_S.add_empty(self.pA1pl_S, DictionaryItemIs(biz))
+        self.pronPers_S.add(self.pA1pl_S, "lAr", DictionaryItemIs(biz))
+        self.pronPers_S.add_empty(self.pA2pl_S, DictionaryItemIs(siz))
+        self.pronPers_S.add(self.pA2pl_S, "lAr", DictionaryItemIs(siz))
 
         # --- modified `ben-sen` special state and transitions
-        pronPers_Mod_S.add_empty(pA1sgMod_S, DictionaryItemIs(ben))
-        pronPers_Mod_S.add_empty(pA2sgMod_S, DictionaryItemIs(sen))
-        pA1sgMod_S.add_empty(pPnonMod_S)
-        pA2sgMod_S.add_empty(pPnonMod_S)
-        pPnonMod_S.add(pDat_ST, "A")
+        self.pronPers_Mod_S.add_empty(self.pA1sgMod_S, DictionaryItemIs(ben))
+        self.pronPers_Mod_S.add_empty(self.pA2sgMod_S, DictionaryItemIs(sen))
+        self.pA1sgMod_S.add_empty(self.pPnonMod_S)
+        self.pA2sgMod_S.add_empty(self.pPnonMod_S)
+        self.pPnonMod_S.add(self.pDat_ST, "A")
         # ----
 
         # Possesive connecitons are not used.
-        pA1sg_S.add_empty(pPnon_S)
-        pA2sg_S.add_empty(pPnon_S)
-        pA3sg_S.add_empty(pPnon_S)
-        pA1pl_S.add_empty(pPnon_S)
-        pA2pl_S.add_empty(pPnon_S)
-        pA3pl_S.add_empty(pPnon_S)
+        self.pA1sg_S.add_empty(self.pPnon_S)
+        self.pA2sg_S.add_empty(self.pPnon_S)
+        self.pA3sg_S.add_empty(self.pPnon_S)
+        self.pA1pl_S.add_empty(self.pPnon_S)
+        self.pA2pl_S.add_empty(self.pPnon_S)
+        self.pA3pl_S.add_empty(self.pPnon_S)
 
         # ------------ Noun -> Rel -> Pron ---------------------------
         # masanınki
-        pronAfterRel_S.add_empty(pA3sgRel_S)
-        pronAfterRel_S.add(pA3plRel_S, "lAr")
-        pA3sgRel_S.add_empty(pPnonRel_S)
-        pA3plRel_S.add_empty(pPnonRel_S)
-        pPnonRel_S.add_empty(pNom_ST)
-        pPnonRel_S.add(pDat_ST, "+nA")
-        pPnonRel_S.add(pAcc_ST, "+nI")
-        pPnonRel_S.add(pAbl_ST, "+ndAn")
-        pPnonRel_S.add(pLoc_ST, "+ndA")
-        pPnonRel_S.add(pIns_ST, "+ylA")
-        pPnonRel_S.add(pGen_ST, "+nIn")
+        self.pronAfterRel_S.add_empty(self.pA3sgRel_S)
+        self.pronAfterRel_S.add(self.pA3plRel_S, "lAr")
+        self.pA3sgRel_S.add_empty(self.pPnonRel_S)
+        self.pA3plRel_S.add_empty(self.pPnonRel_S)
+        self.pPnonRel_S.add_empty(self.pNom_ST)
+        self.pPnonRel_S.add(self.pDat_ST, "+nA")
+        self.pPnonRel_S.add(self.pAcc_ST, "+nI")
+        self.pPnonRel_S.add(self.pAbl_ST, "+ndAn")
+        self.pPnonRel_S.add(self.pLoc_ST, "+ndA")
+        self.pPnonRel_S.add(self.pIns_ST, "+ylA")
+        self.pPnonRel_S.add(self.pGen_ST, "+nIn")
 
         # ------------ Demonstrative pronouns. ------------------------
 
@@ -1916,8 +2036,8 @@ class TurkishMorphotactics:
 
         o_demons = self.lexicon.get_item_by_id("o_Pron_Demons")
 
-        pronDemons_S.add_empty(pA3sg_S)
-        pronDemons_S.add(pA3pl_S, "nlAr")
+        self.pronDemons_S.add_empty(self.pA3sg_S)
+        self.pronDemons_S.add(self.pA3pl_S, "nlAr")
 
         # ------------ Quantitiva Pronouns ----------------------------
 
@@ -1944,15 +2064,15 @@ class TurkishMorphotactics:
 
         # we have separate A3pl and A3sg states for Quantitive Pronouns.
         # herkes and hep cannot be singular.
-        pronQuant_S.add_empty(
-            pQuantA3sg_S,
+        self.pronQuant_S.add_empty(
+            self.pQuantA3sg_S,
             DictionaryItemIsAny(
                 herkes, umum, hepsi, cumlesi, hep, tumu, birkaci, topu
             ).not_(),
         )
 
-        pronQuant_S.add(
-            pQuantA3pl_S,
+        self.pronQuant_S.add(
+            self.pQuantA3pl_S,
             "lAr",
             DictionaryItemIsAny(
                 hep,
@@ -1971,24 +2091,24 @@ class TurkishMorphotactics:
         )
 
         # bazılarınız -> A1pl+P1pl
-        pronQuant_S.add(pQuantA1pl_S, "lAr", DictionaryItemIsAny(bazi))
-        pronQuant_S.add(pQuantA2pl_S, "lAr", DictionaryItemIsAny(bazi))
+        self.pronQuant_S.add(self.pQuantA1pl_S, "lAr", DictionaryItemIsAny(bazi))
+        self.pronQuant_S.add(self.pQuantA2pl_S, "lAr", DictionaryItemIsAny(bazi))
 
         # Herkes is implicitly plural.
-        pronQuant_S.add_empty(
-            pQuantA3pl_S,
+        self.pronQuant_S.add_empty(
+            self.pQuantA3pl_S,
             DictionaryItemIsAny(
                 herkes, umum, birkaci, hepsi, cumlesi, cogu, bircogu, tumu, topu
             ),
         )
 
         # connect "kimse" to Noun-A3sg and Noun-A3pl. It behaves like a noun.
-        pronQuant_S.add_empty(a3sg_S, DictionaryItemIs(kimse))
-        pronQuant_S.add(a3pl_S, "lAr", DictionaryItemIsAny(kimse))
+        self.pronQuant_S.add_empty(self.a3sg_S, DictionaryItemIs(kimse))
+        self.pronQuant_S.add(self.a3pl_S, "lAr", DictionaryItemIsAny(kimse))
 
         # for `birbiri-miz` `hep-imiz`
-        pronQuant_S.add_empty(
-            pQuantA1pl_S,
+        self.pronQuant_S.add_empty(
+            self.pQuantA1pl_S,
             DictionaryItemIsAny(
                 biri,
                 bazi,
@@ -2006,8 +2126,8 @@ class TurkishMorphotactics:
         )
 
         # for `birbiri-niz` and `hep-iniz`
-        pronQuant_S.add_empty(
-            pQuantA2pl_S,
+        self.pronQuant_S.add_empty(
+            self.pQuantA2pl_S,
             DictionaryItemIsAny(
                 biri,
                 bazi,
@@ -2026,19 +2146,19 @@ class TurkishMorphotactics:
 
         # this is used for birbir-ler-i, çok-lar-ı, birçok-lar-ı separate root and A3pl states are
         # used for this.
-        pronQuantModified_S.add_empty(pQuantModA3pl_S)
-        pQuantModA3pl_S.add(pP3pl_S, "lArI")
+        self.pronQuantModified_S.add_empty(self.pQuantModA3pl_S)
+        self.pQuantModA3pl_S.add(self.pP3pl_S, "lArI")
 
         # both `biri-ne` and `birisi-ne` or `birbirine` and `birbirisine` are accepted.
-        pQuantA3sg_S.add_empty(
-            pP3sg_S,
+        self.pQuantA3sg_S.add_empty(
+            self.pP3sg_S,
             DictionaryItemIsAny(
                 biri, birbiri, kimi, herbiri, hicbiri, oburu, oburku, beriki
             ).and_(not_have(PhoneticAttribute.ModifiedPronoun)),
         )
 
-        pQuantA3sg_S.add(
-            pP3sg_S,
+        self.pQuantA3sg_S.add(
+            self.pP3sg_S,
             "sI",
             DictionaryItemIsAny(
                 biri, bazi, kimi, birbiri, herbiri, hicbiri, oburku
@@ -2046,19 +2166,21 @@ class TurkishMorphotactics:
         )
 
         # there is no connection from pQuantA3pl to Pnon for preventing `biriler` (except herkes)
-        pQuantA3pl_S.add(
-            pP3pl_S, "I", DictionaryItemIsAny(biri, bazi, birbiri, kimi, oburku, beriki)
+        self.pQuantA3pl_S.add(
+            self.pP3pl_S,
+            "I",
+            DictionaryItemIsAny(biri, bazi, birbiri, kimi, oburku, beriki),
         )
-        pQuantA3pl_S.add_empty(
-            pP3pl_S,
+        self.pQuantA3pl_S.add_empty(
+            self.pP3pl_S,
             DictionaryItemIsAny(hepsi, birkaci, cumlesi, cogu, tumu, topu, bircogu),
         )
-        pQuantA3pl_S.add_empty(
-            pPnon_S, DictionaryItemIsAny(herkes, umum, oburku, beriki)
+        self.pQuantA3pl_S.add_empty(
+            self.pPnon_S, DictionaryItemIsAny(herkes, umum, oburku, beriki)
         )
 
-        pQuantA1pl_S.add(pP1pl_S, "ImIz")
-        pQuantA2pl_S.add(pP2pl_S, "InIz")
+        self.pQuantA1pl_S.add(self.pP1pl_S, "ImIz")
+        self.pQuantA2pl_S.add(self.pP2pl_S, "InIz")
 
         # ------------ Question Pronouns ----------------------------
         # `kim` (kim_Pron_Ques), `ne` and `nere`
@@ -2066,48 +2188,53 @@ class TurkishMorphotactics:
         ne = self.lexicon.get_item_by_id("ne_Pron_Ques")
         nere = self.lexicon.get_item_by_id("nere_Pron_Ques")
         kim = self.lexicon.get_item_by_id("kim_Pron_Ques")
-        pronQues_S.add_empty(pQuesA3sg_S)
-        pronQues_S.add(pQuesA3pl_S, "lAr")
+        self.pronQues_S.add_empty(self.pQuesA3sg_S)
+        self.pronQues_S.add(self.pQuesA3pl_S, "lAr")
 
-        pQuesA3sg_S.add_all(
+        self.pQuesA3sg_S.add_all(
             [
-                (pPnon_S, ""),
-                (pP3sg_S, "+sI"),
-                (pP1sg_S, "Im", DictionaryItemIs(ne).not_()),
-                (pP1sg_S, "yIm", DictionaryItemIs(ne)),
-                (pP2sg_S, "In", DictionaryItemIs(ne).not_()),
-                (pP2sg_S, "yIn", DictionaryItemIs(ne)),
-                (pP1pl_S, "ImIz", DictionaryItemIs(ne).not_()),
-                (pP1pl_S, "yImIz", DictionaryItemIs(ne)),
+                (self.pPnon_S, ""),
+                (self.pP3sg_S, "+sI"),
+                (self.pP1sg_S, "Im", DictionaryItemIs(ne).not_()),
+                (self.pP1sg_S, "yIm", DictionaryItemIs(ne)),
+                (self.pP2sg_S, "In", DictionaryItemIs(ne).not_()),
+                (self.pP2sg_S, "yIn", DictionaryItemIs(ne)),
+                (self.pP1pl_S, "ImIz", DictionaryItemIs(ne).not_()),
+                (self.pP1pl_S, "yImIz", DictionaryItemIs(ne)),
             ]
         )
 
-        pQuesA3pl_S.add_all(
-            [(pPnon_S, ""), (pP3sg_S, "I"), (pP1sg_S, "Im"), (pP1pl_S, "ImIz")]
+        self.pQuesA3pl_S.add_all(
+            [
+                (self.pPnon_S, ""),
+                (self.pP3sg_S, "I"),
+                (self.pP1sg_S, "Im"),
+                (self.pP1pl_S, "ImIz"),
+            ]
         )
 
         # ------------ Reflexive Pronouns ----------------------------
         # `kendi`
 
         kendi = self.lexicon.get_item_by_id("kendi_Pron_Reflex")
-        pronReflex_S.add_all(
+        self.pronReflex_S.add_all(
             [
-                (pReflexA1sg_S, ""),
-                (pReflexA2sg_S, ""),
-                (pReflexA3sg_S, ""),
-                (pReflexA1pl_S, ""),
-                (pReflexA2pl_S, ""),
-                (pReflexA3pl_S, ""),
+                (self.pReflexA1sg_S, ""),
+                (self.pReflexA2sg_S, ""),
+                (self.pReflexA3sg_S, ""),
+                (self.pReflexA1pl_S, ""),
+                (self.pReflexA2pl_S, ""),
+                (self.pReflexA3pl_S, ""),
             ]
         )
 
-        pReflexA1sg_S.add(pP1sg_S, "Im")
-        pReflexA2sg_S.add(pP2sg_S, "In")
-        pReflexA3sg_S.add(pP3sg_S, "+sI")
-        pReflexA2sg_S.add_empty(pP3sg_S)
-        pReflexA1pl_S.add(pP1pl_S, "ImIz")
-        pReflexA2pl_S.add(pP2pl_S, "InIz")
-        pReflexA3pl_S.add(pP3pl_S, "lArI")
+        self.pReflexA1sg_S.add(self.pP1sg_S, "Im")
+        self.pReflexA2sg_S.add(self.pP2sg_S, "In")
+        self.pReflexA3sg_S.add(self.pP3sg_S, "+sI")
+        self.pReflexA2sg_S.add_empty(self.pP3sg_S)
+        self.pReflexA1pl_S.add(self.pP1pl_S, "ImIz")
+        self.pReflexA2pl_S.add(self.pP2pl_S, "InIz")
+        self.pReflexA3pl_S.add(self.pP3pl_S, "lArI")
 
         # ------------------------
         # Case connections for all
@@ -2116,76 +2243,80 @@ class TurkishMorphotactics:
 
         yGroup = DictionaryItemIsAny(ne, nere, falan, falanca, hep, herkes)
 
-        pPnon_S.add_all(
+        self.pPnon_S.add_all(
             [
-                (pNom_ST, ""),
+                (self.pNom_ST, ""),
                 # not allowing `ben-e` and `sen-e`. `ban-a` and `san-a` are using different states
                 (
-                    pDat_ST,
+                    self.pDat_ST,
                     "+nA",
                     DictionaryItemIsAny(
                         ben, sen, ne, nere, falan, falanca, herkes
                     ).not_(),
                 ),
-                (pDat_ST, "+yA", yGroup),
-                (pAcc_ST, "+nI", nGroup),
-                (pAcc_ST, "+yI", yGroup),
-                (pLoc_ST, "+ndA", nGroup),
-                (pLoc_ST, ">dA", yGroup),
-                (pAbl_ST, "+ndAn", nGroup),
-                (pAbl_ST, ">dAn", yGroup),
+                (self.pDat_ST, "+yA", yGroup),
+                (self.pAcc_ST, "+nI", nGroup),
+                (self.pAcc_ST, "+yI", yGroup),
+                (self.pLoc_ST, "+ndA", nGroup),
+                (self.pLoc_ST, ">dA", yGroup),
+                (self.pAbl_ST, "+ndAn", nGroup),
+                (self.pAbl_ST, ">dAn", yGroup),
                 (
-                    pGen_ST,
+                    self.pGen_ST,
                     "+nIn",
                     nGroup.and_(DictionaryItemIsAny(biz, ben, sen).not_()),
                 ),
                 (
-                    pGen_ST,
+                    self.pGen_ST,
                     "im",
                     DictionaryItemIsAny(ben, biz),
                 ),  # benim, senin, bizim are genitive.
-                (pGen_ST, "in", DictionaryItemIs(sen)),
-                (pGen_ST, "+yIn", yGroup.and_(DictionaryItemIsAny(biz).not_())),
-                (pEqu_ST, ">cA", yGroup),
-                (pEqu_ST, ">cA", nGroup),
-                (pIns_ST, "+ylA", yGroup),
-                (pIns_ST, "+nlA", nGroup),
-                (pIns_ST, "+nInlA", nGroup.and_(DictionaryItemIsAny(bu, su, o, sen))),
-                (pIns_ST, "inle", DictionaryItemIs(siz)),
-                (pIns_ST, "imle", DictionaryItemIsAny(biz, ben)),
+                (self.pGen_ST, "in", DictionaryItemIs(sen)),
+                (self.pGen_ST, "+yIn", yGroup.and_(DictionaryItemIsAny(biz).not_())),
+                (self.pEqu_ST, ">cA", yGroup),
+                (self.pEqu_ST, ">cA", nGroup),
+                (self.pIns_ST, "+ylA", yGroup),
+                (self.pIns_ST, "+nlA", nGroup),
+                (
+                    self.pIns_ST,
+                    "+nInlA",
+                    nGroup.and_(DictionaryItemIsAny(bu, su, o, sen)),
+                ),
+                (self.pIns_ST, "inle", DictionaryItemIs(siz)),
+                (self.pIns_ST, "imle", DictionaryItemIsAny(biz, ben)),
             ]
         )
 
         conditionpP1sg_S = DictionaryItemIsAny(kim, ben, ne, nere, kendi)
 
-        pP1sg_S.add_all(
+        self.pP1sg_S.add_all(
             [
-                (pNom_ST, ""),
-                (pDat_ST, "+nA", nGroup),
-                (pAcc_ST, "+nI", nGroup),
-                (pDat_ST, "+yA", yGroup),
-                (pAcc_ST, "+yI", yGroup),
-                (pLoc_ST, "+ndA", DictionaryItemIsAny(kendi)),
-                (pAbl_ST, "+ndAn", DictionaryItemIsAny(kendi)),
-                (pEqu_ST, "+ncA", DictionaryItemIsAny(kendi)),
-                (pIns_ST, "+nlA", conditionpP1sg_S),
-                (pGen_ST, "+nIn", conditionpP1sg_S),
+                (self.pNom_ST, ""),
+                (self.pDat_ST, "+nA", nGroup),
+                (self.pAcc_ST, "+nI", nGroup),
+                (self.pDat_ST, "+yA", yGroup),
+                (self.pAcc_ST, "+yI", yGroup),
+                (self.pLoc_ST, "+ndA", DictionaryItemIsAny(kendi)),
+                (self.pAbl_ST, "+ndAn", DictionaryItemIsAny(kendi)),
+                (self.pEqu_ST, "+ncA", DictionaryItemIsAny(kendi)),
+                (self.pIns_ST, "+nlA", conditionpP1sg_S),
+                (self.pGen_ST, "+nIn", conditionpP1sg_S),
             ]
         )
 
         conditionP2sg = DictionaryItemIsAny(kim, sen, ne, nere, kendi)
-        pP2sg_S.add_all(
+        self.pP2sg_S.add_all(
             [
-                (pNom_ST, ""),
-                (pDat_ST, "+nA", nGroup),
-                (pAcc_ST, "+nI", nGroup),
-                (pDat_ST, "+yA", yGroup),
-                (pAcc_ST, "+yI", yGroup),
-                (pLoc_ST, "+ndA", DictionaryItemIsAny(kendi)),
-                (pAbl_ST, "+ndAn", DictionaryItemIsAny(kendi)),
-                (pEqu_ST, "+ncA", DictionaryItemIsAny(kendi)),
-                (pIns_ST, "+nlA", conditionP2sg),
-                (pGen_ST, "+nIn", conditionP2sg),
+                (self.pNom_ST, ""),
+                (self.pDat_ST, "+nA", nGroup),
+                (self.pAcc_ST, "+nI", nGroup),
+                (self.pDat_ST, "+yA", yGroup),
+                (self.pAcc_ST, "+yI", yGroup),
+                (self.pLoc_ST, "+ndA", DictionaryItemIsAny(kendi)),
+                (self.pAbl_ST, "+ndAn", DictionaryItemIsAny(kendi)),
+                (self.pEqu_ST, "+ncA", DictionaryItemIsAny(kendi)),
+                (self.pIns_ST, "+nlA", conditionP2sg),
+                (self.pGen_ST, "+nIn", conditionP2sg),
             ]
         )
 
@@ -2193,18 +2324,18 @@ class TurkishMorphotactics:
             kendi, kim, ne, nere, o, bazi, biri, birbiri, herbiri, hep, kimi, hicbiri
         )
 
-        pP3sg_S.add_all(
+        self.pP3sg_S.add_all(
             [
-                (pNom_ST, ""),
-                (pDat_ST, "+nA", nGroup),
-                (pAcc_ST, "+nI", nGroup),
-                (pDat_ST, "+yA", yGroup),
-                (pAcc_ST, "+yI", yGroup),
-                (pLoc_ST, "+ndA", p3sgCond),
-                (pAbl_ST, "+ndAn", p3sgCond),
-                (pGen_ST, "+nIn", p3sgCond),
-                (pEqu_ST, "ncA", p3sgCond),
-                (pIns_ST, "+ylA", p3sgCond),
+                (self.pNom_ST, ""),
+                (self.pDat_ST, "+nA", nGroup),
+                (self.pAcc_ST, "+nI", nGroup),
+                (self.pDat_ST, "+yA", yGroup),
+                (self.pAcc_ST, "+yI", yGroup),
+                (self.pLoc_ST, "+ndA", p3sgCond),
+                (self.pAbl_ST, "+ndAn", p3sgCond),
+                (self.pGen_ST, "+nIn", p3sgCond),
+                (self.pEqu_ST, "ncA", p3sgCond),
+                (self.pIns_ST, "+ylA", p3sgCond),
             ]
         )
 
@@ -2228,33 +2359,33 @@ class TurkishMorphotactics:
             bazi,
             hicbiri,
         )
-        pP1pl_S.add_all(
+        self.pP1pl_S.add_all(
             [
-                (pNom_ST, ""),
-                (pDat_ST, "+nA", nGroup),
-                (pAcc_ST, "+nI", nGroup),
-                (pDat_ST, "+yA", yGroup),
-                (pAcc_ST, "+yI", yGroup),
-                (pLoc_ST, "+ndA", hepCnd),
-                (pAbl_ST, "+ndAn", hepCnd),
-                (pGen_ST, "+nIn", hepCnd),
-                (pEqu_ST, "+ncA", hepCnd),
-                (pIns_ST, "+nlA", hepCnd),
+                (self.pNom_ST, ""),
+                (self.pDat_ST, "+nA", nGroup),
+                (self.pAcc_ST, "+nI", nGroup),
+                (self.pDat_ST, "+yA", yGroup),
+                (self.pAcc_ST, "+yI", yGroup),
+                (self.pLoc_ST, "+ndA", hepCnd),
+                (self.pAbl_ST, "+ndAn", hepCnd),
+                (self.pGen_ST, "+nIn", hepCnd),
+                (self.pEqu_ST, "+ncA", hepCnd),
+                (self.pIns_ST, "+nlA", hepCnd),
             ]
         )
 
-        pP2pl_S.add_all(
+        self.pP2pl_S.add_all(
             [
-                (pNom_ST, ""),
-                (pDat_ST, "+nA", nGroup),
-                (pAcc_ST, "+nI", nGroup),
-                (pDat_ST, "+yA", yGroup),
-                (pAcc_ST, "+yI", yGroup),
-                (pLoc_ST, "+ndA", hepCnd),
-                (pAbl_ST, "+ndAn", hepCnd),
-                (pGen_ST, "+nIn", hepCnd),
-                (pEqu_ST, "+ncA", hepCnd),
-                (pIns_ST, "+nlA", hepCnd),
+                (self.pNom_ST, ""),
+                (self.pDat_ST, "+nA", nGroup),
+                (self.pAcc_ST, "+nI", nGroup),
+                (self.pDat_ST, "+yA", yGroup),
+                (self.pAcc_ST, "+yI", yGroup),
+                (self.pLoc_ST, "+ndA", hepCnd),
+                (self.pAbl_ST, "+ndAn", hepCnd),
+                (self.pGen_ST, "+nIn", hepCnd),
+                (self.pEqu_ST, "+ncA", hepCnd),
+                (self.pIns_ST, "+nlA", hepCnd),
             ]
         )
 
@@ -2279,204 +2410,210 @@ class TurkishMorphotactics:
             topu,
         )
 
-        pP3pl_S.add_all(
+        self.pP3pl_S.add_all(
             [
-                (pNom_ST, ""),
-                (pDat_ST, "+nA", nGroup),
-                (pAcc_ST, "+nI", nGroup),
-                (pDat_ST, "+yA", yGroup),
-                (pAcc_ST, "+yI", yGroup),
-                (pLoc_ST, "+ndA", hepsi_cnd),
-                (pAbl_ST, "+ndAn", hepsi_cnd),
-                (pGen_ST, "+nIn", hepsi_cnd.or_(DictionaryItemIsAny(sen, siz))),
-                (pEqu_ST, "+ncA", hepsi_cnd),
-                (pIns_ST, "+ylA", hepsi_cnd),
+                (self.pNom_ST, ""),
+                (self.pDat_ST, "+nA", nGroup),
+                (self.pAcc_ST, "+nI", nGroup),
+                (self.pDat_ST, "+yA", yGroup),
+                (self.pAcc_ST, "+yI", yGroup),
+                (self.pLoc_ST, "+ndA", hepsi_cnd),
+                (self.pAbl_ST, "+ndAn", hepsi_cnd),
+                (self.pGen_ST, "+nIn", hepsi_cnd.or_(DictionaryItemIsAny(sen, siz))),
+                (self.pEqu_ST, "+ncA", hepsi_cnd),
+                (self.pIns_ST, "+ylA", hepsi_cnd),
             ]
         )
 
-        pNom_ST.add(
-            with_S, "+nlI", DictionaryItemIsAny(bu, su, o_demons, ben, sen, o, biz, siz)
+        self.pNom_ST.add(
+            self.with_S,
+            "+nlI",
+            DictionaryItemIsAny(bu, su, o_demons, ben, sen, o, biz, siz),
         )
-        pNom_ST.add(with_S, "lI", DictionaryItemIsAny(nere))
-        pNom_ST.add(with_S, "+ylI", DictionaryItemIsAny(ne))
-        pNom_ST.add(
-            without_S,
+        self.pNom_ST.add(self.with_S, "lI", DictionaryItemIsAny(nere))
+        self.pNom_ST.add(self.with_S, "+ylI", DictionaryItemIsAny(ne))
+        self.pNom_ST.add(
+            self.without_S,
             "+nsIz",
             DictionaryItemIsAny(nere, bu, su, o_demons, ben, sen, o, biz, siz),
         )
-        pNom_ST.add(without_S, "+ysIz", DictionaryItemIsAny(ne))
-        pGen_ST.add(
-            rel_S,
+        self.pNom_ST.add(self.without_S, "+ysIz", DictionaryItemIsAny(ne))
+        self.pGen_ST.add(
+            self.rel_S,
             "ki",
             DictionaryItemIsAny(nere, bu, su, o_demons, ne, sen, o, biz, siz),
         )
 
         notRelRepetition = HasTailSequence(rel, adj, zero, noun, a3sg, pnon, loc).not_()
-        pLoc_ST.add(rel_S, "ki", notRelRepetition)
+        self.pLoc_ST.add(self.rel_S, "ki", notRelRepetition)
 
-        pIns_ST.add(vWhile_S, "+yken")
+        self.pIns_ST.add(self.vWhile_S, "+yken")
 
         # ------------- Derivation connections ---------
 
-        pNom_ST.add_empty(pronZeroDeriv_S, HasTail())
-        pDat_ST.add_empty(pronZeroDeriv_S, HasTail())
-        pLoc_ST.add_empty(pronZeroDeriv_S, HasTail())
-        pAbl_ST.add_empty(pronZeroDeriv_S, HasTail())
-        pGen_ST.add_empty(pronZeroDeriv_S, HasTail())
-        pIns_ST.add_empty(pronZeroDeriv_S, HasTail())
+        self.pNom_ST.add_empty(self.pronZeroDeriv_S, HasTail())
+        self.pDat_ST.add_empty(self.pronZeroDeriv_S, HasTail())
+        self.pLoc_ST.add_empty(self.pronZeroDeriv_S, HasTail())
+        self.pAbl_ST.add_empty(self.pronZeroDeriv_S, HasTail())
+        self.pGen_ST.add_empty(self.pronZeroDeriv_S, HasTail())
+        self.pIns_ST.add_empty(self.pronZeroDeriv_S, HasTail())
 
-        pronZeroDeriv_S.add_empty(pvVerbRoot_S)
+        self.pronZeroDeriv_S.add_empty(self.pvVerbRoot_S)
 
     def connect_verb_after_pronoun(self):
-        pvVerbRoot_S.add_empty(pvPresent_S)
+        self.pvVerbRoot_S.add_empty(self.pvPresent_S)
 
-        pvVerbRoot_S.add(vWhile_S, "+yken")
+        self.pvVerbRoot_S.add(self.vWhile_S, "+yken")
 
-        pvVerbRoot_S.add(pvPast_S, "+ydI")
+        self.pvVerbRoot_S.add(self.pvPast_S, "+ydI")
 
-        pvVerbRoot_S.add(pvNarr_S, "+ymIş")
+        self.pvVerbRoot_S.add(self.pvNarr_S, "+ymIş")
 
-        pvVerbRoot_S.add(pvCond_S, "+ysA")
+        self.pvVerbRoot_S.add(self.pvCond_S, "+ysA")
 
         # disallow `benin, bizim with A1sg analysis etc.`
 
-        allowA1sgTrans = PreviousGroupContains(pA1pl_S, pP1sg_S).not_()
+        allowA1sgTrans = PreviousGroupContains(self.pA1pl_S, self.pP1sg_S).not_()
 
         allowA1plTrans = PreviousGroupContains(
-            pA1sg_S, pA2sg_S, pP1sg_S, pP2sg_S
+            self.pA1sg_S, self.pA2sg_S, self.pP1sg_S, self.pP2sg_S
         ).not_()
 
-        allowA2sgTrans = PreviousGroupContains(pA2pl_S, pP2sg_S).not_()
+        allowA2sgTrans = PreviousGroupContains(self.pA2pl_S, self.pP2sg_S).not_()
 
-        allowA2plTrans = PreviousGroupContains(pA2sg_S, pP2pl_S).not_()
+        allowA2plTrans = PreviousGroupContains(self.pA2sg_S, self.pP2pl_S).not_()
 
-        pvPresent_S.add(pvA1sg_ST, "+yIm", allowA1sgTrans)
-        pvPresent_S.add(pvA2sg_ST, "sIn", allowA2sgTrans)
+        self.pvPresent_S.add(self.pvA1sg_ST, "+yIm", allowA1sgTrans)
+        self.pvPresent_S.add(self.pvA2sg_ST, "sIn", allowA2sgTrans)
         # We do not allow ending with A3sg from empty Present tense.
-        pvPresent_S.add_empty(nA3sg_S)
-        pvPresent_S.add(pvA1pl_ST, "+yIz", allowA1plTrans)
-        pvPresent_S.add(pvA2pl_ST, "sInIz")
-        pvPresent_S.add(pvA3pl_ST, "lAr", PreviousGroupContains(pLoc_ST))
+        self.pvPresent_S.add_empty(self.nA3sg_S)
+        self.pvPresent_S.add(self.pvA1pl_ST, "+yIz", allowA1plTrans)
+        self.pvPresent_S.add(self.pvA2pl_ST, "sInIz")
+        self.pvPresent_S.add(self.pvA3pl_ST, "lAr", PreviousGroupContains(self.pLoc_ST))
 
-        pvPast_S.add(pvA1sg_ST, "m", allowA1sgTrans)
-        pvPast_S.add(pvA2sg_ST, "n", allowA2sgTrans)
-        pvPast_S.add(pvA1pl_ST, "k", allowA1plTrans)
-        pvPast_S.add(pvA2pl_ST, "InIz")
-        pvPast_S.add(pvA3pl_ST, "lAr")
-        pvPast_S.add_empty(pvA3sg_ST)
+        self.pvPast_S.add(self.pvA1sg_ST, "m", allowA1sgTrans)
+        self.pvPast_S.add(self.pvA2sg_ST, "n", allowA2sgTrans)
+        self.pvPast_S.add(self.pvA1pl_ST, "k", allowA1plTrans)
+        self.pvPast_S.add(self.pvA2pl_ST, "InIz")
+        self.pvPast_S.add(self.pvA3pl_ST, "lAr")
+        self.pvPast_S.add_empty(self.pvA3sg_ST)
 
-        pvNarr_S.add(pvA1sg_ST, "Im", allowA1sgTrans)
-        pvNarr_S.add(pvA2sg_ST, "sIn", allowA2sgTrans)
-        pvNarr_S.add(pvA1pl_ST, "Iz", allowA1plTrans)
-        pvNarr_S.add(pvA2pl_ST, "sInIz")
-        pvNarr_S.add(pvA3pl_ST, "lAr")
-        pvNarr_S.add_empty(pvA3sg_ST)
+        self.pvNarr_S.add(self.pvA1sg_ST, "Im", allowA1sgTrans)
+        self.pvNarr_S.add(self.pvA2sg_ST, "sIn", allowA2sgTrans)
+        self.pvNarr_S.add(self.pvA1pl_ST, "Iz", allowA1plTrans)
+        self.pvNarr_S.add(self.pvA2pl_ST, "sInIz")
+        self.pvNarr_S.add(self.pvA3pl_ST, "lAr")
+        self.pvNarr_S.add_empty(self.pvA3sg_ST)
         # narr+cons is allowed but not past+cond
-        pvNarr_S.add(pvCond_S, "sA")
+        self.pvNarr_S.add(self.pvCond_S, "sA")
 
-        pvCond_S.add(pvA1sg_ST, "m", allowA1sgTrans)
-        pvCond_S.add(pvA2sg_ST, "n", allowA2sgTrans)
-        pvCond_S.add(pvA1pl_ST, "k", allowA1plTrans)
-        pvCond_S.add(pvA2pl_ST, "nIz", allowA2plTrans)
-        pvCond_S.add_empty(pvA3sg_ST)
-        pvCond_S.add(pvA3pl_ST, "lAr")
+        self.pvCond_S.add(self.pvA1sg_ST, "m", allowA1sgTrans)
+        self.pvCond_S.add(self.pvA2sg_ST, "n", allowA2sgTrans)
+        self.pvCond_S.add(self.pvA1pl_ST, "k", allowA1plTrans)
+        self.pvCond_S.add(self.pvA2pl_ST, "nIz", allowA2plTrans)
+        self.pvCond_S.add_empty(self.pvA3sg_ST)
+        self.pvCond_S.add(self.pvA3pl_ST, "lAr")
 
         rejectNoCopula = CurrentGroupContainsAny(
-            pvPast_S, pvCond_S, pvCopBeforeA3pl_S
+            self.pvPast_S, self.pvCond_S, self.pvCopBeforeA3pl_S
         ).not_()
 
-        pvA1sg_ST.add(pvCop_ST, "dIr", rejectNoCopula)
-        pvA2sg_ST.add(pvCop_ST, "dIr", rejectNoCopula)
-        pvA1pl_ST.add(pvCop_ST, "dIr", rejectNoCopula)
-        pvA2pl_ST.add(pvCop_ST, "dIr", rejectNoCopula)
+        self.pvA1sg_ST.add(self.pvCop_ST, "dIr", rejectNoCopula)
+        self.pvA2sg_ST.add(self.pvCop_ST, "dIr", rejectNoCopula)
+        self.pvA1pl_ST.add(self.pvCop_ST, "dIr", rejectNoCopula)
+        self.pvA2pl_ST.add(self.pvCop_ST, "dIr", rejectNoCopula)
 
-        pvA3sg_S.add(pvCop_ST, ">dIr", rejectNoCopula)
+        self.pvA3sg_S.add(self.pvCop_ST, ">dIr", rejectNoCopula)
 
-        pvA3pl_ST.add(pvCop_ST, "dIr", rejectNoCopula)
+        self.pvA3pl_ST.add(self.pvCop_ST, "dIr", rejectNoCopula)
 
         # Copula can come before A3pl.
-        pvPresent_S.add(pvCopBeforeA3pl_S, ">dIr")
-        pvCopBeforeA3pl_S.add(pvA3pl_ST, "lAr")
+        self.pvPresent_S.add(self.pvCopBeforeA3pl_S, ">dIr")
+        self.pvCopBeforeA3pl_S.add(self.pvA3pl_ST, "lAr")
 
     def connect_adverbs(self):
-        advNounRoot_ST.add_empty(avZero_S)
-        avZero_S.add_empty(avNounAfterAdvRoot_ST)
-        avNounAfterAdvRoot_ST.add_empty(avA3sg_S)
-        avA3sg_S.add_empty(avPnon_S)
-        avPnon_S.add(avDat_ST, "+yA")
+        self.advNounRoot_ST.add_empty(self.avZero_S)
+        self.avZero_S.add_empty(self.avNounAfterAdvRoot_ST)
+        self.avNounAfterAdvRoot_ST.add_empty(self.avA3sg_S)
+        self.avA3sg_S.add_empty(self.avPnon_S)
+        self.avPnon_S.add(self.avDat_ST, "+yA")
 
-        advForVerbDeriv_ST.add_empty(avZeroToVerb_S)
-        avZeroToVerb_S.add_empty(nVerb_S)
+        self.advForVerbDeriv_ST.add_empty(self.avZeroToVerb_S)
+        self.avZeroToVerb_S.add_empty(self.nVerb_S)
 
     def connect_postpositives(self):
-        postpRoot_ST.add_empty(postpZero_S)
-        postpZero_S.add_empty(nVerb_S)
+        self.postpRoot_ST.add_empty(self.postpZero_S)
+        self.postpZero_S.add_empty(self.nVerb_S)
 
         # gibi is kind of special.
         gibiGen = self.lexicon.get_item_by_id("gibi_Postp_PCGen")
         gibiNom = self.lexicon.get_item_by_id("gibi_Postp_PCNom")
         sonraAbl = self.lexicon.get_item_by_id("sonra_Postp_PCAbl")
-        postpZero_S.add_empty(
-            po2nRoot_S, DictionaryItemIsAny(gibiGen, gibiNom, sonraAbl)
+        self.postpZero_S.add_empty(
+            self.po2nRoot_S, DictionaryItemIsAny(gibiGen, gibiNom, sonraAbl)
         )
 
-        po2nRoot_S.add_empty(po2nA3sg_S)
-        po2nRoot_S.add(po2nA3pl_S, "lAr")
+        self.po2nRoot_S.add_empty(self.po2nA3sg_S)
+        self.po2nRoot_S.add(self.po2nA3pl_S, "lAr")
 
         # gibisi, gibim-e, gibi-e, gibi-mize
-        po2nA3sg_S.add(po2nP3sg_S, "+sI")
-        po2nA3sg_S.add(po2nP1sg_S, "m", DictionaryItemIsAny(gibiGen, gibiNom))
-        po2nA3sg_S.add(po2nP2sg_S, "n", DictionaryItemIsAny(gibiGen, gibiNom))
-        po2nA3sg_S.add(po2nP1pl_S, "miz", DictionaryItemIsAny(gibiGen, gibiNom))
-        po2nA3sg_S.add(po2nP2pl_S, "niz", DictionaryItemIsAny(gibiGen, gibiNom))
+        self.po2nA3sg_S.add(self.po2nP3sg_S, "+sI")
+        self.po2nA3sg_S.add(self.po2nP1sg_S, "m", DictionaryItemIsAny(gibiGen, gibiNom))
+        self.po2nA3sg_S.add(self.po2nP2sg_S, "n", DictionaryItemIsAny(gibiGen, gibiNom))
+        self.po2nA3sg_S.add(
+            self.po2nP1pl_S, "miz", DictionaryItemIsAny(gibiGen, gibiNom)
+        )
+        self.po2nA3sg_S.add(
+            self.po2nP2pl_S, "niz", DictionaryItemIsAny(gibiGen, gibiNom)
+        )
 
         # gibileri
-        po2nA3pl_S.add(po2nP3sg_S, "+sI")
-        po2nA3pl_S.add_empty(po2nPnon_S)
+        self.po2nA3pl_S.add(self.po2nP3sg_S, "+sI")
+        self.po2nA3pl_S.add_empty(self.po2nPnon_S)
 
-        po2nP3sg_S.add_all(
+        self.po2nP3sg_S.add_all(
             [
-                (po2nNom_ST, ""),
-                (po2nDat_ST, "nA"),
-                (po2nLoc_ST, "ndA"),
-                (po2nAbl_ST, "ndAn"),
-                (po2nIns_ST, "ylA"),
-                (po2nGen_ST, "nIn"),
-                (po2nAcc_ST, "nI"),
+                (self.po2nNom_ST, ""),
+                (self.po2nDat_ST, "nA"),
+                (self.po2nLoc_ST, "ndA"),
+                (self.po2nAbl_ST, "ndAn"),
+                (self.po2nIns_ST, "ylA"),
+                (self.po2nGen_ST, "nIn"),
+                (self.po2nAcc_ST, "nI"),
             ]
         )
 
-        po2nPnon_S.add_all(
+        self.po2nPnon_S.add_all(
             [
-                (po2nNom_ST, ""),
-                (po2nDat_ST, "A"),
-                (po2nLoc_ST, "dA"),
-                (po2nAbl_ST, "dAn"),
-                (po2nIns_ST, "lA"),
-                (po2nGen_ST, "In"),
-                (po2nEqu_ST, "cA"),
-                (po2nAcc_ST, "I"),
+                (self.po2nNom_ST, ""),
+                (self.po2nDat_ST, "A"),
+                (self.po2nLoc_ST, "dA"),
+                (self.po2nAbl_ST, "dAn"),
+                (self.po2nIns_ST, "lA"),
+                (self.po2nGen_ST, "In"),
+                (self.po2nEqu_ST, "cA"),
+                (self.po2nAcc_ST, "I"),
             ]
         )
 
-        po2nP1sg_S.add(po2nDat_ST, "e")
-        po2nP2sg_S.add(po2nDat_ST, "e")
-        po2nP1pl_S.add(po2nDat_ST, "e")
-        po2nP2pl_S.add(po2nDat_ST, "e")
+        self.po2nP1sg_S.add(self.po2nDat_ST, "e")
+        self.po2nP2sg_S.add(self.po2nDat_ST, "e")
+        self.po2nP1pl_S.add(self.po2nDat_ST, "e")
+        self.po2nP2pl_S.add(self.po2nDat_ST, "e")
 
     def connect_verbs(self):
         # Imperative.
-        verbRoot_S.add_empty(vImp_S)
+        self.verbRoot_S.add_empty(self.vImp_S)
 
-        vImp_S.add_all(
+        self.vImp_S.add_all(
             [
-                (vA2sg_ST, ""),  # oku
-                (vA2sg_ST, "sAnA"),  # oku
-                (vA3sg_ST, "sIn"),  # okusun
-                (vA2pl_ST, "+yIn"),  # okuyun
-                (vA2pl_ST, "+yInIz"),  # okuyunuz
-                (vA2pl_ST, "sAnIzA"),  # okuyunuz
-                (vA3pl_ST, "sInlAr"),  # okusunlar
+                (self.vA2sg_ST, ""),  # oku
+                (self.vA2sg_ST, "sAnA"),  # oku
+                (self.vA3sg_ST, "sIn"),  # okusun
+                (self.vA2pl_ST, "+yIn"),  # okuyun
+                (self.vA2pl_ST, "+yInIz"),  # okuyunuz
+                (self.vA2pl_ST, "sAnIzA"),  # okuyunuz
+                (self.vA3pl_ST, "sInlAr"),  # okusunlar
             ]
         )
 
@@ -2487,63 +2624,65 @@ class TurkishMorphotactics:
         # 3- "Ir" form appears after some specific verbs but currently we treat them as separate verb.
         # such as "pişmek - pişirmek". Oflazer parses them as causative.
 
-        verbRoot_S.add(
-            vCausT_S,
+        self.verbRoot_S.add(
+            self.vCausT_S,
             "t",
             HasRootAttribute(RootAttribute.Causative_t)
-            .or_(LastDerivationIs(vCausTir_S))
-            .and_not(LastDerivationIsAny(vCausT_S, vPass_S, vAble_S)),
+            .or_(LastDerivationIs(self.vCausTir_S))
+            .and_not(LastDerivationIsAny(self.vCausT_S, self.vPass_S, self.vAble_S)),
         )
 
-        verbRoot_S.add(
-            vCausTir_S,
+        self.verbRoot_S.add(
+            self.vCausTir_S,
             ">dIr",
             HasPhoneticAttribute(PhoneticAttribute.LastLetterConsonant).and_not(
-                LastDerivationIsAny(vCausTir_S, vPass_S, vAble_S)
+                LastDerivationIsAny(self.vCausTir_S, self.vPass_S, self.vAble_S)
             ),
         )
 
-        vCausT_S.add_empty(verbRoot_S)
-        vCausTir_S.add_empty(verbRoot_S)
+        self.vCausT_S.add_empty(self.verbRoot_S)
+        self.vCausTir_S.add_empty(self.verbRoot_S)
 
         # Progressive1 suffix. "-Iyor"
-        # if last letter is a vowel, this is handled with verbRoot_VowelDrop_S root.
-        verbRoot_S.add(vProgYor_S, "Iyor", not_have(PhoneticAttribute.LastLetterVowel))
+        # if last letter is a vowel, this is handled with self.verbRoot_VowelDrop_S root.
+        self.verbRoot_S.add(
+            self.vProgYor_S, "Iyor", not_have(PhoneticAttribute.LastLetterVowel)
+        )
 
-        # For "aramak", the modified root "ar" connects to verbRoot_VowelDrop_S. Here it is connected to
+        # For "aramak", the modified root "ar" connects to self.verbRoot_VowelDrop_S. Here it is connected to
         # progressive "Iyor" suffix. We use a separate root state for these for convenience.
-        verbRoot_VowelDrop_S.add(vProgYor_S, "Iyor")
-        vProgYor_S.add_all(
+        self.verbRoot_VowelDrop_S.add(self.vProgYor_S, "Iyor")
+        self.vProgYor_S.add_all(
             [
-                (vA1sg_ST, "um"),
-                (vA2sg_ST, "sun"),
-                (vA3sg_ST, ""),
-                (vA1pl_ST, "uz"),
-                (vA2pl_ST, "sunuz"),
-                (vA3pl_ST, "lar"),
-                (vCond_S, "sa"),
-                (vPastAfterTense_S, "du"),
-                (vNarrAfterTense_S, "muş"),
-                (vCopBeforeA3pl_S, "dur"),
-                (vWhile_S, "ken"),
+                (self.vA1sg_ST, "um"),
+                (self.vA2sg_ST, "sun"),
+                (self.vA3sg_ST, ""),
+                (self.vA1pl_ST, "uz"),
+                (self.vA2pl_ST, "sunuz"),
+                (self.vA3pl_ST, "lar"),
+                (self.vCond_S, "sa"),
+                (self.vPastAfterTense_S, "du"),
+                (self.vNarrAfterTense_S, "muş"),
+                (self.vCopBeforeA3pl_S, "dur"),
+                (self.vWhile_S, "ken"),
             ]
         )
 
         # Progressive - 2 "-mAktA"
-        verbRoot_S.add(vProgMakta_S, "mAktA")
-        vProgMakta_S.add_all(
+        self.verbRoot_S.add(self.vProgMakta_S, "mAktA")
+        self.vProgMakta_S.add_all(
             [
-                (vA1sg_ST, "yIm"),
-                (vA2sg_ST, "sIn"),
-                (vA3sg_ST, ""),
-                (vA1pl_ST, "yIz"),
-                (vA2pl_ST, "sInIz"),
-                (vA3pl_ST, "lAr"),
-                (vCond_S, "ysA"),
-                (vPastAfterTense_S, "ydI"),
-                (vNarrAfterTense_S, "ymIş"),
-                (vCopBeforeA3pl_S, "dIr"),
-                (vWhile_S, "yken"),
+                (self.vA1sg_ST, "yIm"),
+                (self.vA2sg_ST, "sIn"),
+                (self.vA3sg_ST, ""),
+                (self.vA1pl_ST, "yIz"),
+                (self.vA2pl_ST, "sInIz"),
+                (self.vA3pl_ST, "lAr"),
+                (self.vCond_S, "ysA"),
+                (self.vPastAfterTense_S, "ydI"),
+                (self.vNarrAfterTense_S, "ymIş"),
+                (self.vCopBeforeA3pl_S, "dIr"),
+                (self.vWhile_S, "yken"),
             ]
         )
 
@@ -2551,202 +2690,204 @@ class TurkishMorphotactics:
         # For single syllable words, it forms as "ar-er". For others "ir-ır-ur-ür"
         # However there are exceptions to it as well. So dictionary items are marked as Aorist_I and
         # Aorist_A.
-        verbRoot_S.add(
-            vAor_S,
+        self.verbRoot_S.add(
+            self.vAor_S,
             "Ir",
             HasRootAttribute(RootAttribute.Aorist_I).or_(HasAnySuffixSurface()),
         )
-        verbRoot_S.add(
-            vAor_S,
+        self.verbRoot_S.add(
+            self.vAor_S,
             "Ar",
             HasRootAttribute(RootAttribute.Aorist_A).and_(HasAnySuffixSurface().not_()),
         )
-        vAor_S.add_all(
+        self.vAor_S.add_all(
             [
-                (vA1sg_ST, "Im"),
-                (vA2sg_ST, "sIn"),
-                (vA3sg_ST, ""),
-                (vA1pl_ST, "Iz"),
-                (vA2pl_ST, "sInIz"),
-                (vA3pl_ST, "lAr"),
-                (vPastAfterTense_S, "dI"),
-                (vNarrAfterTense_S, "mIş"),
-                (vCond_S, "sA"),
-                (vCopBeforeA3pl_S, "dIr"),
-                (vWhile_S, "ken"),
+                (self.vA1sg_ST, "Im"),
+                (self.vA2sg_ST, "sIn"),
+                (self.vA3sg_ST, ""),
+                (self.vA1pl_ST, "Iz"),
+                (self.vA2pl_ST, "sInIz"),
+                (self.vA3pl_ST, "lAr"),
+                (self.vPastAfterTense_S, "dI"),
+                (self.vNarrAfterTense_S, "mIş"),
+                (self.vCond_S, "sA"),
+                (self.vCopBeforeA3pl_S, "dIr"),
+                (self.vWhile_S, "ken"),
             ]
         )
 
         # Negative
-        verbRoot_S.add(vNeg_S, "mA", PreviousMorphemeIs(able).not_())
+        self.verbRoot_S.add(self.vNeg_S, "mA", PreviousMorphemeIs(able).not_())
 
-        vNeg_S.add_all(
+        self.vNeg_S.add_all(
             [
-                (vImp_S, ""),
-                (vPast_S, "dI"),
-                (vFut_S, "yAcA~k"),
-                (vFut_S, "yAcA!ğ"),
-                (vNarr_S, "mIş"),
-                (vProgMakta_S, "mAktA"),
-                (vOpt_S, "yA"),
-                (vDesr_S, "sA"),
-                (vNeces_S, "mAlI"),
-                (vInf1_S, "mAk"),
-                (vInf2_S, "mA"),
-                (vInf3_S, "yIş"),
-                (vActOf_S, "mAcA"),
-                (vPastPart_S, "dI~k"),
-                (vPastPart_S, "dI!ğ"),
-                (vFutPart_S, "yAcA~k"),
-                (vFutPart_S, "yAcA!ğ"),
-                (vPresPart_S, "yAn"),
-                (vNarrPart_S, "mIş"),
-                (vSinceDoingSo_S, "yAlI"),
-                (vByDoingSo_S, "yArAk"),
-                (vHastily_S, "yIver"),
-                (vEverSince_S, "yAgör"),
-                (vAfterDoing_S, "yIp"),
-                (vWhen_S, "yIncA"),
-                (vAsLongAs_S, "dIkçA"),
-                (vNotState_S, "mAzlI~k"),
-                (vNotState_S, "mAzlI!ğ"),
-                (vFeelLike_S, "yAsI"),
+                (self.vImp_S, ""),
+                (self.vPast_S, "dI"),
+                (self.vFut_S, "yAcA~k"),
+                (self.vFut_S, "yAcA!ğ"),
+                (self.vNarr_S, "mIş"),
+                (self.vProgMakta_S, "mAktA"),
+                (self.vOpt_S, "yA"),
+                (self.vDesr_S, "sA"),
+                (self.vNeces_S, "mAlI"),
+                (self.vInf1_S, "mAk"),
+                (self.vInf2_S, "mA"),
+                (self.vInf3_S, "yIş"),
+                (self.vActOf_S, "mAcA"),
+                (self.vPastPart_S, "dI~k"),
+                (self.vPastPart_S, "dI!ğ"),
+                (self.vFutPart_S, "yAcA~k"),
+                (self.vFutPart_S, "yAcA!ğ"),
+                (self.vPresPart_S, "yAn"),
+                (self.vNarrPart_S, "mIş"),
+                (self.vSinceDoingSo_S, "yAlI"),
+                (self.vByDoingSo_S, "yArAk"),
+                (self.vHastily_S, "yIver"),
+                (self.vEverSince_S, "yAgör"),
+                (self.vAfterDoing_S, "yIp"),
+                (self.vWhen_S, "yIncA"),
+                (self.vAsLongAs_S, "dIkçA"),
+                (self.vNotState_S, "mAzlI~k"),
+                (self.vNotState_S, "mAzlI!ğ"),
+                (self.vFeelLike_S, "yAsI"),
             ]
         )
 
         # Negative form is "m" before progressive "Iyor" because last vowel drops.
         # We use a separate negative state for this.
-        verbRoot_S.add(vNegProg1_S, "m")
-        vNegProg1_S.add(vProgYor_S, "Iyor")
+        self.verbRoot_S.add(self.vNegProg1_S, "m")
+        self.vNegProg1_S.add(self.vProgYor_S, "Iyor")
 
         # Negative Aorist
         # Aorist tense forms differently after negative. It can be "z" or empty.
-        vNeg_S.add(vAorNeg_S, "z")
-        vNeg_S.add_empty(vAorNegEmpty_S)
-        vAorNeg_S.add_all(
+        self.vNeg_S.add(self.vAorNeg_S, "z")
+        self.vNeg_S.add_empty(self.vAorNegEmpty_S)
+        self.vAorNeg_S.add_all(
             [
-                (vA2sg_ST, "sIn"),
-                (vA3sg_ST, ""),
-                (vA2pl_ST, "sInIz"),
-                (vA3pl_ST, "lAr"),
-                (vPastAfterTense_S, "dI"),
-                (vNarrAfterTense_S, "mIş"),
-                (vCond_S, "sA"),
-                (vCopBeforeA3pl_S, "dIr"),
-                (vWhile_S, "ken"),
+                (self.vA2sg_ST, "sIn"),
+                (self.vA3sg_ST, ""),
+                (self.vA2pl_ST, "sInIz"),
+                (self.vA3pl_ST, "lAr"),
+                (self.vPastAfterTense_S, "dI"),
+                (self.vNarrAfterTense_S, "mIş"),
+                (self.vCond_S, "sA"),
+                (self.vCopBeforeA3pl_S, "dIr"),
+                (self.vWhile_S, "ken"),
             ]
         )
 
-        vAorNegEmpty_S.add(vA1sg_ST, "m")
-        vAorNegEmpty_S.add(vA1pl_ST, "yIz")
+        self.vAorNegEmpty_S.add(self.vA1sg_ST, "m")
+        self.vAorNegEmpty_S.add(self.vA1pl_ST, "yIz")
         # oku-maz-ım TODO: not sure here.
-        vNeg_S.add(vAorPartNeg_S, "z")
-        vAorPartNeg_S.add_empty(adjAfterVerb_ST)
+        self.vNeg_S.add(self.vAorPartNeg_S, "z")
+        self.vAorPartNeg_S.add_empty(self.adjAfterVerb_ST)
 
         # Positive Ability.
         # This makes a Verb-Verb derivation.
-        verbRoot_S.add(vAble_S, "+yAbil", LastDerivationIs(vAble_S).not_())
+        self.verbRoot_S.add(
+            self.vAble_S, "+yAbil", LastDerivationIs(self.vAble_S).not_()
+        )
 
-        vAble_S.add_empty(verbRoot_S)
+        self.vAble_S.add_empty(self.verbRoot_S)
 
         # Also for ability that comes before negative, we add a new root state.
         # From there only negative connections is possible.
-        vAbleNeg_S.add_empty(vAbleNegDerivRoot_S)
-        vAbleNegDerivRoot_S.add(vNeg_S, "mA")
-        vAbleNegDerivRoot_S.add(vNegProg1_S, "m")
+        self.vAbleNeg_S.add_empty(self.vAbleNegDerivRoot_S)
+        self.vAbleNegDerivRoot_S.add(self.vNeg_S, "mA")
+        self.vAbleNegDerivRoot_S.add(self.vNegProg1_S, "m")
 
         # it is possible to have abil derivation after negative.
-        vNeg_S.add(vAble_S, "yAbil")
+        self.vNeg_S.add(self.vAble_S, "yAbil")
 
         # Unable.
-        verbRoot_S.add(vUnable_S, "+yAmA", PreviousMorphemeIs(able).not_())
+        self.verbRoot_S.add(self.vUnable_S, "+yAmA", PreviousMorphemeIs(able).not_())
         # careful here. We copy all outgoing transitions to "unable"
-        vUnable_S.copy_outgoing_transitions_from(vNeg_S)
-        verbRoot_S.add(vUnableProg1_S, "+yAm")
-        vUnableProg1_S.add(vProgYor_S, "Iyor")
+        self.vUnable_S.copy_outgoing_transitions_from(self.vNeg_S)
+        self.verbRoot_S.add(self.vUnableProg1_S, "+yAm")
+        self.vUnableProg1_S.add(self.vProgYor_S, "Iyor")
 
         # Infinitive 1 "mAk"
         # Causes Verb to Noun derivation. It is connected to a special noun root state.
-        verbRoot_S.add(vInf1_S, "mA~k")
-        vInf1_S.add_empty(nounInf1Root_S)
+        self.verbRoot_S.add(self.vInf1_S, "mA~k")
+        self.vInf1_S.add_empty(self.nounInf1Root_S)
 
         # Infinitive 2 "mA"
         # Causes Verb to Noun derivation.
-        verbRoot_S.add(vInf2_S, "mA")
-        vInf2_S.add_empty(noun_S)
+        self.verbRoot_S.add(self.vInf2_S, "mA")
+        self.vInf2_S.add_empty(self.noun_S)
 
         # Infinitive 3 "+yUş"
         # Causes Verb to Noun derivation.
-        verbRoot_S.add(vInf3_S, "+yIş")
-        vInf3_S.add_empty(noun_S)
+        self.verbRoot_S.add(self.vInf3_S, "+yIş")
+        self.vInf3_S.add_empty(self.noun_S)
 
         # Agt 3 "+yIcI"
         # Causes Verb to Noun and Adj derivation.
-        verbRoot_S.add(vAgt_S, "+yIcI")
-        vAgt_S.add_empty(noun_S)
-        vAgt_S.add_empty(adjAfterVerb_ST)
+        self.verbRoot_S.add(self.vAgt_S, "+yIcI")
+        self.vAgt_S.add_empty(self.noun_S)
+        self.vAgt_S.add_empty(self.adjAfterVerb_ST)
 
         # ActOf "mAcA"
         # Causes Verb to Noun and Adj derivation.
-        verbRoot_S.add(vActOf_S, "mAcA")
-        vActOf_S.add_empty(nounActOfRoot_S)
+        self.verbRoot_S.add(self.vActOf_S, "mAcA")
+        self.vActOf_S.add_empty(self.nounActOfRoot_S)
 
         # PastPart "oku-duğ-um"
-        verbRoot_S.add(vPastPart_S, ">dI~k")
-        verbRoot_S.add(vPastPart_S, ">dI!ğ")
-        vPastPart_S.add_empty(noun_S)
-        vPastPart_S.add_empty(adjAfterVerb_S)
+        self.verbRoot_S.add(self.vPastPart_S, ">dI~k")
+        self.verbRoot_S.add(self.vPastPart_S, ">dI!ğ")
+        self.vPastPart_S.add_empty(self.noun_S)
+        self.vPastPart_S.add_empty(self.adjAfterVerb_S)
 
         # FutPart "oku-yacağ-ım kitap"
-        verbRoot_S.add(vFutPart_S, "+yAcA~k")
-        verbRoot_S.add(vFutPart_S, "+yAcA!ğ")
-        vFutPart_S.add_empty(noun_S, HasTail())
-        vFutPart_S.add_empty(adjAfterVerb_S)
+        self.verbRoot_S.add(self.vFutPart_S, "+yAcA~k")
+        self.verbRoot_S.add(self.vFutPart_S, "+yAcA!ğ")
+        self.vFutPart_S.add_empty(self.noun_S, HasTail())
+        self.vFutPart_S.add_empty(self.adjAfterVerb_S)
 
         # FutPart "oku-yacağ-ım kitap"
-        verbRoot_S.add(vNarrPart_S, "mIş")
-        vNarrPart_S.add_empty(adjectiveRoot_ST)
+        self.verbRoot_S.add(self.vNarrPart_S, "mIş")
+        self.vNarrPart_S.add_empty(self.adjectiveRoot_ST)
 
         # AorPart "okunabilir-lik"
-        verbRoot_S.add(
-            vAorPart_S,
+        self.verbRoot_S.add(
+            self.vAorPart_S,
             "Ir",
             HasRootAttribute(RootAttribute.Aorist_I).or_(HasAnySuffixSurface()),
         )
-        verbRoot_S.add(
-            vAorPart_S,
+        self.verbRoot_S.add(
+            self.vAorPart_S,
             "Ar",
             HasRootAttribute(RootAttribute.Aorist_A).and_(HasAnySuffixSurface().not_()),
         )
-        vAorPart_S.add_empty(adjAfterVerb_ST)
+        self.vAorPart_S.add_empty(self.adjAfterVerb_ST)
 
         # PresPart
-        verbRoot_S.add(vPresPart_S, "+yAn")
-        vPresPart_S.add_empty(noun_S, HasTail())
-        vPresPart_S.add_empty(adjAfterVerb_ST)  # connect to terminal Adj
+        self.verbRoot_S.add(self.vPresPart_S, "+yAn")
+        self.vPresPart_S.add_empty(self.noun_S, HasTail())
+        self.vPresPart_S.add_empty(self.adjAfterVerb_ST)  # connect to terminal Adj
 
         # FeelLike
-        verbRoot_S.add(vFeelLike_S, "+yAsI")
-        vFeelLike_S.add_empty(noun_S, HasTail())
-        vFeelLike_S.add_empty(adjAfterVerb_ST)  # connect to terminal Adj
+        self.verbRoot_S.add(self.vFeelLike_S, "+yAsI")
+        self.vFeelLike_S.add_empty(self.noun_S, HasTail())
+        self.vFeelLike_S.add_empty(self.adjAfterVerb_ST)  # connect to terminal Adj
 
         # NotState
-        verbRoot_S.add(vNotState_S, "mAzlI~k")
-        verbRoot_S.add(vNotState_S, "mAzlI!ğ")
-        vNotState_S.add_empty(noun_S)
+        self.verbRoot_S.add(self.vNotState_S, "mAzlI~k")
+        self.verbRoot_S.add(self.vNotState_S, "mAzlI!ğ")
+        self.vNotState_S.add_empty(self.noun_S)
 
         # reciprocal
         # TODO: for reducing ambiguity for now remove reciprocal
 
-        # verbRoot_S.add(vRecip_S, "Iş", not_haveAny(RootAttribute.Reciprocal, RootAttribute.NonReciprocal)
+        # self.verbRoot_S.add(self.vRecip_S, "Iş", not_haveAny(RootAttribute.Reciprocal, RootAttribute.NonReciprocal)
         #     .and_not(new ContainsMorpheme(recip)))
 
-        vRecip_S.add_empty(verbRoot_S)
-        vImplicitRecipRoot_S.add_empty(vRecip_S)
+        self.vRecip_S.add_empty(self.verbRoot_S)
+        self.vImplicitRecipRoot_S.add_empty(self.vRecip_S)
 
         # reflexive
-        vImplicitReflexRoot_S.add_empty(vReflex_S)
-        vReflex_S.add_empty(verbRoot_S)
+        self.vImplicitReflexRoot_S.add_empty(self.vReflex_S)
+        self.vReflex_S.add_empty(self.verbRoot_S)
 
         # Passive
         # Causes Verb-Verb derivation. Passive morpheme has three forms.
@@ -2755,119 +2896,119 @@ class TurkishMorphotactics:
         # 3- If Verb ends with other consonants: "nIl"
         # When loading dictionary, first and second case items are marked with Passive_In
 
-        verbRoot_S.add(
-            vPass_S,
+        self.verbRoot_S.add(
+            self.vPass_S,
             "In",
             HasRootAttribute(RootAttribute.Passive_In).and_not(ContainsMorpheme(pass_)),
         )
-        verbRoot_S.add(
-            vPass_S,
+        self.verbRoot_S.add(
+            self.vPass_S,
             "InIl",
             HasRootAttribute(RootAttribute.Passive_In).and_not(ContainsMorpheme(pass_)),
         )
-        verbRoot_S.add(
-            vPass_S,
+        self.verbRoot_S.add(
+            self.vPass_S,
             "+nIl",
-            PreviousStateIsAny(vCausT_S, vCausTir_S)
+            PreviousStateIsAny(self.vCausT_S, self.vCausTir_S)
             .or_(not_have(RootAttribute.Passive_In))
             .and_not(ContainsMorpheme(pass_)),
         )
-        vPass_S.add_empty(verbRoot_S)
+        self.vPass_S.add_empty(self.verbRoot_S)
 
         # Condition "oku-r-sa"
-        vCond_S.add_all(
+        self.vCond_S.add_all(
             [
-                (vA1sg_ST, "m"),
-                (vA2sg_ST, "n"),
-                (vA3sg_ST, ""),
-                (vA1pl_ST, "k"),
-                (vA2pl_ST, "nIz"),
-                (vA3pl_ST, "lAr"),
+                (self.vA1sg_ST, "m"),
+                (self.vA2sg_ST, "n"),
+                (self.vA3sg_ST, ""),
+                (self.vA1pl_ST, "k"),
+                (self.vA2pl_ST, "nIz"),
+                (self.vA3pl_ST, "lAr"),
             ]
         )
 
         # Past "oku-du"
-        verbRoot_S.add(vPast_S, ">dI")
-        vPast_S.add_all(
+        self.verbRoot_S.add(self.vPast_S, ">dI")
+        self.vPast_S.add_all(
             [
-                (vA1sg_ST, "m"),
-                (vA2sg_ST, "n"),
-                (vA3sg_ST, ""),
-                (vA1pl_ST, "k"),
-                (vA2pl_ST, "nIz"),
-                (vA3pl_ST, "lAr"),
+                (self.vA1sg_ST, "m"),
+                (self.vA2sg_ST, "n"),
+                (self.vA3sg_ST, ""),
+                (self.vA1pl_ST, "k"),
+                (self.vA2pl_ST, "nIz"),
+                (self.vA3pl_ST, "lAr"),
             ]
         )
 
-        vPast_S.add(vCond_S, "ysA")
+        self.vPast_S.add(self.vCond_S, "ysA")
 
         # Narrative "oku-muş"
-        verbRoot_S.add(vNarr_S, "mIş")
-        vNarr_S.add_all(
+        self.verbRoot_S.add(self.vNarr_S, "mIş")
+        self.vNarr_S.add_all(
             [
-                (vA1sg_ST, "Im"),
-                (vA2sg_ST, "sIn"),
-                (vA3sg_ST, ""),
-                (vA1pl_ST, "Iz"),
-                (vA2pl_ST, "sInIz"),
-                (vA3pl_ST, "lAr"),
+                (self.vA1sg_ST, "Im"),
+                (self.vA2sg_ST, "sIn"),
+                (self.vA3sg_ST, ""),
+                (self.vA1pl_ST, "Iz"),
+                (self.vA2pl_ST, "sInIz"),
+                (self.vA3pl_ST, "lAr"),
             ]
         )
 
-        vNarr_S.add(vCond_S, "sA")
-        vNarr_S.add(vPastAfterTense_S, "tI")
-        vNarr_S.add(vCopBeforeA3pl_S, "tIr")
-        vNarr_S.add(vWhile_S, "ken")
-        vNarr_S.add(vNarrAfterTense_S, "mIş")
+        self.vNarr_S.add(self.vCond_S, "sA")
+        self.vNarr_S.add(self.vPastAfterTense_S, "tI")
+        self.vNarr_S.add(self.vCopBeforeA3pl_S, "tIr")
+        self.vNarr_S.add(self.vWhile_S, "ken")
+        self.vNarr_S.add(self.vNarrAfterTense_S, "mIş")
 
         # Past after tense "oku-muş-tu"
-        vPastAfterTense_S.add_all(
+        self.vPastAfterTense_S.add_all(
             [
-                (vA1sg_ST, "m"),
-                (vA2sg_ST, "n"),
-                (vA3sg_ST, ""),
-                (vA1pl_ST, "k"),
-                (vA2pl_ST, "nIz"),
-                (vA3pl_ST, "lAr"),
+                (self.vA1sg_ST, "m"),
+                (self.vA2sg_ST, "n"),
+                (self.vA3sg_ST, ""),
+                (self.vA1pl_ST, "k"),
+                (self.vA2pl_ST, "nIz"),
+                (self.vA3pl_ST, "lAr"),
             ]
         )
 
         # Narrative after tense "oku-r-muş"
-        vNarrAfterTense_S.add_all(
+        self.vNarrAfterTense_S.add_all(
             [
-                (vA1sg_ST, "Im"),
-                (vA2sg_ST, "sIn"),
+                (self.vA1sg_ST, "Im"),
+                (self.vA2sg_ST, "sIn"),
                 # for preventing yap+ar+lar(A3pl)+mış+A3sg
-                (vA3sg_ST, ""),
-                (vA1pl_ST, "Iz"),
-                (vA2pl_ST, "sInIz"),
-                (vA3pl_ST, "lAr"),
+                (self.vA3sg_ST, ""),
+                (self.vA1pl_ST, "Iz"),
+                (self.vA2pl_ST, "sInIz"),
+                (self.vA3pl_ST, "lAr"),
             ]
         )
 
-        vNarrAfterTense_S.add(vWhile_S, "ken")
-        vNarrAfterTense_S.add(vCopBeforeA3pl_S, "tIr")
+        self.vNarrAfterTense_S.add(self.vWhile_S, "ken")
+        self.vNarrAfterTense_S.add(self.vCopBeforeA3pl_S, "tIr")
 
         # Future "oku-yacak"
-        verbRoot_S.add(vFut_S, "+yAcA~k")
-        verbRoot_S.add(vFut_S, "+yAcA!ğ")
+        self.verbRoot_S.add(self.vFut_S, "+yAcA~k")
+        self.verbRoot_S.add(self.vFut_S, "+yAcA!ğ")
 
-        vFut_S.add_all(
+        self.vFut_S.add_all(
             [
-                (vA1sg_ST, "Im"),
-                (vA2sg_ST, "sIn"),
-                (vA3sg_ST, ""),
-                (vA1pl_ST, "Iz"),
-                (vA2pl_ST, "sInIz"),
-                (vA3pl_ST, "lAr"),
+                (self.vA1sg_ST, "Im"),
+                (self.vA2sg_ST, "sIn"),
+                (self.vA3sg_ST, ""),
+                (self.vA1pl_ST, "Iz"),
+                (self.vA2pl_ST, "sInIz"),
+                (self.vA3pl_ST, "lAr"),
             ]
         )
 
-        vFut_S.add(vCond_S, "sA")
-        vFut_S.add(vPastAfterTense_S, "tI")
-        vFut_S.add(vNarrAfterTense_S, "mIş")
-        vFut_S.add(vCopBeforeA3pl_S, "tIr")
-        vFut_S.add(vWhile_S, "ken")
+        self.vFut_S.add(self.vCond_S, "sA")
+        self.vFut_S.add(self.vPastAfterTense_S, "tI")
+        self.vFut_S.add(self.vNarrAfterTense_S, "mIş")
+        self.vFut_S.add(self.vCopBeforeA3pl_S, "tIr")
+        self.vFut_S.add(self.vWhile_S, "ken")
 
         # `demek` and `yemek` are special because they are the only two verbs with two letters
         # and ends with a vowel.
@@ -2885,119 +3026,119 @@ class TurkishMorphotactics:
             everSince, repeat, almost, hastily, stay, start
         ).not_()
 
-        vDeYeRoot_S.add_all(
+        self.vDeYeRoot_S.add_all(
             [
-                (vFut_S, "yece~k", diYiCondition),
-                (vFut_S, "yece!ğ", diYiCondition),
-                (vProgYor_S, "yor", diYiCondition),
-                (vAble_S, "yebil", diYiCondition),
-                (vAbleNeg_S, "ye", diYiCondition),
-                (vInf3_S, "yiş", RootSurfaceIsAny("yi")),
-                (vFutPart_S, "yece~k", diYiCondition),
-                (vFutPart_S, "yece!ğ", diYiCondition),
-                (vPresPart_S, "yen", diYiCondition),
-                (vEverSince_S, "yegel", diYiCondition.and_(cMultiVerb)),
-                (vRepeat_S, "yedur", diYiCondition.and_(cMultiVerb)),
-                (vRepeat_S, "yegör", diYiCondition.and_(cMultiVerb)),
-                (vAlmost_S, "yeyaz", diYiCondition.and_(cMultiVerb)),
-                (vStart_S, "yekoy", diYiCondition.and_(cMultiVerb)),
-                (vSinceDoingSo_S, "yeli", diYiCondition),
-                (vByDoingSo_S, "yerek", diYiCondition),
-                (vFeelLike_S, "yesi", diYiCondition),
-                (vAfterDoing_S, "yip", diYiCondition),
-                (vWithoutBeingAbleToHaveDoneSo_S, "yemeden", diYiCondition),
-                (vOpt_S, "ye", diYiCondition),
+                (self.vFut_S, "yece~k", diYiCondition),
+                (self.vFut_S, "yece!ğ", diYiCondition),
+                (self.vProgYor_S, "yor", diYiCondition),
+                (self.vAble_S, "yebil", diYiCondition),
+                (self.vAbleNeg_S, "ye", diYiCondition),
+                (self.vInf3_S, "yiş", RootSurfaceIsAny("yi")),
+                (self.vFutPart_S, "yece~k", diYiCondition),
+                (self.vFutPart_S, "yece!ğ", diYiCondition),
+                (self.vPresPart_S, "yen", diYiCondition),
+                (self.vEverSince_S, "yegel", diYiCondition.and_(cMultiVerb)),
+                (self.vRepeat_S, "yedur", diYiCondition.and_(cMultiVerb)),
+                (self.vRepeat_S, "yegör", diYiCondition.and_(cMultiVerb)),
+                (self.vAlmost_S, "yeyaz", diYiCondition.and_(cMultiVerb)),
+                (self.vStart_S, "yekoy", diYiCondition.and_(cMultiVerb)),
+                (self.vSinceDoingSo_S, "yeli", diYiCondition),
+                (self.vByDoingSo_S, "yerek", diYiCondition),
+                (self.vFeelLike_S, "yesi", diYiCondition),
+                (self.vAfterDoing_S, "yip", diYiCondition),
+                (self.vWithoutBeingAbleToHaveDoneSo_S, "yemeden", diYiCondition),
+                (self.vOpt_S, "ye", diYiCondition),
             ]
         )
 
-        vDeYeRoot_S.add_all(
+        self.vDeYeRoot_S.add_all(
             [
-                (vCausTir_S, "dir", deYeCondition),
-                (vPass_S, "n", deYeCondition),
-                (vPass_S, "nil", deYeCondition),
-                (vPast_S, "di", deYeCondition),
-                (vNarr_S, "miş", deYeCondition),
-                (vAor_S, "r", deYeCondition),
-                (vNeg_S, "me", deYeCondition),
-                (vNegProg1_S, "m", deYeCondition),
-                (vProgMakta_S, "mekte", deYeCondition),
-                (vDesr_S, "se", deYeCondition),
-                (vInf1_S, "mek", deYeCondition),
-                (vInf2_S, "me", deYeCondition),
-                (vInf3_S, "yiş", RootSurfaceIsAny("de")),
-                (vPastPart_S, "di~k", deYeCondition),
-                (vPastPart_S, "di!ğ", deYeCondition),
-                (vNarrPart_S, "miş", deYeCondition),
-                (vHastily_S, "yiver", diYiCondition.and_(cMultiVerb)),
-                (vAsLongAs_S, "dikçe"),
-                (vWithoutHavingDoneSo_S, "meden"),
-                (vWithoutHavingDoneSo_S, "meksizin"),
-                (vNeces_S, "meli"),
-                (vNotState_S, "mezli~k"),
-                (vNotState_S, "mezli!ğ"),
-                (vImp_S, "", RootSurfaceIs("de")),
-                (vImpYemekYe_S, "", RootSurfaceIs("ye")),
-                (vImpYemekYi_S, "", RootSurfaceIs("yi")),
+                (self.vCausTir_S, "dir", deYeCondition),
+                (self.vPass_S, "n", deYeCondition),
+                (self.vPass_S, "nil", deYeCondition),
+                (self.vPast_S, "di", deYeCondition),
+                (self.vNarr_S, "miş", deYeCondition),
+                (self.vAor_S, "r", deYeCondition),
+                (self.vNeg_S, "me", deYeCondition),
+                (self.vNegProg1_S, "m", deYeCondition),
+                (self.vProgMakta_S, "mekte", deYeCondition),
+                (self.vDesr_S, "se", deYeCondition),
+                (self.vInf1_S, "mek", deYeCondition),
+                (self.vInf2_S, "me", deYeCondition),
+                (self.vInf3_S, "yiş", RootSurfaceIsAny("de")),
+                (self.vPastPart_S, "di~k", deYeCondition),
+                (self.vPastPart_S, "di!ğ", deYeCondition),
+                (self.vNarrPart_S, "miş", deYeCondition),
+                (self.vHastily_S, "yiver", diYiCondition.and_(cMultiVerb)),
+                (self.vAsLongAs_S, "dikçe"),
+                (self.vWithoutHavingDoneSo_S, "meden"),
+                (self.vWithoutHavingDoneSo_S, "meksizin"),
+                (self.vNeces_S, "meli"),
+                (self.vNotState_S, "mezli~k"),
+                (self.vNotState_S, "mezli!ğ"),
+                (self.vImp_S, "", RootSurfaceIs("de")),
+                (self.vImpYemekYe_S, "", RootSurfaceIs("ye")),
+                (self.vImpYemekYi_S, "", RootSurfaceIs("yi")),
             ]
         )
 
         # verb `yemek` has an exception case for some imperatives.
-        vImpYemekYi_S.add_all([(vA2pl_ST, "yin"), (vA2pl_ST, "yiniz")])
+        self.vImpYemekYi_S.add_all([(self.vA2pl_ST, "yin"), (self.vA2pl_ST, "yiniz")])
 
-        vImpYemekYe_S.add_all(
+        self.vImpYemekYe_S.add_all(
             [
-                (vA2sg_ST, ""),
-                (vA2sg_ST, "sene"),
-                (vA3sg_ST, "sin"),
-                (vA2pl_ST, "senize"),
-                (vA3pl_ST, "sinler"),
+                (self.vA2sg_ST, ""),
+                (self.vA2sg_ST, "sene"),
+                (self.vA3sg_ST, "sin"),
+                (self.vA2pl_ST, "senize"),
+                (self.vA3pl_ST, "sinler"),
             ]
         )
 
         # Optative (gel-e, gel-eyim gel-me-ye-yim)
-        verbRoot_S.add(vOpt_S, "+yA")
-        vOpt_S.add_all(
+        self.verbRoot_S.add(self.vOpt_S, "+yA")
+        self.vOpt_S.add_all(
             [
-                (vA1sg_ST, "yIm"),
-                (vA2sg_ST, "sIn"),
-                (vA3sg_ST, ""),
-                (vA1pl_ST, "lIm"),
-                (vA2pl_ST, "sInIz"),
-                (vA3pl_ST, "lAr"),
-                (vPastAfterTense_S, "ydI"),
-                (vNarrAfterTense_S, "ymIş"),
+                (self.vA1sg_ST, "yIm"),
+                (self.vA2sg_ST, "sIn"),
+                (self.vA3sg_ST, ""),
+                (self.vA1pl_ST, "lIm"),
+                (self.vA2pl_ST, "sInIz"),
+                (self.vA3pl_ST, "lAr"),
+                (self.vPastAfterTense_S, "ydI"),
+                (self.vNarrAfterTense_S, "ymIş"),
             ]
         )
 
         # Desire (gel-se, gel-se-m gel-me-se-m)
-        verbRoot_S.add(vDesr_S, "sA")
-        vDesr_S.add_all(
+        self.verbRoot_S.add(self.vDesr_S, "sA")
+        self.vDesr_S.add_all(
             [
-                (vA1sg_ST, "m"),
-                (vA2sg_ST, "n"),
-                (vA3sg_ST, ""),
-                (vA1pl_ST, "k"),
-                (vA2pl_ST, "nIz"),
-                (vA3pl_ST, "lAr"),
-                (vPastAfterTense_S, "ydI"),
-                (vNarrAfterTense_S, "ymIş"),
+                (self.vA1sg_ST, "m"),
+                (self.vA2sg_ST, "n"),
+                (self.vA3sg_ST, ""),
+                (self.vA1pl_ST, "k"),
+                (self.vA2pl_ST, "nIz"),
+                (self.vA3pl_ST, "lAr"),
+                (self.vPastAfterTense_S, "ydI"),
+                (self.vNarrAfterTense_S, "ymIş"),
             ]
         )
 
-        verbRoot_S.add(vNeces_S, "mAlI")
-        vNeces_S.add_all(
+        self.verbRoot_S.add(self.vNeces_S, "mAlI")
+        self.vNeces_S.add_all(
             [
-                (vA1sg_ST, "yIm"),
-                (vA2sg_ST, "sIn"),
-                (vA3sg_ST, ""),
-                (vA1pl_ST, "yIz"),
-                (vA2pl_ST, "sInIz"),
-                (vA3pl_ST, "lAr"),
-                (vPastAfterTense_S, "ydI"),
-                (vCond_S, "ysA"),
-                (vNarrAfterTense_S, "ymIş"),
-                (vCopBeforeA3pl_S, "dIr"),
-                (vWhile_S, "yken"),
+                (self.vA1sg_ST, "yIm"),
+                (self.vA2sg_ST, "sIn"),
+                (self.vA3sg_ST, ""),
+                (self.vA1pl_ST, "yIz"),
+                (self.vA2pl_ST, "sInIz"),
+                (self.vA3pl_ST, "lAr"),
+                (self.vPastAfterTense_S, "ydI"),
+                (self.vCond_S, "ysA"),
+                (self.vNarrAfterTense_S, "ymIş"),
+                (self.vCopBeforeA3pl_S, "dIr"),
+                (self.vWhile_S, "yken"),
             ]
         )
 
@@ -3007,195 +3148,195 @@ class TurkishMorphotactics:
         # For preventing "yapar-dı-lar-dı", are added.
 
         previousNotPastNarrCond = PreviousStateIsAny(
-            vPastAfterTense_S, vNarrAfterTense_S, vCond_S
+            self.vPastAfterTense_S, self.vNarrAfterTense_S, self.vCond_S
         ).not_()
-        vA3pl_ST.add(vPastAfterTense_ST, "dI", previousNotPastNarrCond)
-        vA3pl_ST.add(vNarrAfterTense_ST, "mIş", previousNotPastNarrCond)
-        vA3pl_ST.add(vCond_ST, "sA", previousNotPastNarrCond)
+        self.vA3pl_ST.add(self.vPastAfterTense_ST, "dI", previousNotPastNarrCond)
+        self.vA3pl_ST.add(self.vNarrAfterTense_ST, "mIş", previousNotPastNarrCond)
+        self.vA3pl_ST.add(self.vCond_ST, "sA", previousNotPastNarrCond)
 
         a3plCopWhile = PreviousMorphemeIsAny(prog1, prog2, neces, fut, narr, aor)
-        vA3pl_ST.add(vCop_ST, "dIr", a3plCopWhile)
-        vA3pl_ST.add(vWhile_S, "ken", a3plCopWhile)
+        self.vA3pl_ST.add(self.vCop_ST, "dIr", a3plCopWhile)
+        self.vA3pl_ST.add(self.vWhile_S, "ken", a3plCopWhile)
 
         a3sgCopWhile = PreviousMorphemeIsAny(prog1, prog2, neces, fut, narr, aor)
-        vA1sg_ST.add(vCop_ST, "dIr", a3sgCopWhile)
-        vA2sg_ST.add(vCop_ST, "dIr", a3sgCopWhile)
-        vA3sg_ST.add(vCop_ST, ">dIr", a3sgCopWhile)
-        vA1pl_ST.add(vCop_ST, "dIr", a3sgCopWhile)
-        vA2pl_ST.add(vCop_ST, "dIr", a3sgCopWhile)
+        self.vA1sg_ST.add(self.vCop_ST, "dIr", a3sgCopWhile)
+        self.vA2sg_ST.add(self.vCop_ST, "dIr", a3sgCopWhile)
+        self.vA3sg_ST.add(self.vCop_ST, ">dIr", a3sgCopWhile)
+        self.vA1pl_ST.add(self.vCop_ST, "dIr", a3sgCopWhile)
+        self.vA2pl_ST.add(self.vCop_ST, "dIr", a3sgCopWhile)
 
-        vCopBeforeA3pl_S.add(vA3pl_ST, "lAr")
+        self.vCopBeforeA3pl_S.add(self.vA3pl_ST, "lAr")
 
         # Allow Past+A2pl+Cond  Past+A2sg+Cond (geldinse, geldinizse)
 
         previousPast = PreviousMorphemeIs(past).and_not(ContainsMorpheme(cond, desr))
-        vA2pl_ST.add(vCondAfterPerson_ST, "sA", previousPast)
-        vA2sg_ST.add(vCondAfterPerson_ST, "sA", previousPast)
-        vA1sg_ST.add(vCondAfterPerson_ST, "sA", previousPast)
-        vA1pl_ST.add(vCondAfterPerson_ST, "sA", previousPast)
+        self.vA2pl_ST.add(self.vCondAfterPerson_ST, "sA", previousPast)
+        self.vA2sg_ST.add(self.vCondAfterPerson_ST, "sA", previousPast)
+        self.vA1sg_ST.add(self.vCondAfterPerson_ST, "sA", previousPast)
+        self.vA1pl_ST.add(self.vCondAfterPerson_ST, "sA", previousPast)
 
-        verbRoot_S.add(vEverSince_S, "+yAgel", cMultiVerb)
-        verbRoot_S.add(vRepeat_S, "+yAdur", cMultiVerb)
-        verbRoot_S.add(vRepeat_S, "+yAgör", cMultiVerb)
-        verbRoot_S.add(vAlmost_S, "+yAyaz", cMultiVerb)
-        verbRoot_S.add(vHastily_S, "+yIver", cMultiVerb)
-        verbRoot_S.add(vStay_S, "+yAkal", cMultiVerb)
-        verbRoot_S.add(vStart_S, "+yAkoy", cMultiVerb)
+        self.verbRoot_S.add(self.vEverSince_S, "+yAgel", cMultiVerb)
+        self.verbRoot_S.add(self.vRepeat_S, "+yAdur", cMultiVerb)
+        self.verbRoot_S.add(self.vRepeat_S, "+yAgör", cMultiVerb)
+        self.verbRoot_S.add(self.vAlmost_S, "+yAyaz", cMultiVerb)
+        self.verbRoot_S.add(self.vHastily_S, "+yIver", cMultiVerb)
+        self.verbRoot_S.add(self.vStay_S, "+yAkal", cMultiVerb)
+        self.verbRoot_S.add(self.vStart_S, "+yAkoy", cMultiVerb)
 
-        vEverSince_S.add_empty(verbRoot_S)
-        vRepeat_S.add_empty(verbRoot_S)
-        vAlmost_S.add_empty(verbRoot_S)
-        vHastily_S.add_empty(verbRoot_S)
-        vStay_S.add_empty(verbRoot_S)
-        vStart_S.add_empty(verbRoot_S)
+        self.vEverSince_S.add_empty(self.verbRoot_S)
+        self.vRepeat_S.add_empty(self.verbRoot_S)
+        self.vAlmost_S.add_empty(self.verbRoot_S)
+        self.vHastily_S.add_empty(self.verbRoot_S)
+        self.vStay_S.add_empty(self.verbRoot_S)
+        self.vStart_S.add_empty(self.verbRoot_S)
 
-        vA3sg_ST.add(vAsIf_S, ">cAsInA", PreviousMorphemeIsAny(aor, narr))
+        self.vA3sg_ST.add(self.vAsIf_S, ">cAsInA", PreviousMorphemeIsAny(aor, narr))
 
-        verbRoot_S.add(vWhen_S, "+yIncA")
-        verbRoot_S.add(vSinceDoingSo_S, "+yAlI")
-        verbRoot_S.add(vByDoingSo_S, "+yArAk")
-        verbRoot_S.add(vAdamantly_S, "+yAsIyA")
-        verbRoot_S.add(vAfterDoing_S, "+yIp")
-        verbRoot_S.add(vWithoutBeingAbleToHaveDoneSo_S, "+yAmAdAn")
-        verbRoot_S.add(vAsLongAs_S, ">dIkçA")
-        verbRoot_S.add(vWithoutHavingDoneSo_S, "mAdAn")
-        verbRoot_S.add(vWithoutHavingDoneSo_S, "mAksIzIn")
+        self.verbRoot_S.add(self.vWhen_S, "+yIncA")
+        self.verbRoot_S.add(self.vSinceDoingSo_S, "+yAlI")
+        self.verbRoot_S.add(self.vByDoingSo_S, "+yArAk")
+        self.verbRoot_S.add(self.vAdamantly_S, "+yAsIyA")
+        self.verbRoot_S.add(self.vAfterDoing_S, "+yIp")
+        self.verbRoot_S.add(self.vWithoutBeingAbleToHaveDoneSo_S, "+yAmAdAn")
+        self.verbRoot_S.add(self.vAsLongAs_S, ">dIkçA")
+        self.verbRoot_S.add(self.vWithoutHavingDoneSo_S, "mAdAn")
+        self.verbRoot_S.add(self.vWithoutHavingDoneSo_S, "mAksIzIn")
 
-        vAsIf_S.add_empty(advRoot_ST)
-        vSinceDoingSo_S.add_empty(advRoot_ST)
-        vByDoingSo_S.add_empty(advRoot_ST)
-        vAdamantly_S.add_empty(advRoot_ST)
-        vAfterDoing_S.add_empty(advRoot_ST)
-        vWithoutBeingAbleToHaveDoneSo_S.add_empty(advRoot_ST)
-        vAsLongAs_S.add_empty(advRoot_ST)
-        vWithoutHavingDoneSo_S.add_empty(advRoot_ST)
-        vWhile_S.add_empty(advRoot_ST)
-        vWhen_S.add_empty(advNounRoot_ST)
+        self.vAsIf_S.add_empty(self.advRoot_ST)
+        self.vSinceDoingSo_S.add_empty(self.advRoot_ST)
+        self.vByDoingSo_S.add_empty(self.advRoot_ST)
+        self.vAdamantly_S.add_empty(self.advRoot_ST)
+        self.vAfterDoing_S.add_empty(self.advRoot_ST)
+        self.vWithoutBeingAbleToHaveDoneSo_S.add_empty(self.advRoot_ST)
+        self.vAsLongAs_S.add_empty(self.advRoot_ST)
+        self.vWithoutHavingDoneSo_S.add_empty(self.advRoot_ST)
+        self.vWhile_S.add_empty(self.advRoot_ST)
+        self.vWhen_S.add_empty(self.advNounRoot_ST)
 
-    @staticmethod
-    def connect_question():
+    def connect_question(self):
         # mı
-        questionRoot_S.add_empty(qPresent_S)
+        self.questionRoot_S.add_empty(self.qPresent_S)
         # mıydı
-        questionRoot_S.add(qPast_S, "ydI")
+        self.questionRoot_S.add(self.qPast_S, "ydI")
         # mıymış
-        questionRoot_S.add(qNarr_S, "ymIş")
+        self.questionRoot_S.add(self.qNarr_S, "ymIş")
 
         # mıyım
-        qPresent_S.add(qA1sg_ST, "yIm")
+        self.qPresent_S.add(self.qA1sg_ST, "yIm")
         # mısın
-        qPresent_S.add(qA2sg_ST, "sIn")
+        self.qPresent_S.add(self.qA2sg_ST, "sIn")
         # mı
-        qPresent_S.add_empty(qA3sg_ST)
+        self.qPresent_S.add_empty(self.qA3sg_ST)
 
         # mıydım
-        qPast_S.add(qA1sg_ST, "m")
+        self.qPast_S.add(self.qA1sg_ST, "m")
         # mıymışım
-        qNarr_S.add(qA1sg_ST, "Im")
+        self.qNarr_S.add(self.qA1sg_ST, "Im")
 
         # mıydın
-        qPast_S.add(qA2sg_ST, "n")
+        self.qPast_S.add(self.qA2sg_ST, "n")
         # mıymışsın
-        qNarr_S.add(qA2sg_ST, "sIn")
+        self.qNarr_S.add(self.qA2sg_ST, "sIn")
 
         # mıydık
-        qPast_S.add(qA1pl_ST, "k")
+        self.qPast_S.add(self.qA1pl_ST, "k")
         # mıymışız
-        qNarr_S.add(qA1pl_ST, "Iz")
+        self.qNarr_S.add(self.qA1pl_ST, "Iz")
         # mıyız
-        qPresent_S.add(qA1pl_ST, "+yIz")
+        self.qPresent_S.add(self.qA1pl_ST, "+yIz")
 
         # mıydınız
-        qPast_S.add(qA2pl_ST, "InIz")
+        self.qPast_S.add(self.qA2pl_ST, "InIz")
         # mıymışsınız
-        qNarr_S.add(qA2pl_ST, "sInIz")
+        self.qNarr_S.add(self.qA2pl_ST, "sInIz")
         # mısınız
-        qPresent_S.add(qA2pl_ST, "sInIz")
+        self.qPresent_S.add(self.qA2pl_ST, "sInIz")
 
         # mıydılar
-        qPast_S.add(qA3pl_ST, "lAr")
+        self.qPast_S.add(self.qA3pl_ST, "lAr")
         # mıymışlar
-        qNarr_S.add(qA3pl_ST, "lAr")
+        self.qNarr_S.add(self.qA3pl_ST, "lAr")
 
         # mıydı
-        qPast_S.add_empty(qA3sg_ST)
+        self.qPast_S.add_empty(self.qA3sg_ST)
         # mıymış
-        qNarr_S.add_empty(qA3sg_ST)
+        self.qNarr_S.add_empty(self.qA3sg_ST)
 
         # for not allowing "mı-ydı-m-dır"
 
-        rejectNoCopula = CurrentGroupContainsAny(qPast_S).not_()
+        rejectNoCopula = CurrentGroupContainsAny(self.qPast_S).not_()
 
         # mıyımdır
-        qA1sg_ST.add(qCop_ST, "dIr", rejectNoCopula)
+        self.qA1sg_ST.add(self.qCop_ST, "dIr", rejectNoCopula)
         # mısındır
-        qA2sg_ST.add(qCop_ST, "dIr", rejectNoCopula)
+        self.qA2sg_ST.add(self.qCop_ST, "dIr", rejectNoCopula)
         # mıdır
-        qA3sg_ST.add(qCop_ST, ">dIr", rejectNoCopula)
+        self.qA3sg_ST.add(self.qCop_ST, ">dIr", rejectNoCopula)
         # mıyızdır
-        qA1pl_ST.add(qCop_ST, "dIr", rejectNoCopula)
+        self.qA1pl_ST.add(self.qCop_ST, "dIr", rejectNoCopula)
         # mısınızdır
-        qA2pl_ST.add(qCop_ST, "dIr", rejectNoCopula)
+        self.qA2pl_ST.add(self.qCop_ST, "dIr", rejectNoCopula)
 
         # Copula can come before A3pl.
-        qPresent_S.add(pvCopBeforeA3pl_S, "dIr")
-        qCopBeforeA3pl_S.add(qA3pl_ST, "lAr")
+        self.qPresent_S.add(self.pvCopBeforeA3pl_S, "dIr")
+        self.qCopBeforeA3pl_S.add(self.qA3pl_ST, "lAr")
 
-    @staticmethod
-    def connect_imek():
+    def connect_imek(self):
         # idi
-        imekRoot_S.add(imekPast_S, "di")
+        self.imekRoot_S.add(self.imekPast_S, "di")
         # imiş
-        imekRoot_S.add(imekNarr_S, "miş")
+        self.imekRoot_S.add(self.imekNarr_S, "miş")
         # ise
-        imekRoot_S.add(imekCond_S, "se")
+        self.imekRoot_S.add(self.imekCond_S, "se")
 
         # idim, idin, idi, idik, idiniz, idiler
-        imekPast_S.add(imekA1sg_ST, "m")
-        imekPast_S.add(imekA2sg_ST, "n")
-        imekPast_S.add_empty(imekA3sg_ST)
-        imekPast_S.add(imekA1pl_ST, "k")
-        imekPast_S.add(imekA2pl_ST, "niz")
-        imekPast_S.add(imekA3pl_ST, "ler")
+        self.imekPast_S.add(self.imekA1sg_ST, "m")
+        self.imekPast_S.add(self.imekA2sg_ST, "n")
+        self.imekPast_S.add_empty(self.imekA3sg_ST)
+        self.imekPast_S.add(self.imekA1pl_ST, "k")
+        self.imekPast_S.add(self.imekA2pl_ST, "niz")
+        self.imekPast_S.add(self.imekA3pl_ST, "ler")
 
         # imişim, imişsin, imiş, imişiz, imişsiniz, imişler
-        imekNarr_S.add(imekA1sg_ST, "im")
-        imekNarr_S.add(imekA2sg_ST, "sin")
-        imekNarr_S.add_empty(imekA3sg_ST)
-        imekNarr_S.add(imekA1pl_ST, "iz")
-        imekNarr_S.add(imekA2pl_ST, "siniz")
-        imekNarr_S.add(imekA3pl_ST, "ler")
+        self.imekNarr_S.add(self.imekA1sg_ST, "im")
+        self.imekNarr_S.add(self.imekA2sg_ST, "sin")
+        self.imekNarr_S.add_empty(self.imekA3sg_ST)
+        self.imekNarr_S.add(self.imekA1pl_ST, "iz")
+        self.imekNarr_S.add(self.imekA2pl_ST, "siniz")
+        self.imekNarr_S.add(self.imekA3pl_ST, "ler")
 
-        imekPast_S.add(imekCond_S, "yse")
-        imekNarr_S.add(imekCond_S, "se")
+        self.imekPast_S.add(self.imekCond_S, "yse")
+        self.imekNarr_S.add(self.imekCond_S, "se")
 
-        imekCond_S.add(imekA1sg_ST, "m")
-        imekCond_S.add(imekA2sg_ST, "n")
-        imekCond_S.add_empty(imekA3sg_ST)
-        imekCond_S.add(imekA1pl_ST, "k")
-        imekCond_S.add(imekA2pl_ST, "niz")
-        imekCond_S.add(imekA3pl_ST, "ler")
+        self.imekCond_S.add(self.imekA1sg_ST, "m")
+        self.imekCond_S.add(self.imekA2sg_ST, "n")
+        self.imekCond_S.add_empty(self.imekA3sg_ST)
+        self.imekCond_S.add(self.imekA1pl_ST, "k")
+        self.imekCond_S.add(self.imekA2pl_ST, "niz")
+        self.imekCond_S.add(self.imekA3pl_ST, "ler")
 
         # for not allowing "i-di-m-dir"
 
-        rejectNoCopula = CurrentGroupContainsAny(imekPast_S).not_()
+        rejectNoCopula = CurrentGroupContainsAny(self.imekPast_S).not_()
 
         # imişimdir, imişsindir etc.
-        imekA1sg_ST.add(imekCop_ST, "dir", rejectNoCopula)
-        imekA2sg_ST.add(imekCop_ST, "dir", rejectNoCopula)
-        imekA3sg_ST.add(imekCop_ST, "tir", rejectNoCopula)
-        imekA1pl_ST.add(imekCop_ST, "dir", rejectNoCopula)
-        imekA2pl_ST.add(imekCop_ST, "dir", rejectNoCopula)
-        imekA3pl_ST.add(imekCop_ST, "dir", rejectNoCopula)
+        self.imekA1sg_ST.add(self.imekCop_ST, "dir", rejectNoCopula)
+        self.imekA2sg_ST.add(self.imekCop_ST, "dir", rejectNoCopula)
+        self.imekA3sg_ST.add(self.imekCop_ST, "tir", rejectNoCopula)
+        self.imekA1pl_ST.add(self.imekCop_ST, "dir", rejectNoCopula)
+        self.imekA2pl_ST.add(self.imekCop_ST, "dir", rejectNoCopula)
+        self.imekA3pl_ST.add(self.imekCop_ST, "dir", rejectNoCopula)
 
     def handle_post_processing_connections(self):
         # Passive has an exception for some verbs like `kavurmak` or `savurmak`.
         # add passive state connection to modified root `kavr` etc.
-        verbLastVowelDropModRoot_S.add(vPass_S, "Il")
+        self.verbLastVowelDropModRoot_S.add(self.vPass_S, "Il")
         # for not allowing `kavur-ul` add all verb connections to
         # unmodified `kavur` root and remove only the passive.
-        verbLastVowelDropUnmodRoot_S.copy_outgoing_transitions_from(verbRoot_S)
-        verbLastVowelDropUnmodRoot_S.remove_transitions_to(pass_)
+        self.verbLastVowelDropUnmodRoot_S.copy_outgoing_transitions_from(
+            self.verbRoot_S
+        )
+        self.verbLastVowelDropUnmodRoot_S.remove_transitions_to(pass_)
 
     def get_root_state(
         self, dict_item: DictionaryItem, attrs: "set[PhoneticAttribute] | None" = None
@@ -3209,71 +3350,71 @@ class TurkishMorphotactics:
         if root_ is not None:
             return root_
         # Verbs like "aramak" drops their last vowel when  connected to "Iyor" Progressive suffix.
-        # those modified roots are connected to a separate root state called verbRoot_VowelDrop_S.
+        # those modified roots are connected to a separate root state called self.verbRoot_VowelDrop_S.
         if PhoneticAttribute.LastLetterDropped in attrs:
-            return verbRoot_VowelDrop_S
+            return self.verbRoot_VowelDrop_S
         if dict_item.has_attribute(RootAttribute.Reciprocal):
-            return vImplicitRecipRoot_S
+            return self.vImplicitRecipRoot_S
         if dict_item.has_attribute(RootAttribute.Reflexive):
-            return vImplicitReflexRoot_S
+            return self.vImplicitReflexRoot_S
         if dict_item.primary_pos == PrimaryPos.Noun:
             if dict_item.secondary_pos == SecondaryPos.ProperNoun:
-                return nounProper_S
+                return self.nounProper_S
             elif dict_item.secondary_pos == SecondaryPos.Abbreviation:
-                return nounAbbrv_S
+                return self.nounAbbrv_S
             elif dict_item.secondary_pos in [
                 SecondaryPos.Email,
                 SecondaryPos.Url,
                 SecondaryPos.HashTag,
                 SecondaryPos.Mention,
             ]:
-                return nounProper_S
+                return self.nounProper_S
             elif dict_item.secondary_pos in [
                 SecondaryPos.Emoticon,
                 SecondaryPos.RomanNumeral,
             ]:
-                return nounNoSuffix_S
+                return self.nounNoSuffix_S
             if dict_item.has_attribute(RootAttribute.CompoundP3sgRoot):
-                return nounCompoundRoot_S
+                return self.nounCompoundRoot_S
             else:
-                return noun_S
+                return self.noun_S
         elif dict_item.primary_pos == PrimaryPos.Adjective:
-            return adjectiveRoot_ST
+            return self.adjectiveRoot_ST
         elif dict_item.primary_pos == PrimaryPos.Pronoun:
             if dict_item.secondary_pos == SecondaryPos.PersonalPron:
-                return pronPers_S
+                return self.pronPers_S
             if dict_item.secondary_pos == SecondaryPos.DemonstrativePron:
-                return pronDemons_S
+                return self.pronDemons_S
             elif dict_item.secondary_pos == SecondaryPos.QuantitivePron:
-                return pronQuant_S
+                return self.pronQuant_S
             elif dict_item.secondary_pos == SecondaryPos.QuestionPron:
-                return pronQues_S
+                return self.pronQues_S
             elif dict_item.secondary_pos == SecondaryPos.ReflexivePron:
-                return pronReflex_S
+                return self.pronReflex_S
             else:
-                return pronQuant_S
+                return self.pronQuant_S
         elif dict_item.primary_pos == PrimaryPos.Adverb:
-            return advRoot_ST
+            return self.advRoot_ST
         elif dict_item.primary_pos == PrimaryPos.Conjunction:
-            return conjRoot_ST
+            return self.conjRoot_ST
         elif dict_item.primary_pos == PrimaryPos.Question:
-            return questionRoot_S
+            return self.questionRoot_S
         elif dict_item.primary_pos == PrimaryPos.Interjection:
-            return interjRoot_ST
+            return self.interjRoot_ST
         elif dict_item.primary_pos == PrimaryPos.Verb:
-            return verbRoot_S
+            return self.verbRoot_S
         elif dict_item.primary_pos == PrimaryPos.Punctuation:
-            return puncRoot_ST
+            return self.puncRoot_ST
         elif dict_item.primary_pos == PrimaryPos.Determiner:
-            return detRoot_ST
+            return self.detRoot_ST
         elif dict_item.primary_pos == PrimaryPos.PostPositive:
-            return postpRoot_ST
+            return self.postpRoot_ST
         elif dict_item.primary_pos == PrimaryPos.Numeral:
-            return numeralRoot_ST
+            return self.numeralRoot_ST
         elif dict_item.primary_pos == PrimaryPos.Duplicator:
-            return dupRoot_ST
+            return self.dupRoot_ST
         else:
-            return noun_S
+            return self.noun_S
 
 
 class MorphemeTransition:
