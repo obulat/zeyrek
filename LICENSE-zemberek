@@ -6,6 +6,8 @@ these files come from Zemberek:
   has changed since they were copied
 - the disambiguation model, src/zeyrek/resources/tr/ambiguity/model_15k_v25.bin,
   copied without changes from Zemberek 0.20.0
+- the sentences of tests/data/disambiguation-gold.txt, from Zemberek's
+  sentence-boundary test text
 
 Zemberek is under the Apache License 2.0:
 

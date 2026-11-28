@@ -305,3 +305,11 @@ def test_disambiguation_model_weights():
     # A perceptron updates the weights of a lemma in the three positions together.
     assert weights.get("10:kitap") == weights.get("10b:kitap") != 0
     assert weights.get("10:xqzt") == 0
+
+
+def test_disambiguation_accuracy_on_the_annotated_sentences(analyzer):
+    from tests.evaluate_disambiguation import evaluate
+
+    result = evaluate(analyzer)
+    assert not result.missing
+    assert result.model / result.ambiguous > 0.9
