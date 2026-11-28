@@ -63,6 +63,16 @@ suffix. The last one is the word without its inflectional suffixes:
 [['çekiliş'], ['çekil', 'çekiliş'], ['çek', 'çekil', 'çekiliş']]
 ```
 
+The `formatted` string of a `Parse` is written by a formatter. The default one follows Zemberek, and
+`formatter="UD"` writes [Universal Dependencies](https://universaldependencies.org/u/feat/index.html) features:
+
+```pycon
+>>> zeyrek.MorphAnalyzer(formatter="UD").analyze_word("kitaplarımdan")[0].formatted
+'Case=Abl|Number=Plur|Number[psor]=Sing|Person=3|Person[psor]=1'
+```
+
+The [documentation](https://zeyrek.readthedocs.io/en/latest/#formatters) explains both formats and
+how to write your own formatter.
 
 ## Credits
 

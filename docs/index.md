@@ -80,9 +80,86 @@ Parse object fields include:
   IGs can have its own part of speech, and the part of speech of the word as a whole is determined
   by the part of speech of the last IG.
 - `morphemes`: sequence of morphemes in the word, a list of strings - abbreviations of English names of morphemes.
-- `formatted`: a human-readable string representation of the analysis. There are several kinds of
-  possible formats. Default formatter shows the dictionary item and its part of speech,
-  and morphemes (with their surfaces, if available), divided into inflectional groups by `|` character.
+- `formatted`: the analysis as a string, written by the analyzer's formatter. See [Formatters](#formatters).
+
+## Formatters
+
+A formatter turns an analysis into the `formatted` string of a `Parse`. Zeyrek has two formatters.
+
+### Default formatter
+
+The default formatter writes the analysis the way Zemberek does:
+
+```pycon
+>>> analyzer.analyze_word("kitaplarımdan")[0].formatted
+'[kitap:Noun] kitap:Noun+lar:A3pl+ım:P1sg+dan:Abl'
+```
+
+- `[kitap:Noun]` is the dictionary item: its lemma and part of speech. A secondary part of speech
+  follows a comma, as in `[ben:Pron,Pers]` or `[Ankara:Noun,Prop]`.
+- `kitap:Noun` is the stem of the word, then its first morpheme.
+- `+lar:A3pl` is the next morpheme, with the letters it adds to the word before the colon.
+  A morpheme with no letters, such as `A3sg`, is written without a colon.
+- `|` starts a new inflectional group, and `→` follows the derivational morpheme that changes the part of
+  speech. In `güzeldi`, the adjective becomes a verb:
+
+```pycon
+>>> analyzer.analyze_word("güzeldi")[0].formatted
+'[güzel:Adj] güzel:Adj|Zero→Verb+di:Past+A3sg'
+```
+
+To leave the surfaces out, set a `DefaultFormatter` with `add_surface=False`:
+
+```pycon
+>>> from zeyrek.formatters import DefaultFormatter
+>>> analyzer.formatter = DefaultFormatter(add_surface=False)
+>>> analyzer.analyze_word("kitaplarımdan")[0].formatted
+'[kitap:Noun] Noun+A3pl+P1sg+Abl'
+```
+
+### Universal Dependencies formatter
+
+`formatter="UD"` writes the features of the word in the format of
+[Universal Dependencies](https://universaldependencies.org/u/feat/index.html), which Turkish treebanks
+and many NLP tools use:
+
+```pycon
+>>> ud_analyzer = zeyrek.MorphAnalyzer(formatter="UD")
+>>> for parse in ud_analyzer.analyze_word("benim"):
+...     print(parse.pos, parse.formatted)
+Noun Case=Nom|Number=Sing|Number[psor]=Sing|Person=3|Person[psor]=1
+Pron Case=Gen|Number=Sing|Person=1|PronType=Prs
+Verb Case=Nom|Number=Sing|Person=1
+Verb Case=Nom|Number=Sing|Person=1|PronType=Prs
+>>> ud_analyzer.analyze_word("geliyorum")[0].formatted
+'Aspect=Prog|Mood=Ind|Number=Sing|Person=1|Polarity=Pos|Polite=Infm|Tense=Pres'
+>>> ud_analyzer.analyze_word("üç")[0].formatted
+'NumType=Card'
+```
+
+The UD formatter writes features for nouns, verbs, pronouns, numerals and adjectives. Other parts of speech,
+such as conjunctions, are written in the default format:
+
+```pycon
+>>> ud_analyzer.analyze_word("ve")[0].formatted
+'[ve:Conj] ve:Conj'
+```
+
+### Writing your own formatter
+
+A formatter is a subclass of `zeyrek.formatters.Formatter` with a `format` method that takes an analysis
+and returns a string. The analysis has the dictionary item in `dict_item`, the stem in `stem`,
+and the morphemes with their surfaces in `morphemes`:
+
+```pycon
+>>> from zeyrek.formatters import Formatter
+>>> class MorphemeIds(Formatter):
+...     def format(self, analysis):
+...         return " ".join(morpheme.id_ for morpheme, _ in analysis.morphemes)
+>>> analyzer.formatter = MorphemeIds()
+>>> analyzer.analyze_word("kitaplarımdan")[0].formatted
+'Noun A3pl P1sg Abl'
+```
 
 ## License
 
