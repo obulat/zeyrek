@@ -1,7 +1,9 @@
 """Main module."""
 
+import functools
 import itertools
 import re
+from collections.abc import Sequence
 from typing import ClassVar, NamedTuple
 
 from zeyrek import tr
@@ -109,10 +111,13 @@ class MorphAnalyzer:
 
     Analyzer uses default text dictionaries from Zemberek-NLP. All dictionaries are
     in resources/tr folder. Numbers, and unknown proper nouns written with an
-    apostrophe, such as "Melik'in", are analysed too. You can also add your own dictionary files in .txt format, with
+    apostrophe, such as "Melik'in", are analyzed too. You can also add your own dictionary files in .txt format, with
     each word on its own line.
 
         >>> lemmer.add_dictionary('/path/to/file')
+
+    The analyses of the last `cache_size` words are cached, so repeated words are
+    analyzed once. Pass `cache_size=0` to turn the cache off.
 
     TrLemmer can analyze or lemmatize words and sentences.
 
@@ -133,6 +138,7 @@ class MorphAnalyzer:
         lexicon: "RootLexicon | None" = None,
         formatter: "Formatter | None" = None,
         return_all_lemmas: bool = False,
+        cache_size: int = 10_000,
     ):
         self.lexicon = lexicon or RootLexicon.default_text_dictionaries()
 
@@ -144,9 +150,15 @@ class MorphAnalyzer:
             else MorphAnalyzer.formatters[formatter]()
         )
         self.return_all_lemmas = return_all_lemmas
+        self._cached_analyses = functools.lru_cache(maxsize=cache_size)(
+            lambda word: tuple(self._analyze(word))
+        )
 
-    def _parse(self, word: str) -> list[SingleAnalysis]:
+    def _parse(self, word: str) -> tuple[SingleAnalysis, ...]:
         """Parses a word and returns SingleAnalysis result."""
+        return self._cached_analyses(word)
+
+    def _analyze(self, word: str) -> list[SingleAnalysis]:
         stem, apostrophe, ending = word.replace("’", "'").partition("'")
         if NUMBER.fullmatch(stem):
             return self._parse_number(stem, _normalize(ending))
@@ -194,7 +206,7 @@ class MorphAnalyzer:
         return self._analyze_unknown_stem(item, ending)
 
     def _parse_ottoman_link(self, word: str) -> list[SingleAnalysis]:
-        """Analyses the noun of "bakiye-i", without the izafet after the hyphen."""
+        """Analyzes the noun of "bakiye-i", without the izafet after the hyphen."""
         match = OTTOMAN_LINK.fullmatch(word)
         return self.analyzer.analyze(match[1]) if match else []
 
@@ -284,7 +296,7 @@ class MorphAnalyzer:
         return result
 
     @staticmethod
-    def filter_proper_nouns(word: str, analysis: list[SingleAnalysis]):
+    def filter_proper_nouns(word: str, analysis: Sequence[SingleAnalysis]):
         if word[0].isupper():
             only_proper_nouns = [
                 a
@@ -318,3 +330,4 @@ class MorphAnalyzer:
         """
         lexicon_from_path = self.lexicon.add_dictionary_from_path(path_to_dictionary)
         self.morphotactics.stem_transitions.add_lexicon_items(lexicon_from_path.items)
+        self._cached_analyses.cache_clear()
