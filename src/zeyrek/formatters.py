@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import ClassVar
 
-from zeyrek.attributes import SecondaryPos
+from zeyrek.attributes import PrimaryPos, SecondaryPos
 from zeyrek.morphotactics import Morpheme
 from zeyrek.rulebasedanalyzer import SingleAnalysis
 
@@ -12,6 +12,15 @@ def format_dict_item(lemma, ppos, spos) -> str:
     """Formats information about analysis dictionary item."""
     spos_string = "" if spos is None else f",{spos}"
     return f"[{lemma}:{ppos}{spos_string}] "
+
+
+def is_new_word(morpheme: Morpheme) -> bool:
+    """
+    A derivational suffix, such as "-ki" in "evdekiler", starts a new word, which
+    has its own case and agreement. The copula "Zero" keeps them: "evdeyim" is still
+    in the locative.
+    """
+    return morpheme.derivational and morpheme.id_ != "Zero"
 
 
 class Formatter:
@@ -46,23 +55,20 @@ class UDFormatter(Formatter, ABC):
     def __init__(self, add_surface=True):
         self.add_surface = add_surface
 
-    def format_adj(self, analysis: SingleAnalysis) -> str:
-        """UD features of an adjective.
+    def format_nominal(self, analysis: SingleAnalysis) -> str:
+        """UD features of a noun or an adjective, after its derivations.
 
-        A plain adjective has no features in UD. An adjective derived into a noun
-        (``kırmızıya``: Adj+Zero+Noun+A3sg+Dat) or a verb (``güzeldi``:
-        Adj+Zero+Verb+Past+A3sg) gets the features of the last one.
+        A noun or an adjective can become a verb, as ``güzeldi``
+        (Adj+Zero+Verb+Past+A3sg) or ``evdeyim`` (Noun+A3sg+Loc+Zero+Verb+Pres+A1sg),
+        and then gets the features of a verb. An adjective has no features in UD,
+        and an adjective that becomes a noun, as ``kırmızıya``, gets the features of
+        a noun.
         """
-        derived = [
-            morpheme.id_
-            for morpheme, _ in analysis.morphemes
-            if morpheme.id_ in ("Noun", "Verb")
-        ]
-        if not derived:
-            return "_"
-        if derived[-1] == "Verb":
+        if analysis.pos == PrimaryPos.Verb:
             return self.format_verb(analysis)
-        return self.format_noun(analysis)
+        if analysis.pos == PrimaryPos.Noun:
+            return self.format_noun(analysis)
+        return "_"
 
     @staticmethod
     def format_noun(analysis: SingleAnalysis) -> str:
@@ -74,7 +80,8 @@ class UDFormatter(Formatter, ABC):
         person_psor = ""
         for m in analysis.morphemes:
             morph = m[0]
-            # print("\tMorph id: ", morph.id_)
+            if is_new_word(morph):
+                case = number = person = number_psor = person_psor = ""
             if morph.id_ in cases:
                 case = morph.id_
             possessive_value = UDFormatter.possessives.get(morph.id_)
@@ -160,6 +167,8 @@ class UDFormatter(Formatter, ABC):
 
         for k, m in enumerate(analysis.morphemes):
             morph = m[0]
+            if is_new_word(morph):
+                case = ""
             if morph.id_ in cases:
                 case = f"|Case={morph.id_}"
 
@@ -200,12 +209,14 @@ class UDFormatter(Formatter, ABC):
             elif morph.id_ == "Narr":
                 if "Past" not in morph_ids:
                     evident = "|Evident=Nfh"
-                tense = "Past"
+                # "okuyacakmış" stays in the future tense.
+                if tense == "":
+                    tense = "Past"
             elif morph.id_ == "Pass":
                 voice = "|Voice=Pass"
             if morph.id_ in ["PresPart", "PastPart"]:
                 verb_form = "Part"
-            if morph.id_ == "Noun" and verb_form == "":
+            if morph.id_ == "Noun" and verb_form == "" and k > 0:
                 verb_form = "Vnoun"
             if morph.id_ == "Opt":
                 mood = "Opt"
@@ -238,8 +249,9 @@ class UDFormatter(Formatter, ABC):
             number = "|Number=" + number if verb_form == "" else ""
         if person != "":
             person = "|Person=" + person if verb_form == "" else ""
-        if "Noun" in morph_ids:
-            noun_deriv = morph_ids.index("Noun")
+        # A noun root that becomes a verb, as "evdeyim", is not a verbal noun.
+        if "Noun" in morph_ids[1:]:
+            noun_deriv = morph_ids.index("Noun", 1)
             for id_ in morph_ids[noun_deriv:]:
                 if id_ in cases:
                     case = f"|Case={id_}"
@@ -255,16 +267,14 @@ class UDFormatter(Formatter, ABC):
 
     def format(self, analysis: SingleAnalysis) -> str:
         pos = analysis.dict_item.primary_pos.value
-        if pos == "Noun":
-            return self.format_noun(analysis)
+        if pos in ("Noun", "Adj"):
+            return self.format_nominal(analysis)
         elif pos == "Verb":
             return self.format_verb(analysis)
         elif pos == "Pron":
             return self.format_pron(analysis)
         elif pos == "Num":
             return self.format_num(analysis)
-        elif pos == "Adj":
-            return self.format_adj(analysis)
 
         # result = f"[{analysis.dict_item.lemma}:{analysis.dict_item.primary_pos.value}"
         # if analysis.dict_item.secondary_pos != SecondaryPos.NONE:
