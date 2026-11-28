@@ -149,8 +149,6 @@ class MorphAnalyzer:
             else MorphAnalyzer.formatters[formatter]()
         )
         self.return_all_lemmas = return_all_lemmas
-        # Texts repeat the same words a lot, so the analyses of the latest words are
-        # kept.
         self._cached_analyses = functools.lru_cache(maxsize=cache_size)(
             lambda word: tuple(self._analyze(word))
         )
