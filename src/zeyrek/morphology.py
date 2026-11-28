@@ -6,6 +6,7 @@ from typing import ClassVar, NamedTuple
 
 from zeyrek import tr
 from zeyrek.attributes import PrimaryPos, SecondaryPos
+from zeyrek.disambiguation import Disambiguator
 from zeyrek.formatters import DefaultFormatter, Formatter, UDFormatter
 from zeyrek.lexicon import DictionaryItem, RootLexicon
 from zeyrek.lexicon_helpers import (
@@ -59,6 +60,15 @@ def _tokenize_text(text: str) -> list[str]:
 
     # NLTK keeps "Ankara'da" in one token, but splits "Ankara’da" in three.
     return word_tokenize(text.replace("’", "'"), language="turkish")
+
+
+def _tokenize_sentences(text: str) -> list[list[str]]:
+    from nltk.tokenize import sent_tokenize
+
+    return [
+        _tokenize_text(sentence)
+        for sentence in sent_tokenize(text.replace("’", "'"), language="turkish")
+    ]
 
 
 def _read_number(number: str) -> tuple[str, SecondaryPos]:
@@ -144,6 +154,7 @@ class MorphAnalyzer:
             else MorphAnalyzer.formatters[formatter]()
         )
         self.return_all_lemmas = return_all_lemmas
+        self._disambiguator: Disambiguator | None = None
 
     def _parse(self, word: str) -> list[SingleAnalysis]:
         """Parses a word and returns SingleAnalysis result."""
@@ -208,6 +219,17 @@ class MorphAnalyzer:
             result.append((sentence, sentence_analysis))
         return result
 
+    def _to_parse(self, word: str, analysis: "SingleAnalysis | None") -> Parse:
+        if analysis is None:
+            return Parse(word, "Unk", "Unk", ["Unk"], "Unk")
+        return Parse(
+            word,
+            analysis.dict_item.lemma,
+            analysis.pos.value,
+            [m[0].id_ for m in analysis.morphemes],
+            self.formatter.format(analysis),
+        )
+
     def analyze_word(self, word: str) -> list[Parse]:
         """
         Public method that returns the analyses of a single word, without tokenizing it,
@@ -215,19 +237,7 @@ class MorphAnalyzer:
         :param word: Word to analyze
         :return: List of Parse objects; a single 'Unk' Parse if the word is unknown
         """
-        analysis = [a for a in self._parse(word) if a is not None]
-        if not analysis:
-            return [Parse(word, "Unk", "Unk", ["Unk"], "Unk")]
-        return [
-            Parse(
-                word,
-                a.dict_item.lemma,
-                a.pos.value,
-                [m[0].id_ for m in a.morphemes],
-                self.formatter.format(a),
-            )
-            for a in analysis
-        ]
+        return [self._to_parse(word, a) for a in self._parse(word) or [None]]
 
     def analyze(self, text: str) -> list[list[Parse]]:
         """
@@ -237,31 +247,51 @@ class MorphAnalyzer:
         """
         return [self.analyze_word(word) for word in _tokenize_text(text)]
 
+    def _best_analyses(self, words: list[str]) -> "list[SingleAnalysis | None]":
+        if self._disambiguator is None:
+            self._disambiguator = Disambiguator()
+        analyses = [list(self._parse(word)) for word in words]
+        return self._disambiguator.best_analyses(words, analyses)
+
+    def disambiguate(self, text: str) -> list[Parse]:
+        """
+        Returns the most likely analysis of each word of the text, chosen from the
+        words around it with Zemberek's disambiguation model.
+
+            >>> [parse.formatted for parse in analyzer.disambiguate("Bu kitabı okudum.")]
+            ['[bu:Det] bu:Det', '[kitap:Noun] kitab:Noun+A3sg+ı:Acc', ...]
+
+        :param text: Text to analyze, split into sentences and words with NLTK
+        :return: One Parse for each word; an 'Unk' Parse if the word is unknown
+        """
+        return [
+            self._to_parse(word, analysis)
+            for words in _tokenize_sentences(text)
+            for word, analysis in zip(words, self._best_analyses(words), strict=True)
+        ]
+
     def lemmatize(self, text: str) -> "list[tuple[str, list]] | list[str]":
         """
-        This method will eventually use some form of disambiguation for lemmatizing.
-        Currently, it simply returns all lemmas available for each word of the text.
+        Returns the lemma of each word of the text, from its most likely analysis in
+        the sentence, as `disambiguate` chooses it. With `return_all_lemmas`, returns
+        every possible lemma of each word instead.
         :param text: The text which needs lemmatization.
-        :return: A list of tuples: sentence and a list of list of
-        lemmas for all words of the text
+        :return: A list of lemmas, or a list of tuples of each word and its lemmas.
+        A word without analyses is its own lemma.
         """
-        return_all_lemmas = self.return_all_lemmas
+        if not self.return_all_lemmas:
+            return [
+                analysis.dict_item.lemma if analysis else word
+                for words in _tokenize_sentences(text)
+                for word, analysis in zip(
+                    words, self._best_analyses(words), strict=True
+                )
+            ]
         result = []
-        words = _tokenize_text(text)
-        for word in words:
+        for word in _tokenize_text(text):
             analysis = self._parse(word)
-            if return_all_lemmas:
-                if len(analysis) == 0:
-                    word_lemmas = [word]
-                else:
-                    analysis_lemmas = [a.dict_item.lemma for a in analysis]
-                    filtered_lemmas = list(set(analysis_lemmas))
-                    word_lemmas = filtered_lemmas
-                result.append((word, word_lemmas))
-
-            else:
-                analysis = self.filter_proper_nouns(word, analysis)
-                result.append(analysis[0].dict_item.lemma if analysis else word)
+            lemmas = list({a.dict_item.lemma: None for a in analysis}) or [word]
+            result.append((word, lemmas))
         return result
 
     def derived_lemmas(self, word: str) -> list[list[str]]:
