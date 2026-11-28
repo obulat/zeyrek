@@ -119,22 +119,38 @@ To leave the surfaces out, set a `DefaultFormatter` with `add_surface=False`:
 
 ### Universal Dependencies formatter
 
-`formatter="UD"` writes the features of the word in the format of
-[Universal Dependencies](https://universaldependencies.org/u/feat/index.html), which Turkish treebanks
-and many NLP tools use:
+`formatter="UD"` writes the features of the word as
+[Universal Dependencies](https://universaldependencies.org/u/feat/index.html) features, the format of the
+Turkish UD treebanks:
 
 ```pycon
 >>> ud_analyzer = zeyrek.MorphAnalyzer(formatter="UD")
->>> for parse in ud_analyzer.analyze_word("benim"):
-...     print(parse.pos, parse.formatted)
-Noun Case=Nom|Number=Sing|Number[psor]=Sing|Person=3|Person[psor]=1
-Pron Case=Gen|Number=Sing|Person=1|PronType=Prs
-Verb Case=Nom|Number=Sing|Person=1
-Verb Case=Nom|Number=Sing|Person=1|PronType=Prs
+>>> ud_analyzer.analyze_word("kitaplarımdan")[0].formatted
+'Case=Abl|Number=Plur|Number[psor]=Sing|Person=3|Person[psor]=1'
 >>> ud_analyzer.analyze_word("geliyorum")[0].formatted
 'Aspect=Prog|Mood=Ind|Number=Sing|Person=1|Polarity=Pos|Polite=Infm|Tense=Pres'
+>>> ud_analyzer.analyze_word("okuyacakmışsın")[0].formatted
+'Aspect=Perf|Evident=Nfh|Mood=Ind|Number=Sing|Person=2|Polarity=Pos|Tense=Fut'
 >>> ud_analyzer.analyze_word("üç")[0].formatted
 'NumType=Card'
+```
+
+A word gets the features of the part of speech it ends in. `evdeyim`, "I am at home", is a noun that
+becomes a verb, so it gets the features of a verb and keeps the case of the noun:
+
+```pycon
+>>> ud_analyzer.analyze_word("evdeyim")[0].formatted
+'Aspect=Perf|Case=Loc|Mood=Ind|Number=Sing|Person=1|Polarity=Pos|Tense=Pres'
+```
+
+A derivational suffix makes a new word with its own case. In `evdekiler`, "the ones at home", the
+locative belongs to `evde`, and the word after `-ki` is in the nominative. Each analysis has its own features:
+
+```pycon
+>>> for parse in ud_analyzer.analyze_word("evdekiler"):
+...     print(parse.pos, parse.formatted)
+Verb Aspect=Perf|Mood=Ind|Number=Plur|Person=3|Polarity=Pos|Tense=Pres
+Noun Case=Nom|Number=Plur|Person=3
 ```
 
 The UD formatter writes features for nouns, verbs, pronouns, numerals and adjectives. Other parts of speech,
