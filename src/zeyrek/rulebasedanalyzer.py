@@ -45,7 +45,7 @@ class RuleBasedAnalyzer:
         return [parse_analysis(path) for path in self.search(paths)]
 
     def analyze_with_stem(self, stem_transition, ending: str):
-        """Analyses the ending of a word whose stem is not in the lexicon."""
+        """Analyzes the ending of a word whose stem is not in the lexicon."""
         paths = [SearchPath.initial(stem_transition, ending)]
         return [parse_analysis(path) for path in self.search(paths)]
 

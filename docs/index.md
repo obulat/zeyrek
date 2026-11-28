@@ -52,7 +52,7 @@ suffix. The last one is the word without its inflectional suffixes:
 ```
 
 `MorphAnalyzer` keeps the analyses of the last 10,000 words it saw, so repeated words in a text
-are analysed once. Set the size with `cache_size`, or turn the cache off with `cache_size=0`:
+are analyzed once. Set the size with `cache_size`, or turn the cache off with `cache_size=0`:
 
 ```pycon
 >>> analyzer = zeyrek.MorphAnalyzer(cache_size=50_000)

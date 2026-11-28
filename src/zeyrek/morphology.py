@@ -110,13 +110,13 @@ class MorphAnalyzer:
 
     Analyzer uses default text dictionaries from Zemberek-NLP. All dictionaries are
     in resources/tr folder. Numbers, and unknown proper nouns written with an
-    apostrophe, such as "Melik'in", are analysed too. You can also add your own dictionary files in .txt format, with
+    apostrophe, such as "Melik'in", are analyzed too. You can also add your own dictionary files in .txt format, with
     each word on its own line.
 
         >>> lemmer.add_dictionary('/path/to/file')
 
     The analyses of the last `cache_size` words are cached, so repeated words are
-    analysed once. Pass `cache_size=0` to turn the cache off.
+    analyzed once. Pass `cache_size=0` to turn the cache off.
 
     TrLemmer can analyze or lemmatize words and sentences.
 
@@ -150,7 +150,7 @@ class MorphAnalyzer:
         )
         self.return_all_lemmas = return_all_lemmas
         # Texts repeat the same words a lot, so the analyses of the latest words are
-        # kept, as Zemberek's AnalysisCache does.
+        # kept.
         self._cached_analyses = functools.lru_cache(maxsize=cache_size)(
             lambda word: tuple(self._analyze(word))
         )
@@ -207,7 +207,7 @@ class MorphAnalyzer:
         return self._analyze_unknown_stem(item, ending)
 
     def _parse_ottoman_link(self, word: str) -> list[SingleAnalysis]:
-        """Analyses the noun of "bakiye-i", without the izafet after the hyphen."""
+        """Analyzes the noun of "bakiye-i", without the izafet after the hyphen."""
         match = OTTOMAN_LINK.fullmatch(word)
         return self.analyzer.analyze(match[1]) if match else []
 
