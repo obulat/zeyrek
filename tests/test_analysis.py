@@ -15,7 +15,6 @@ from zeyrek.morphotactics import (
     SearchPath,
     StemTransition,
     TurkishMorphotactics,
-    adjectiveRoot_ST,
     root_S,
 )
 
@@ -73,7 +72,7 @@ def test_stem_transition():
     morphotactics = TurkishMorphotactics(lexicon=lexicon)
     lexicon.get_matching_items("beyaz")[0]
     transition = morphotactics.stem_transitions.prefix_matches("beyaz")[0]
-    assert transition.to_ == adjectiveRoot_ST
+    assert transition.to_ is morphotactics.adjectiveRoot_ST
     assert str(transition) == "<(Dict: beyaz [P:Adj]):beyaz → [adjectiveRoot_ST:Adj]>"
     assert transition.condition is None
     assert transition.condition_count == 0
