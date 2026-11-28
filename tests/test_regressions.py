@@ -7,6 +7,7 @@ import pytest
 
 import zeyrek
 from zeyrek.attributes import PhoneticAttribute, calculate_phonetic_attributes
+from zeyrek.lexicon import RootLexicon
 from zeyrek.lexicon_helpers import turkish_numbers_to_string
 from zeyrek.morphology import MorphAnalyzer
 
@@ -257,3 +258,58 @@ def test_ottoman_compounds(analyzer, word, lemma):
 
 def test_hyphen_without_an_izafet_is_still_unknown(analyzer):
     assert [parse.lemma for parse in analyzer.analyze_word("ev-ler")] == ["Unk"]
+
+
+def test_an_analyzer_with_its_own_lexicon_does_not_change_other_analyzers():
+    MorphAnalyzer(lexicon=RootLexicon.from_lines(["beyaz [P:Adj]"]))
+    formatted = {parse.formatted for parse in MorphAnalyzer().analyze_word("onun")}
+    assert "[o:Pron,Pers] o:Pron+A3sg+nun:Gen" in formatted
+
+
+@pytest.mark.parametrize(
+    "text, formatted",
+    [
+        ("Bu kitabı okudum.", "[kitap:Noun] kitab:Noun+A3sg+ı:Acc"),
+        ("Ali'nin kitabı masada.", "[kitap:Noun] kitab:Noun+A3sg+ı:P3sg"),
+    ],
+)
+def test_disambiguate_chooses_the_analysis_from_the_sentence(analyzer, text, formatted):
+    assert analyzer.disambiguate(text)[1].formatted == formatted
+
+
+@pytest.mark.parametrize(
+    "text, lemmas",
+    [
+        ("Mektup onun tarafından yazıldı.", ["mektup", "o", "taraf", "yazmak", "."]),
+        ("Bu sene çok kar yağdı.", ["bu", "sene", "çok", "kar", "yağmak", "."]),
+        ("xqzt geldi.", ["xqzt", "gelmek", "."]),
+    ],
+)
+def test_lemmatize_uses_the_sentence(analyzer, text, lemmas):
+    assert analyzer.lemmatize(text) == lemmas
+
+
+def test_disambiguate_keeps_unknown_words(analyzer):
+    assert [parse.lemma for parse in analyzer.disambiguate("xqzt geldi.")] == [
+        "Unk",
+        "gelmek",
+        ".",
+    ]
+
+
+def test_disambiguation_model_weights():
+    from zeyrek.disambiguation import default_weights
+
+    weights = default_weights()
+    assert len(weights) == 350_093
+    # A perceptron updates the weights of a lemma in the three positions together.
+    assert weights.get("10:kitap") == weights.get("10b:kitap") != 0
+    assert weights.get("10:xqzt") == 0
+
+
+def test_disambiguation_accuracy_on_the_annotated_sentences(analyzer):
+    from tests.evaluate_disambiguation import evaluate
+
+    result = evaluate(analyzer)
+    assert not result.missing
+    assert result.model / result.ambiguous > 0.9

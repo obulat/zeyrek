@@ -6,8 +6,8 @@ authors = [
     {name = "Olga Bulat", email = "obulat@gmail.com"},
 ]
 readme = "README.md"
-license = "MIT"
-license-files = ["LICENSE"]
+license = "MIT AND Apache-2.0"
+license-files = ["LICENSE", "LICENSE-zemberek"]
 requires-python = ">=3.10"
 keywords = ["turkish", "nlp", "morphology", "lemmatizer", "morphological-analysis", "zemberek"]
 classifiers = [

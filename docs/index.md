@@ -26,12 +26,29 @@ Parse(word='benim', lemma='ben', pos='Verb', morphemes=['Noun', 'A3sg', 'Zero', 
 Parse(word='benim', lemma='ben', pos='Verb', morphemes=['Pron', 'A1sg', 'Zero', 'Verb', 'Pres', 'A1sg'], formatted='[ben:Pron,Pers] ben:Pron+A1sg|Zero→Verb+Pres+im:A1sg')
 ```
 
-If you only need the base form of words, or lemmas, you can call `lemmatize`. It returns
-the most likely lemma for each word of the text:
+A word often has several analyses, and the right one depends on the sentence. `disambiguate`
+returns the most likely analysis of each word, chosen with Zemberek's disambiguation model.
+`kitabı` is "the book" as an object in the first sentence, and "his book" in the second:
 
 ```pycon
->>> analyzer.lemmatize("benim evim")
-['ben', 'ev']
+>>> for parse in analyzer.disambiguate("Bu kitabı okudum. Ali'nin kitabı masada."):
+...     print(parse.formatted)
+[bu:Det] bu:Det
+[kitap:Noun] kitab:Noun+A3sg+ı:Acc
+[okumak:Verb] oku:Verb+du:Past+m:A1sg
+[.:Punc] .:Punc
+[Ali:Noun,Prop] ali:Noun+A3sg+nin:Gen
+[kitap:Noun] kitab:Noun+A3sg+ı:P3sg
+[masa:Noun] masa:Noun+A3sg+da:Loc
+[.:Punc] .:Punc
+```
+
+If you only need the base form of words, or lemmas, you can call `lemmatize`. It returns
+the lemma of the most likely analysis of each word:
+
+```pycon
+>>> analyzer.lemmatize("Mektup onun tarafından yazıldı.")
+['mektup', 'o', 'taraf', 'yazmak', '.']
 ```
 
 To get every possible lemma, create the analyzer with `return_all_lemmas=True`. `lemmatize`
@@ -87,7 +104,8 @@ Parse object fields include:
 ## License
 
 Licensed under MIT License.
-Zemberek, from parts of which Zeyrek was ported, is under Apache License, Version 2.0.
+Zemberek, from parts of which Zeyrek was ported, is under Apache License, Version 2.0. Zeyrek's dictionaries
+and disambiguation model come from Zemberek, and `LICENSE-zemberek` in the repository has Zemberek's license.
 
 ## Disclaimer
 
