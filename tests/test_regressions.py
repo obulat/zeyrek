@@ -257,3 +257,17 @@ def test_ottoman_compounds(analyzer, word, lemma):
 
 def test_hyphen_without_an_izafet_is_still_unknown(analyzer):
     assert [parse.lemma for parse in analyzer.analyze_word("ev-ler")] == ["Unk"]
+
+
+def test_cached_analyses_are_not_shared(analyzer):
+    analyzer._parse("evde").clear()
+    assert analyzer.analyze_word("evde")[0].lemma == "ev"
+
+
+def test_added_dictionary_clears_the_cache(tmp_path):
+    analyzer = MorphAnalyzer()
+    assert [parse.lemma for parse in analyzer.analyze_word("glorbuda")] == ["Unk"]
+    dictionary = tmp_path / "words.txt"
+    dictionary.write_text("glorbu [P:Noun]\n", encoding="utf8")
+    analyzer.add_dictionary(str(dictionary))
+    assert "glorbu" in {parse.lemma for parse in analyzer.analyze_word("glorbuda")}

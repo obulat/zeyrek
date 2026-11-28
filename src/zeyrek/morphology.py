@@ -1,5 +1,6 @@
 """Main module."""
 
+import functools
 import itertools
 import re
 from typing import ClassVar, NamedTuple
@@ -114,6 +115,9 @@ class MorphAnalyzer:
 
         >>> lemmer.add_dictionary('/path/to/file')
 
+    The analyses of the last `cache_size` words are cached, so repeated words are
+    analysed once. Pass `cache_size=0` to turn the cache off.
+
     TrLemmer can analyze or lemmatize words and sentences.
 
         >>> lemmer.lemmatize('beyazlaştırmak')
@@ -133,6 +137,7 @@ class MorphAnalyzer:
         lexicon: "RootLexicon | None" = None,
         formatter: "Formatter | None" = None,
         return_all_lemmas: bool = False,
+        cache_size: int = 10_000,
     ):
         self.lexicon = lexicon or RootLexicon.default_text_dictionaries()
 
@@ -144,9 +149,17 @@ class MorphAnalyzer:
             else MorphAnalyzer.formatters[formatter]()
         )
         self.return_all_lemmas = return_all_lemmas
+        # Texts repeat the same words a lot, so the analyses of the latest words are
+        # kept, as Zemberek's AnalysisCache does.
+        self._cached_analyses = functools.lru_cache(maxsize=cache_size)(
+            lambda word: tuple(self._analyze(word))
+        )
 
     def _parse(self, word: str) -> list[SingleAnalysis]:
         """Parses a word and returns SingleAnalysis result."""
+        return list(self._cached_analyses(word))
+
+    def _analyze(self, word: str) -> list[SingleAnalysis]:
         stem, apostrophe, ending = word.replace("’", "'").partition("'")
         if NUMBER.fullmatch(stem):
             return self._parse_number(stem, _normalize(ending))
@@ -318,3 +331,4 @@ class MorphAnalyzer:
         """
         lexicon_from_path = self.lexicon.add_dictionary_from_path(path_to_dictionary)
         self.morphotactics.stem_transitions.add_lexicon_items(lexicon_from_path.items)
+        self._cached_analyses.cache_clear()
