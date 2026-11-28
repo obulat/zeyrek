@@ -3,6 +3,7 @@
 import functools
 import itertools
 import re
+from collections.abc import Sequence
 from typing import ClassVar, NamedTuple
 
 from zeyrek import tr
@@ -153,9 +154,9 @@ class MorphAnalyzer:
             lambda word: tuple(self._analyze(word))
         )
 
-    def _parse(self, word: str) -> list[SingleAnalysis]:
+    def _parse(self, word: str) -> tuple[SingleAnalysis, ...]:
         """Parses a word and returns SingleAnalysis result."""
-        return list(self._cached_analyses(word))
+        return self._cached_analyses(word)
 
     def _analyze(self, word: str) -> list[SingleAnalysis]:
         stem, apostrophe, ending = word.replace("’", "'").partition("'")
@@ -295,7 +296,7 @@ class MorphAnalyzer:
         return result
 
     @staticmethod
-    def filter_proper_nouns(word: str, analysis: list[SingleAnalysis]):
+    def filter_proper_nouns(word: str, analysis: Sequence[SingleAnalysis]):
         if word[0].isupper():
             only_proper_nouns = [
                 a
